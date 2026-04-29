@@ -1,0 +1,61 @@
+<view class="container">
+  
+  <view class="lang-switch-fixed" bindtap="switchLang">
+    <view class="lang-badge">
+      <text class="lang-icon">🌐</text>
+      <text>{{currentLang === 'zh' ? 'เปลี่ยนเป็นภาษาไทย' : '切换为中文'}}</text>
+    </view>
+  </view>
+
+  <block wx:if="{{authStatus === 'checking'}}">
+    <view class="loading-box">
+      <view class="spinner"></view>
+      <text class="loading-text">{{currentLang === 'zh' ? '安全环境核验中...' : 'กำลังตรวจสอบสิทธิ์...'}}</text>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="auth-card">
+      
+      <block wx:if="{{authStatus === 'unregistered'}}">
+        <view class="header-icon">
+          <icon type="info" size="60" color="#07c160"/>
+        </view>
+        <view class="title">{{currentLang === 'zh' ? '申请加入系统' : 'ขอเข้าใช้งานระบบ'}}</view>
+        <view class="desc">{{currentLang === 'zh' ? '请输入真实姓名，提交后联系管理员开通' : 'กรุณากรอกชื่อจริง และติดต่อผู้ดูแลเพื่อเปิดสิทธิ์'}}</view>
+        
+        <view class="input-group">
+          <input class="name-input" 
+                 placeholder="{{currentLang === 'zh' ? '您的姓名' : 'ชื่อของคุณ'}}" 
+                 bindinput="onNameInput" 
+                 placeholder-class="p-class" />
+        </view>
+        
+        <button class="btn-submit" bindtap="submitApplication">
+          {{currentLang === 'zh' ? '提交申请' : 'ส่งคำขอเข้าใช้งาน'}}
+        </button>
+      </block>
+
+      <block wx:if="{{authStatus === 'pending'}}">
+        <view class="header-icon">
+          <icon type="waiting" size="60" color="#ff9800"/>
+        </view>
+        <view class="title">{{currentLang === 'zh' ? '审核进行中' : 'อยู่ระหว่างตรวจสอบ'}}</view>
+        <view class="desc">{{currentLang === 'zh' ? '您的申请已提交，请联系管理员开通权限' : 'ส่งคำขอแล้ว กรุณาติดต่อผู้ดูแลระบบเพื่ออนุมัติ'}}</view>
+        
+        <!-- <view class="id-display-mini">ID: {{tempOpenId}}</view> -->
+
+        <button class="btn-refresh" bindtap="checkAuth">
+          {{currentLang === 'zh' ? '刷新审核状态' : 'รีเฟรชสถานะ'}}
+        </button>
+      </block>
+
+      <view class="footer-brand">Agritech Enterprise Co., Ltd.</view>
+    </view>
+    
+    <view class="visitor-entry" bindtap="goToVisitor">
+      {{currentLang === 'zh' ? '访客进入' : 'เข้าชมทั่วไป'}}
+    </view>
+  </block>
+
+</view>

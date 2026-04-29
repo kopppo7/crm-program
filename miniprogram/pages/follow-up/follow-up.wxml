@@ -1,0 +1,51 @@
+<view class="container">
+  <view class="card">
+    <view class="card-title">{{t.fuTitle}}</view>
+    
+    <view class="form-item">
+      <text class="label">{{t.fuType}}</text>
+      <picker mode="selector" range="{{followTypes}}" bindchange="onTypeChange">
+        <view class="picker-val">{{selectedType || t.fuTypePlaceholder}}</view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="label">{{t.fuResult}}</text>
+      <picker mode="selector" range="{{statusOptions}}" range-key="label" bindchange="onStatusChange">
+        <view class="picker-val {{!selectedStatusLabel ? 'text-gray' : ''}}">{{selectedStatusLabel || t.fuResultPlaceholder}}</view>
+      </picker>
+    </view>
+
+    <view class="form-item column" wx:if="{{selectedStatus === 'Closed Lost'}}">
+      <text class="label">{{t.fuLostReason}}</text>
+      <input class="input-box" placeholder="{{t.fuLostPlaceholder}}" bindinput="onLostReasonInput" />
+    </view>
+
+    <view class="form-item" wx:if="{{selectedStatus !== 'Closed Won' && selectedStatus !== 'Closed Lost' && selectedStatus !== 'Invalid'}}">
+      <text class="label">{{t.fuNextTime}}</text>
+      <picker mode="date" start="{{today}}" value="{{nextFollowUp || today}}" bindchange="onDateChange">
+        <view class="picker-val {{!nextFollowUp ? 'text-gray' : ''}}">{{nextFollowUp || t.fuDatePlaceholder}}</view>
+      </picker>
+    </view>
+
+    <view class="form-item column">
+      <text class="label">{{t.fuNote}}</text>
+      <textarea class="note-input" placeholder="{{t.fuNotePlaceholder}}" bindinput="onNoteInput"></textarea>
+    </view>
+
+    <view class="form-item column">
+      <text class="label">{{t.fuUpload}}</text>
+      <view class="image-grid">
+        <view class="img-box" wx:for="{{tempImgPaths}}" wx:key="*this">
+          <image src="{{item}}" mode="aspectFill" class="preview-img" bindtap="previewImage" data-url="{{item}}"></image>
+          <view class="del-btn" bindtap="removeImage" data-index="{{index}}">×</view>
+        </view>
+        <view class="upload-btn" bindtap="chooseImage" wx:if="{{tempImgPaths.length < 3}}">
+          <text class="plus">+</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <button class="submit-btn" bindtap="submitFollowUp">{{t.fuSubmit}}</button>
+</view>

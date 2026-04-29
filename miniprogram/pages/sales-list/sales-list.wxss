@@ -1,0 +1,45 @@
+page { background-color: #f4f6f9; height: 100%; }
+.container { display: flex; flex-direction: column; height: 100vh; }
+
+.search-bar { background: #fff; padding: 10px 15px; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 10; }
+.search-box { display: flex; align-items: center; background: #f0f2f5; border-radius: 20px; padding: 0 15px; height: 36px; width: 100%; box-sizing: border-box; }
+.search-input { flex: 1; margin-left: 8px; font-size: 14px; color: #333; }
+
+.list-container { flex: 1; padding: 15px; box-sizing: border-box; }
+.empty-state { text-align: center; color: #999; margin-top: 80px; font-size: 14px; }
+.customer-card { background: #fff; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; flex-direction: column; }
+.card-content { padding: 15px; border-bottom: 1px solid #f9f9f9; }
+.header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.name { font-size: 16px; font-weight: bold; color: #333; }
+
+.tag { font-size: 11px; padding: 3px 8px; border-radius: 4px; }
+.status-pending { background: #fff7e6; color: #fa8c16; }
+.status-Contacted, .status-Strong.Intent, .status-Quoted, .status-Demo.Scheduled { background: #e6f7ff; color: #1890ff; }
+.status-Closed.Won { background: #f6ffed; color: #52c41a; }
+.status-Closed.Lost, .status-Invalid { background: #f5f5f5; color: #888; }
+
+.info { font-size: 14px; margin-bottom: 6px; color: #333; }
+.text-gray { color: #888; font-size: 12px; }
+.text-alert { color: #ff4d4f; font-size: 12px; font-weight: bold; }
+.card-action { padding: 10px 15px; display: flex; justify-content: flex-end; background: #fafafa; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;}
+.action-btn { margin: 0; background: #07c160; color: #fff; font-size: 13px; padding: 6px 15px; border-radius: 20px; line-height: 1.5; }
+
+.loading-bottom { text-align: center; padding: 10px 0 25px; font-size: 12px; color: #aaa; }
+/* 右下角悬浮切换按钮 */
+.lang-float-btn {
+  position: fixed;
+  right: 20px;
+  bottom: 40px; /* 避开底部可能的操作区域 */
+  background: #ffffff;
+  color: #333;
+  padding: 10px 15px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 999;
+  border: 1px solid #f0f0f0;
+}
+.lang-float-btn:active {
+  background: #f4f6f9;
+}

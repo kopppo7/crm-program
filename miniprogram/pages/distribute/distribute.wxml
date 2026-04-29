@@ -1,0 +1,64 @@
+<view class="container">
+  <view class="card parse-card">
+    <textarea 
+      class="parse-input"
+      maxlength="-1"
+      placeholder="请在此粘贴整段线索内容，系统将自动提取信息..." 
+      placeholder-class="placeholder-style"
+      bindinput="handleSmartParse" 
+    ></textarea>
+  </view>
+
+  <view class="card">
+    
+    <view class="form-group">
+      <view class="form-item">
+        <text class="label">客户姓名</text>
+        <input class="input" value="{{customer.name}}" bindinput="handleInput" data-field="name" placeholder="Name" />
+      </view>
+
+      <view class="form-item">
+        <text class="label">联系电话</text>
+        <input class="input" value="{{customer.phone}}" bindinput="handleInput" data-field="phone" type="number" placeholder="Phone Number" />
+      </view>
+
+      <view class="form-item">
+        <text class="label">所在城市</text>
+        <input class="input" value="{{customer.city}}" bindinput="handleInput" data-field="city" placeholder="City" />
+      </view>
+
+      <view class="form-row">
+        <view class="form-item half">
+          <text class="label">需求负载</text>
+          <input class="input" value="{{customer.payload}}" bindinput="handleInput" data-field="payload" placeholder="eg: 500kg" />
+        </view>
+        <view class="form-item half">
+          <text class="label">预计购买</text>
+          <input class="input" value="{{customer.timeline}}" bindinput="handleInput" data-field="timeline" placeholder="eg: Next Week" />
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card sales-card">
+    <view class="card-title">
+      <text class="title-icon">👤</text>
+      <text>分配销售人员</text>
+    </view>
+    <picker mode="selector" range="{{salesList}}" range-key="name" bindchange="onSalesChange">
+      <view class="picker-container {{selectedSales ? 'active' : ''}}">
+        <view class="sales-info">
+          <image class="sales-avatar" src="/images/avatar-default.png" wx:if="{{selectedSales}}"></image>
+          <text>{{selectedSales ? selectedSales.name : '请点击选择负责人'}}</text>
+        </view>
+        <text class="arrow">▾</text>
+      </view>
+    </picker>
+  </view>
+
+  <view class="footer-btn">
+    <button class="submit-btn" bindtap="submitCustomer">
+      <text>确认分配线索</text>
+    </button>
+  </view>
+</view>

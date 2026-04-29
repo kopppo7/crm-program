@@ -1,0 +1,39 @@
+<view class="container">
+  <view class="header-section">
+    <view class="lang-switch-bar">
+      <view class="lang-btn" bindtap="switchLang">
+        <text class="icon">🌐</text>
+        <text>{{currentLang === 'zh' ? 'เปลี่ยนเป็นภาษาไทย' : '切换为中文'}}</text>
+      </view>
+    </view>
+    
+    <view class="welcome-text">
+      <text class="title">{{t.homeTitle}}</text>
+      <text class="subtitle">{{currentLang === 'zh' ? '开启高效跟进的一天！' : 'เริ่มวันทำงานที่มีประสิทธิภาพ!'}}</text>
+    </view>
+  </view>
+
+  <view class="menu-list">
+    <view class="menu-card" bindtap="goToTodo">
+      <view class="card-left">
+        <view class="icon-box todo-bg">📅</view>
+        <view class="card-text">
+          <text class="menu-name">{{t.homeTodo}}</text>
+          <text class="menu-desc">{{currentLang === 'zh' ? '查看今天需要联系的客户' : 'ลูกค้าที่ต้องติดต่อวันนี้'}}</text>
+        </view>
+      </view>
+      <view class="card-arrow">></view>
+    </view>
+
+    <view class="menu-card" bindtap="goToAll">
+      <view class="card-left">
+        <view class="icon-box all-bg">👥</view>
+        <view class="card-text">
+          <text class="menu-name">{{t.homeAll}}</text>
+          <text class="menu-desc">{{currentLang === 'zh' ? '管理名下分配的所有线索' : 'จัดการลูกค้าทั้งหมดของคุณ'}}</text>
+        </view>
+      </view>
+      <view class="card-arrow">></view>
+    </view>
+  </view>
+</view>

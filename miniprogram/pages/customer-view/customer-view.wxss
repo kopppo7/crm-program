@@ -1,0 +1,50 @@
+page { background-color: #f4f6f9; height: 100%; }
+.container { display: flex; flex-direction: column; height: 100vh; }
+
+/* 搜索栏固定在顶部 */
+.search-bar { background: #fff; padding: 10px 15px; z-index: 10; }
+.search-box { display: flex; align-items: center; background: #f0f2f5; border-radius: 20px; padding: 0 15px; height: 36px; width: 100%; box-sizing: border-box; }
+.search-input { flex: 1; margin-left: 8px; font-size: 14px; color: #333; }
+
+/* 筛选栏美化：胶囊按钮风格 */
+.filter-bar { display: flex; background: #fff; border-bottom: 1px solid #eee; padding: 10px 0; z-index: 10; }
+.filter-picker { flex: 1; text-align: center; }
+.filter-item { 
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center; 
+  font-size: 13px; 
+  color: #333; 
+  font-weight: bold; 
+  background: #f4f6f9; 
+  padding: 6px 18px; 
+  border-radius: 15px; 
+}
+.arrow { font-size: 10px; color: #999; margin-left: 6px; }
+
+/* 列表容器 */
+.list-container { flex: 1; padding: 15px; box-sizing: border-box; }
+.empty-state { text-align: center; color: #999; margin-top: 80px; font-size: 14px; }
+
+/* 客户卡片美化 */
+.customer-card { background: #fff; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+.card-content { padding: 15px; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.name { font-size: 16px; font-weight: bold; color: #333; }
+
+/* 状态标签基础样式 */
+.tag { font-size: 11px; padding: 4px 8px; border-radius: 4px; font-weight: 500; background:#e6f7ff; color:#1890ff; }
+.status-pending { background: #fff7e6; color: #fa8c16; } 
+
+/* 卡片文本间距 */
+.info { font-size: 14px; margin-bottom: 6px; color: #333; }
+.text-gray { color: #888; font-size: 12px; }
+.divider { height: 1px; background: #f0f0f0; margin: 12px 0; }
+
+/* 底部负责人与日期对齐 */
+.footer-info { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #666; }
+.sales-name { font-weight: 500; background: #f0f2f5; padding: 4px 8px; border-radius: 4px; }
+.next-time { color: #ff4d4f; font-weight: bold; }
+
+/* 底部加载文字 */
+.loading-bottom { text-align: center; padding: 10px 0 25px; font-size: 12px; color: #aaa; }

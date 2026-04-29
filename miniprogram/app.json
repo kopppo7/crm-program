@@ -1,0 +1,23 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/admin-home/admin-home",
+    "pages/sales-home/sales-home",
+    "pages/sales-list/sales-list",
+    "pages/distribute/distribute",
+    "pages/follow-up/follow-up",
+    "pages/customer-detail/customer-detail",
+    "pages/member-mgmt/member-mgmt",
+    "pages/customer-view/customer-view"
+  ],
+  "window": {
+    "backgroundColor": "#F6F6F6",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#F6F6F6",
+    "navigationBarTitleText": "Agritech CRM",
+    "navigationBarTextStyle": "black"
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents"
+}

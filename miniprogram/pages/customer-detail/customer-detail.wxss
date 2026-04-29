@@ -1,0 +1,243 @@
+page {
+  background-color: #f4f6f9;
+  padding-bottom: 80px; /* 给底部悬浮按钮留出空间 */
+}
+
+.container {
+  padding: 15px;
+}
+
+/* --- 顶部客户信息卡片 --- */
+.customer-info-card {
+  width: 90%;
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  margin-bottom: 20px;
+}
+
+.info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px dashed #eee;
+}
+
+.name {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+.status-tag {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #e6f7ff;
+  color: #1890ff;
+  font-weight: bold;
+}
+
+.info-item {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.label {
+  font-size: 14px;
+  color: #888;
+  width: 100px;
+}
+
+.value {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.highlight {
+  color: #07c160;
+  font-weight: bold;
+}
+
+.info-grid {
+  display: flex;
+  background: #f8f9fb;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 15px;
+}
+
+.grid-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-cell .label {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 4px;
+}
+
+.grid-cell .value {
+  font-size: 13px;
+  color: #333;
+  font-weight: bold;
+}
+
+/* --- 时间轴区域 --- */
+.timeline-section {
+  width: 90%;
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+  border-left: 4px solid #07c160;
+  padding-left: 10px;
+}
+
+.empty-logs {
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+  padding: 30px 0;
+}
+
+/* 时间轴核心布局 */
+.timeline-item {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+/* 左侧轴线 */
+.line-box {
+  width: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 15px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #07c160;
+  border: 3px solid #e1f5e8;
+  z-index: 2;
+}
+
+.line {
+  flex: 1;
+  width: 2px;
+  background: #eee;
+  margin-top: 4px;
+  margin-bottom: -24px; /* 让线段连接到下一个元素 */
+}
+.timeline-item:last-child .line {
+  display: none; /* 最后一个元素不需要向下的连接线 */
+}
+
+/* 右侧内容卡片 */
+.log-content {
+  flex: 1;
+  background: #fcfcfc;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  padding: 15px;
+}
+
+.log-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.log-date {
+  font-size: 12px;
+  color: #999;
+}
+
+.log-type {
+  font-size: 12px;
+  color: #fa8c16;
+  background: #fff7e6;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.log-tag {
+  font-size: 13px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.log-note {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.log-reason {
+  font-size: 12px;
+  color: #ff4d4f;
+  background: #fff1f0;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+/* 缩略图区域 */
+.log-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.log-img {
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+  background: #eee;
+}
+
+/* --- 底部固定按钮 --- */
+.footer-action {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 15px 20px 25px;
+  background: #fff;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+  z-index: 100;
+}
+
+.follow-btn {
+  background: #07c160;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 25px;
+  height: 48px;
+  line-height: 48px;
+  box-shadow: 0 4px 10px rgba(7,193,96,0.3);
+}
+.follow-btn:active {
+  transform: scale(0.98);
+  background: #06ad56;
+}

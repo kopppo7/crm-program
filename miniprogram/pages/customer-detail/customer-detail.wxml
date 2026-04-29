@@ -1,0 +1,71 @@
+<view class="container">
+  <view class="customer-info-card">
+    <view class="info-header">
+      <text class="name">{{customer.name}}</text>
+      <text class="status-tag status-{{customer.status}}">{{t.status[customer.status] || customer.status}}</text>
+    </view>
+    
+    <view class="info-item" bindtap="makePhoneCall" data-phone="{{customer.phone}}">
+      <text class="label">{{t.cdPhone || '电话'}}：</text>
+      <text class="value highlight">{{customer.phone}} 📞</text>
+    </view>
+    
+    <view class="info-item">
+      <text class="label">{{t.cdCity || '城市'}}：</text>
+      <text class="value">{{customer.city}}</text>
+    </view>
+    
+    <view class="info-grid">
+      <view class="grid-cell">
+        <text class="label">{{t.cdPayload || '需求'}}：</text>
+        <text class="value">{{customer.payload || '--'}}</text>
+      </view>
+      <view class="grid-cell">
+        <text class="label">意向机型 (Model)：</text>
+        <text class="value">{{customer.interested_model || '--'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="timeline-section">
+    <view class="section-title">{{t.cdTimeline || '跟进时间轴'}}</view>
+    
+    <view wx:if="{{logs.length === 0}}" class="empty-logs">{{t.cdEmptyTimeline || '暂无跟进记录'}}</view>
+
+    <view class="timeline-item" wx:for="{{logs}}" wx:key="_id">
+      <view class="line-box">
+        <view class="dot"></view>
+        <view class="line"></view>
+      </view>
+      
+      <view class="log-content">
+        <view class="log-header">
+          <text class="log-date">{{item.createTimeStr}}</text>
+          <text class="log-type">{{item.follow_type}}</text>
+        </view>
+        <view class="log-tag">{{t.status[item.result_tag] || item.result_tag}}</view>
+        <view class="log-note">{{item.note}}</view>
+        
+        <view class="log-reason" wx:if="{{item.lost_reason}}">战败原因：{{item.lost_reason}}</view>
+        
+        <view class="log-images" wx:if="{{item.screenshot_files.length > 0}}">
+          <image 
+            wx:for="{{item.screenshot_files}}" 
+            wx:for-item="img" 
+            wx:key="*this" 
+            src="{{img}}" 
+            mode="aspectFill" 
+            class="log-img" 
+            bindtap="previewImage" 
+            data-current="{{img}}" 
+            data-all="{{item.screenshot_files}}"
+          ></image>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="footer-action">
+    <button class="follow-btn" bindtap="goToFollowUp">{{t.cdBtnFollowUp || '新增跟进记录'}}</button>
+  </view>
+</view>

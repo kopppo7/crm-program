@@ -1,0 +1,44 @@
+<view class="container">
+  
+  <view class="section" wx:if="{{pendingList.length > 0}}">
+    <view class="section-header">
+      <text class="section-title warning-color">待审核申请 ({{pendingList.length}})</text>
+    </view>
+    
+    <view class="member-card pending-border" wx:for="{{pendingList}}" wx:key="_id">
+      <view class="info">
+        <view class="name-row">
+          <text class="name">{{item.name}}</text>
+          <text class="time">{{item.createTimeStr || '新申请'}}</text>
+        </view>
+        <view class="openid-text">OpenID: {{item.openid}}</view>
+      </view>
+      <view class="actions">
+        <button class="btn-approve" size="mini" bindtap="approveMember" data-id="{{item._id}}" data-name="{{item.name}}">通过审核</button>
+        <view class="btn-reject" bindtap="removeMember" data-id="{{item._id}}" data-name="{{item.name}}" data-type="pending">拒绝</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">团队正式成员 ({{activeList.length}})</text>
+    </view>
+    
+    <view class="empty-tip" wx:if="{{activeList.length === 0}}">暂无正式成员</view>
+
+    <view class="member-card" wx:for="{{activeList}}" wx:key="_id">
+      <view class="info">
+        <view class="name-row">
+          <text class="name">{{item.name}}</text>
+          <text class="role-badge {{item.role === 'admin' ? 'admin-bg' : 'sales-bg'}}">{{item.role === 'admin' ? '管理员' : '销售'}}</text>
+        </view>
+        <view class="openid-text">ID: {{item.openid}}</view>
+      </view>
+      <view class="actions">
+        <text class="btn-delete" bindtap="removeMember" data-id="{{item._id}}" data-name="{{item.name}}" data-type="active">移除</text>
+      </view>
+    </view>
+  </view>
+
+</view>

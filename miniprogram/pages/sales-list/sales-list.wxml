@@ -1,0 +1,42 @@
+<view class="container">
+  <view class="search-bar">
+    <view class="search-box">
+      <icon type="search" size="14" color="#999" />
+      <input 
+        class="search-input" 
+        placeholder="{{t.searchPlaceholder}}" 
+        bindinput="onSearchInput" 
+        bindconfirm="onSearch" 
+        confirm-type="search" 
+        value="{{searchKeyword}}"
+      />
+      <icon wx:if="{{searchKeyword}}" type="clear" size="14" color="#ccc" bindtap="clearSearch" style="padding: 10px;" />
+    </view>
+  </view>
+
+  <scroll-view class="list-container" scroll-y bindscrolltolower="loadMore">
+    <view wx:if="{{customerList.length === 0 && !isLoading}}" class="empty-state">
+      <text>{{searchKeyword ? (currentLang === 'zh' ? '没有找到' : 'ไม่พบข้อมูล') : (currentType === 'todo' ? t.emptyTodo : t.emptyData)}}</text>
+    </view>
+
+    <view class="customer-card" wx:for="{{customerList}}" wx:key="_id">
+      <view class="card-content" bindtap="goToDetail" data-id="{{item._id}}">
+        <view class="header">
+          <text class="name">{{item.name}}</text>
+          <text class="tag status-{{item.status}}">{{statusMap[item.status] || (currentLang === 'zh' ? '待处理' : 'รอดำเนินการ')}}</text>
+        </view>
+        <view class="info" catchtap="makePhoneCall" data-phone="{{item.phone}}">📞 {{item.phone}}</view>
+        
+        <view class="info text-gray">{{t.lblPayload}}: {{item.payload || '--'}} | {{t.lblCity}}: {{item.city || '--'}}</view>
+        <view class="info text-alert" wx:if="{{item.next_follow_up}}">⏰ {{t.lblNextTime}}: {{item.next_follow_up}}</view>
+      </view>
+      <view class="card-action">
+        <button class="action-btn" bindtap="goToFollowUp" data-id="{{item._id}}">{{t.btnFollowUp}}</button>
+      </view>
+    </view>
+
+    <view class="loading-bottom" wx:if="{{customerList.length > 0}}">
+      <text>{{isLoading ? t.loading : (hasMore ? t.loadMore : t.noMore)}}</text>
+    </view>
+  </scroll-view>
+</view>

@@ -1,0 +1,25 @@
+<view class="work-station">
+  <view class="header">
+    <text class="title">Agritech 管理后台</text>
+  </view>
+
+  <view class="menu-grid">
+    <view class="menu-card" bindtap="goToDistribute">
+      <view class="icon-box">📋</view>
+      <text class="card-name">分配客户</text>
+      <text class="card-desc">录入并下发线索</text>
+    </view>
+
+    <view class="menu-card" bindtap="goToCustomerView">
+      <view class="icon-box">👥</view>
+      <text class="card-name">查看客户</text>
+      <text class="card-desc">监控销售跟进进度</text>
+    </view>
+
+    <view class="menu-card" bindtap="goToMemberMgmt">
+      <view class="icon-box">⚙️</view>
+      <text class="menu-name">团队成员管理</text>
+    </view>
+
+  </view>
+</view>

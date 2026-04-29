@@ -1,0 +1,118 @@
+/* pages/index/index.wxss */
+page {
+  background-color: #f6f8fb;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 30px;
+}
+
+/* 语言切换按钮 */
+.lang-switch-fixed {
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  z-index: 100;
+}
+
+.lang-badge {
+  background: #fff;
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-size: 13px;
+  color: #555;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  border: 1px solid #eee;
+}
+
+.lang-icon { margin-right: 6px; }
+
+/* 加载状态 */
+.loading-box { display: flex; flex-direction: column; align-items: center; }
+.spinner {
+  width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #07c160;
+  border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.loading-text { font-size: 15px; color: #999; }
+
+/* 交互卡片 */
+.auth-card {
+  width: 100%;
+  background: #fff;
+  border-radius: 24px;
+  padding: 40px 30px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.header-icon { margin-bottom: 25px; }
+
+.title { font-size: 22px; font-weight: bold; color: #333; margin-bottom: 12px; }
+.desc { font-size: 14px; color: #888; line-height: 1.6; margin-bottom: 35px; }
+
+/* 表单输入 */
+.input-group { margin-bottom: 25px; }
+.name-input {
+  background: #f8f9fb;
+  height: 50px;
+  border-radius: 12px;
+  padding: 0 15px;
+  font-size: 16px;
+  text-align: left;
+  border: 1px solid #edf1f7;
+}
+.p-class { color: #ccc; }
+
+/* 按钮 */
+.btn-submit {
+  background: #07c160;
+  color: #fff;
+  height: 50px;
+  line-height: 34px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+}
+.btn-submit:active { opacity: 0.8; transform: scale(0.98); }
+
+.btn-refresh {
+  background: #fff;
+  color: #07c160;
+  border: 1px solid #07c160;
+  height: 50px;
+  line-height: 50px;
+  border-radius: 12px;
+  font-size: 16px;
+}
+
+.id-display-mini {
+  font-size: 11px;
+  color: #bbb;
+  margin-bottom: 20px;
+  font-family: monospace;
+}
+
+.footer-brand {
+  margin-top: 40px;
+  font-size: 11px;
+  color: #ddd;
+  letter-spacing: 1px;
+}
+
+.visitor-entry {
+  margin-top: 30px;
+  font-size: 14px;
+  color: #07c160;
+  text-decoration: underline;
+}
