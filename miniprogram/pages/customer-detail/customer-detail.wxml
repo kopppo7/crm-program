@@ -15,15 +15,27 @@
       <text class="value">{{customer.city}}</text>
     </view>
     
-    <view class="info-grid">
-      <view class="grid-cell">
+    <!-- 🌟 改进一：改用按需展示的纵向列表块 -->
+    <view class="extra-info-box" wx:if="{{customer.payload || customer.timeline || customer.interested_model}}">
+      
+      <!-- 按需展示：需求 -->
+      <view class="extra-item" wx:if="{{customer.payload}}">
         <text class="label">{{t.cdPayload || '需求'}}：</text>
-        <text class="value">{{customer.payload || '--'}}</text>
+        <text class="value">{{customer.payload}}</text>
       </view>
-      <view class="grid-cell">
-        <text class="label">意向机型 (Model)：</text>
-        <text class="value">{{customer.interested_model || '--'}}</text>
+      
+      <!-- 按需展示：预计购买时间 -->
+      <view class="extra-item" wx:if="{{customer.timeline}}">
+        <text class="label">{{currentLang === 'zh' ? '预计购买' : 'คาดว่าจะซื้อ'}}：</text>
+        <text class="value">{{customer.timeline}}</text>
       </view>
+
+      <!-- 按需展示：意向机型 -->
+      <view class="extra-item" wx:if="{{customer.interested_model}}">
+        <text class="label">意向机型：</text>
+        <text class="value">{{customer.interested_model}}</text>
+      </view>
+      
     </view>
   </view>
 

@@ -1,145 +1,124 @@
 const db = wx.cloud.database();
-const _ = db.command;
-const i18n = require('../../utils/i18n.js'); 
+const i18n = require('../../utils/i18n.js');
 
 Page({
   data: {
-    currentType: 'todo',
-    customerList: [],
-    searchKeyword: '', 
-    myOpenId: '',
-    page: 0,
-    pageSize: 20,
-    hasMore: true,
-    isLoading: false,
-
-    t: {}, 
-    currentLang: 'zh',
-    statusMap: {} 
+    customerId: '', 
+    customer: {},   
+    logs: [],       
+    t: {},
+    currentLang: 'zh'
   },
 
   onLoad(options) {
-    if (options.type) {
-      this.setData({ currentType: options.type });
+    if (options.id) {
+      this.setData({ customerId: options.id });
+    } else {
+      wx.showToast({ title: '参数错误，缺少客户ID', icon: 'none' });
     }
   },
 
   onShow() {
     this.initLanguage();
-    const salesId = wx.getStorageSync('myOpenId');
-    this.setData({ myOpenId: salesId }, () => {
-      this.fetchData(true); // 每次回到列表页都会重新拉取数据
-    });
+    if (this.data.customerId) {
+      // 🌟 改进：使用 Promise 链式调用，确保先拿到客户信息，再处理时间轴
+      this.fetchCustomerDetail().then(() => {
+        this.fetchFollowUpLogs();
+      });
+    }
   },
 
   initLanguage() {
     const lang = i18n.getLang();
-    const trans = i18n.t();
     this.setData({
       currentLang: lang,
-      t: trans,
-      statusMap: trans.status 
+      t: i18n.t()
     });
-    const titleObj = {
-      'zh': { todo: '今日待办', all: '我的客户' },
-      'th': { todo: 'งานวันนี้', all: 'ลูกค้าของฉัน' }
-    };
-    wx.setNavigationBarTitle({ title: titleObj[lang][this.data.currentType] });
+    wx.setNavigationBarTitle({ title: lang === 'zh' ? '客户详情' : 'รายละเอียดลูกค้า' });
   },
 
-  switchLang() {
-    const newLang = this.data.currentLang === 'zh' ? 'th' : 'zh';
-    i18n.setLang(newLang); 
-    this.initLanguage();   
-  },
-
-  onSearchInput(e) { this.setData({ searchKeyword: e.detail.value.trim() }); },
-  onSearch() { this.fetchData(true); },
-  clearSearch() { this.setData({ searchKeyword: '' }, () => { this.fetchData(true); }); },
-
-  loadMore() {
-    if (this.data.hasMore && !this.data.isLoading) {
-      this.setData({ page: this.data.page + 1 }, () => {
-        this.fetchData(false);
+  // 将请求改为 Promise 以便顺序执行
+  fetchCustomerDetail() {
+    return new Promise((resolve, reject) => {
+      wx.showLoading({ title: '加载中...' });
+      db.collection('customers').doc(this.data.customerId).get().then(res => {
+        this.setData({ customer: res.data });
+        wx.hideLoading();
+        resolve(res.data);
+      }).catch(err => {
+        console.error('获取客户详情失败', err);
+        wx.hideLoading();
+        wx.showToast({ title: '获取数据失败', icon: 'none' });
+        reject(err);
       });
-    }
+    });
   },
 
-  fetchData(reset = false) {
-    if (reset) {
-      this.setData({ page: 0, hasMore: true, customerList: [] });
-    }
-    
-    if (!this.data.hasMore || this.data.isLoading) return;
-
-    this.setData({ isLoading: true });
-    if (reset) wx.showLoading({ title: '加载中' });
-
-    let conditions = [];
-    conditions.push({ assigned_sales_id: this.data.myOpenId });
-
-    // === 核心：今日待办的过滤逻辑 ===
-    if (this.data.currentType === 'todo') {
-      const todayStr = this.getTodayString();
-      
-      // 1. 踢出已经完结的客户（成交、战败、无效）
-      conditions.push({ 
-        status: _.nin(['Closed Won', 'Closed Lost', 'Invalid']) 
-      });
-
-      // 2. 只保留：下次跟进日期在今天及以前的、或者没填日期的、或者刚分配还是pending的
-      conditions.push(
-        _.or([
-          { next_follow_up: _.lte(todayStr) }, // 约定的日期 <= 今天
-          { next_follow_up: _.eq('') },        
-          { next_follow_up: _.exists(false) }, 
-          { status: 'pending' }              
-        ])
-      );
-    }
-
-    if (this.data.searchKeyword) {
-      const regex = db.RegExp({ regexp: this.data.searchKeyword, options: 'i' });
-      conditions.push(
-        _.or([
-          { name: regex }, { phone: regex }, { city: regex }, { payload: regex }
-        ])
-      );
-    }
-
-    db.collection('customers')
-      .where(_.and(conditions))
+  // 🌟 改进二：时间轴优化逻辑
+  fetchFollowUpLogs() {
+    db.collection('follow_up_logs')
+      .where({
+        customer_id: this.data.customerId
+      })
       .orderBy('createTime', 'desc')
-      .skip(this.data.page * this.data.pageSize)
-      .limit(this.data.pageSize)
       .get()
       .then(res => {
-        const newData = res.data;
-        this.setData({
-          customerList: reset ? newData : this.data.customerList.concat(newData),
-          hasMore: newData.length === this.data.pageSize,
-          isLoading: false
-        });
-        if (reset) wx.hideLoading();
-      })
-      .catch(err => {
-        this.setData({ isLoading: false });
-        if (reset) wx.hideLoading();
-        console.error(err);
+        let fetchedLogs = res.data;
+
+        // 🌟 CRM 高级体验：如果没有获取到客户真实的创建时间，用今天兜底
+        let createDateStr = '';
+        if (this.data.customer && this.data.customer.createTime) {
+          const cd = new Date(this.data.customer.createTime);
+          createDateStr = `${cd.getFullYear()}-${('0' + (cd.getMonth() + 1)).slice(-2)}-${('0' + cd.getDate()).slice(-2)}`;
+        } else {
+          createDateStr = 'Initial';
+        }
+
+        // 自动在数组末尾（时间轴最底端）追加一条“系统初始分配”记录
+        const initialLog = {
+          _id: 'sys_init_001',
+          createTimeStr: createDateStr,
+          follow_type: this.data.currentLang === 'zh' ? '系统自动记录' : 'บันทึกระบบ',
+          result_tag: 'pending',
+          note: this.data.currentLang === 'zh' ? '线索成功录入并分配给销售' : 'รับข้อมูลลูกค้าและมอบหมายสำเร็จ',
+          screenshot_files: []
+        };
+
+        fetchedLogs.push(initialLog); // 追加初始记录
+
+        this.setData({ logs: fetchedLogs });
+      }).catch(err => {
+        console.error('获取时间轴失败', err);
       });
   },
 
-  getTodayString() {
-    const d = new Date();
-    const year = d.getFullYear();
-    let month = d.getMonth() + 1;
-    let day = d.getDate();
-    if (month < 10) month = '0' + month;
-    if (day < 10) day = '0' + day;
-    return `${year}-${month}-${day}`;
+  makePhoneCall(e) {
+    const phoneNum = String(e.currentTarget.dataset.phone);
+    if (!phoneNum || phoneNum === 'undefined') return;
+
+    wx.showModal({
+      title: 'Call Confirmation',
+      content: 'Do you want to call ' + phoneNum + '?',
+      confirmText: 'Call',
+      cancelText: 'Cancel',
+      success: (res) => {
+        if (res.confirm) {
+          wx.makePhoneCall({ phoneNumber: phoneNum });
+        }
+      }
+    });
   },
 
-  makePhoneCall(e) { wx.makePhoneCall({ phoneNumber: e.currentTarget.dataset.phone }); },
-  goToFollowUp(e) { wx.navigateTo({ url: `/pages/follow-up/follow-up?id=${e.currentTarget.dataset.id}` }); },
-  goToDetail(e) { wx.navigateTo({ url: `/pages/customer-detail/customer-detail?id=${e.currentTarget.dataset.id}` }); }
-})
+  goToFollowUp() {
+    if (!this.data.customerId) return;
+    wx.navigateTo({ 
+      url: `/pages/follow-up/follow-up?id=${this.data.customerId}` 
+    });
+  },
+
+  previewImage(e) {
+    const current = e.currentTarget.dataset.current;
+    const urls = e.currentTarget.dataset.all;
+    wx.previewImage({ current: current, urls: urls });
+  }
+}); 

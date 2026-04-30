@@ -48,6 +48,8 @@ const zh = {
    cdPhone: "电话",
    cdCity: "城市",
    cdPayload: "需求",
+   cdModel: "意向机型",
+   cdTimelineProj: "预计购买",
    cdTimeline: "跟进时间轴",
    cdEmptyTimeline: "暂无跟进记录，赶快去联系客户吧！",
    cdBtnFollowUp: "新增跟进",
@@ -65,7 +67,8 @@ const zh = {
    fuNote: "沟通简述",
    fuNotePlaceholder: "简单记录一下沟通内容及客户痛点...",
    fuUpload: "上传截图 (最多3张)",
-   fuSubmit: "保存记录"
+   fuSubmit: "保存记录",
+   fuSuccess: "保存成功"
 };
 
 const th = {
@@ -118,6 +121,8 @@ const th = {
   cdPhone: "เบอร์โทร",
   cdCity: "เมือง",
   cdPayload: "ความต้องการ",
+  cdModel: "รุ่นที่สนใจ",
+  cdTimelineProj: "คาดว่าจะซื้อ",
   cdTimeline: "ไทม์ไลน์การติดตาม",
   cdEmptyTimeline: "ยังไม่มีบันทึกการติดตาม รีบติดต่อลูกค้าเลย!",
   cdBtnFollowUp: "เพิ่มการติดตาม",
@@ -135,7 +140,8 @@ const th = {
   fuNote: "สรุปการสนทนา",
   fuNotePlaceholder: "บันทึกสรุปการพูดคุยและปัญหาของลูกค้า...",
   fuUpload: "อัปโหลดภาพ (สูงสุด 3 รูป)",
-  fuSubmit: "บันทึกข้อมูล"
+  fuSubmit: "บันทึกข้อมูล",
+  fuSuccess: "บันทึกสำเร็จ"
 };
 
 module.exports = {

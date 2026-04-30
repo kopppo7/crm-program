@@ -241,3 +241,34 @@ page {
   transform: scale(0.98);
   background: #06ad56;
 }
+
+/* --- 替换原来的 info-grid 样式 --- */
+.extra-info-box {
+  background: #f8f9fb;
+  border-radius: 8px;
+  padding: 12px 15px;
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column; /* 🌟 强制纵向排列，彻底解决挤压重叠 */
+  gap: 10px; /* 项目间距 */
+}
+
+.extra-item {
+  display: flex;
+  align-items: flex-start;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.extra-item .label {
+  color: #888;
+  width: 90px; /* 给左侧标签固定宽度 */
+  flex-shrink: 0; /* 禁止左侧标签被压缩 */
+}
+
+.extra-item .value {
+  color: #333;
+  font-weight: bold;
+  flex: 1; /* 右侧内容占据所有剩余空间 */
+  word-break: break-all; /* 允许长单词或泰语换行 */
+}
