@@ -29,22 +29,100 @@ page { background-color: #f4f6f9; height: 100%; }
 /* 客户卡片美化 */
 .customer-card { background: #fff; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
 .card-content { padding: 15px; }
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.name { font-size: 16px; font-weight: bold; color: #333; }
 
-/* 状态标签基础样式 */
-.tag { font-size: 11px; padding: 4px 8px; border-radius: 4px; font-weight: 500; background:#e6f7ff; color:#1890ff; }
+/* 🌟 卡片头部改用相对定位，防止 Tag 换行导致错位 */
+.header { 
+  position: relative;
+  display: flex; 
+  width: 100%;
+  align-items: flex-start;
+  margin-bottom: 8px; 
+}
+
+/* 名字限定右侧内边距给绝对定位的 Tag 留出空间 */
+.name { 
+  flex: 1; 
+  padding-right: 150rpx;
+  word-break: break-all;
+  font-size: 16px; 
+  font-weight: bold; 
+  color: #333; 
+}
+
+/* 🌟 Tag 绝对定位容器 */
+.tags-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8rpx;
+  z-index: 2;
+}
+
+/* 状态标签基础样式，强制不换行、不收缩 */
+.tag { 
+  font-size: 11px; 
+  padding: 4px 8px; 
+  border-radius: 4px; 
+  font-weight: 500; 
+  background:#e6f7ff; 
+  color:#1890ff; 
+  white-space: nowrap;
+  flex-shrink: 0;
+}
 .status-pending { background: #fff7e6; color: #fa8c16; } 
+
+/* 🌟 逾期专属标签 */
+.overdue-tag {
+  background-color: #fff1f0 !important;
+  color: #ff4d4f !important;
+  border: 1px solid #ffa39e !important;
+  font-weight: bold;
+}
 
 /* 卡片文本间距 */
 .info { font-size: 14px; margin-bottom: 6px; color: #333; }
 .text-gray { color: #888; font-size: 12px; }
 .divider { height: 1px; background: #f0f0f0; margin: 12px 0; }
 
+/* 🌟 电话行样式，加大热区 */
+.phone-row { display: flex; align-items: center; margin-bottom: 6px; }
+.phone-link {
+  color: #07c160; 
+  text-decoration: underline;
+  padding: 10rpx 0;
+  font-weight: 500;
+  display: inline-block;
+}
+.phone-link:active { opacity: 0.6; }
+
 /* 底部负责人与日期对齐 */
 .footer-info { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #666; }
 .sales-name { font-weight: 500; background: #f0f2f5; padding: 4px 8px; border-radius: 4px; }
 .next-time { color: #ff4d4f; font-weight: bold; }
+.text-gray-time { color: #888; font-weight: normal; } /* 首次分配时间样式更平缓 */
 
 /* 底部加载文字 */
 .loading-bottom { text-align: center; padding: 10px 0 25px; font-size: 12px; color: #aaa; }
+
+page { 
+  background-color: #f4f6f9; 
+  height: 100%; 
+  overflow: hidden; /* 🌟 核心防坑1：彻底干掉页面级滚动，强迫只能在内部滚动 */
+}
+
+.container { 
+  display: flex; 
+  flex-direction: column; 
+  height: 100vh; 
+}
+
+/* 列表容器 */
+.list-container { 
+  flex: 1; 
+  height: 0; /* 🌟 核心防坑2：高度设为0，强迫 scroll-view 根据 flex: 1 重新计算绝对高度 */
+  padding: 15px; 
+  box-sizing: border-box; 
+}

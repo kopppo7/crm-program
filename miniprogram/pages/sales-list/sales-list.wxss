@@ -9,10 +9,36 @@ page { background-color: #f4f6f9; height: 100%; }
 .empty-state { text-align: center; color: #999; margin-top: 80px; font-size: 14px; }
 .customer-card { background: #fff; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; flex-direction: column; }
 .card-content { padding: 15px; border-bottom: 1px solid #f9f9f9; }
-.header { display: flex; justify-content: space-between; margin-bottom: 8px; }
-.name { font-size: 16px; font-weight: bold; color: #333; }
+/* 1. 头部容器，确保是 Flex 布局 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; /* 顶部对齐，防止长名字让 Tag 居中很怪 */
+  width: 100%;
+}
 
-.tag { font-size: 11px; padding: 3px 8px; border-radius: 4px; }
+/* 2. 名字部分：允许它占据剩余空间，并允许换行 */
+.name {
+  flex: 1;                /* 占据除了 Tag 之外的所有剩余空间 */
+  margin-right: 20rpx;    /* 跟右侧 Tag 保持一点间距 */
+  word-break: break-all;  /* 允许在单词内换行，防止泰语长词撑破容器 */
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 3. Tag 标签部分：这是解决问题的关键 */
+.tag {
+  white-space: nowrap;    /* 🌟 强制不换行 */
+  flex-shrink: 0;         /* 🌟 强制不收缩（即便空间不够，也要保持原样） */
+  
+  /* 以下是你原有的基础样式，确保包含 */
+  font-size: 24rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  background-color: #e6f7ff; /* 示例蓝色 */
+  color: #1890ff;
+}
 .status-pending { background: #fff7e6; color: #fa8c16; }
 .status-Contacted, .status-Strong.Intent, .status-Quoted, .status-Demo.Scheduled { background: #e6f7ff; color: #1890ff; }
 .status-Closed.Won { background: #f6ffed; color: #52c41a; }
@@ -42,4 +68,99 @@ page { background-color: #f4f6f9; height: 100%; }
 }
 .lang-float-btn:active {
   background: #f4f6f9;
+}
+
+/* 标签容器改为纵向排列，右侧对齐 */
+.tags-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6rpx; /* 两个标签之间的间距 */
+}
+
+/* 逾期专用红色高亮 Tag */
+.overdue-tag {
+  background-color: #fff1f0 !important;
+  color: #ff4d4f !important;
+  border: 1px solid #ffa39e !important;
+  font-weight: bold;
+  font-size: 20rpx;
+  padding: 4rpx 10rpx;
+  border-radius: 8rpx;
+  box-shadow: 0 2rpx 8rpx rgba(255, 77, 79, 0.1);
+}
+
+/* 电话行专门处理 */
+.phone-row {
+  display: flex;
+  align-items: center;
+  margin-top: 6rpx;
+}
+
+/* 电话链接样式，提示销售这个可以点 */
+.phone-link {
+  color: #07c160; /* Agritech 的主色调或使用 #1890ff 蓝色 */
+  text-decoration: underline;
+  padding: 10rpx 0; /* 扩大上下点击热区，避免点偏 */
+  font-weight: 500;
+  display: inline-block;
+}
+.phone-link:active {
+  opacity: 0.6;
+}
+
+/* 1. 修改头部容器：作为绝对定位的参考点 */
+.header {
+  position: relative; /* 🌟 设为相对定位 */
+  display: flex;
+  width: 100%;
+}
+
+/* 2. 修改姓名样式：限制宽度，防止长名字压到右侧标签 */
+.name {
+  flex: 1;
+  padding-right: 150rpx; /* 🌟 预留出右上角标签的空间 */
+  word-break: break-all;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 3. 修改标签容器：绝对定位，脱离文档流 */
+.tags-container {
+  position: absolute; /* 🌟 核心：脱离文档流，高度不再撑开 header */
+  top: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8rpx;
+  z-index: 2; /* 确保标签浮在最上面 */
+}
+
+/* 4. 电话行的间距现在完全受控了 */
+.phone-row {
+  display: flex;
+  align-items: center;
+  margin-top: 10rpx; /* 🌟 这个数值你可以自由调节，改完后所有卡片的间距都会极度统一 */
+}
+
+page { 
+  background-color: #f4f6f9; 
+  height: 100%; 
+  overflow: hidden; /* 🌟 核心防坑1：彻底干掉页面级滚动，强迫只能在内部滚动 */
+}
+
+.container { 
+  display: flex; 
+  flex-direction: column; 
+  height: 100vh; 
+}
+
+/* 列表容器 */
+.list-container { 
+  flex: 1; 
+  height: 0; /* 🌟 核心防坑2：高度设为0，强迫 scroll-view 根据 flex: 1 重新计算绝对高度 */
+  padding: 15px; 
+  box-sizing: border-box; 
 }

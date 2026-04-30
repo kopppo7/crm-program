@@ -4,6 +4,7 @@ const i18n = require('../../utils/i18n.js');
 
 Page({
   data: {
+    isCalling: false,
     currentType: 'todo',
     customerList: [],
     searchKeyword: '', 
@@ -26,9 +27,16 @@ Page({
 
   onShow() {
     this.initLanguage();
+  
+    // 🌟 改进二：如果是因为拨号返回，直接拦截刷新
+    if (this.data.isCalling) {
+      this.setData({ isCalling: false }); // 重置状态
+      return; 
+    }
+  
     const salesId = wx.getStorageSync('myOpenId');
     this.setData({ myOpenId: salesId }, () => {
-      this.fetchData(true); // 每次回到列表页都会重新拉取数据
+      this.fetchData(true); 
     });
   },
 
@@ -93,7 +101,8 @@ Page({
           { next_follow_up: _.lte(todayStr) }, // 约定的日期 <= 今天
           { next_follow_up: _.eq('') },        
           { next_follow_up: _.exists(false) }, 
-          { status: 'pending' }              
+          { status: 'pending' },
+          { status: 'No Answer' } // 保留未接通客户高频显示逻辑           
         ])
       );
     }
@@ -114,10 +123,35 @@ Page({
       .limit(this.data.pageSize)
       .get()
       .then(res => {
-        const newData = res.data;
+        const todayStr = this.getTodayString();
+
+        // 🌟 改进一 & 改进二：数据二次加工，计算时间与逾期状态
+        const newData = res.data.map(item => {
+          // 格式化创建/分配时间
+          let createDateStr = '';
+          if (item.createTime) {
+            const cd = new Date(item.createTime);
+            const cy = cd.getFullYear();
+            const cm = ('0' + (cd.getMonth() + 1)).slice(-2);
+            const cday = ('0' + cd.getDate()).slice(-2);
+            createDateStr = `${cy}-${cm}-${cday}`;
+          }
+          item.formattedCreateTime = createDateStr || todayStr;
+
+          // 判断是否逾期 (时间早于今天，且未完结的客户)
+          let compareDate = item.next_follow_up || createDateStr;
+          if (compareDate && compareDate < todayStr && !['Closed Won', 'Closed Lost', 'Invalid'].includes(item.status)) {
+            item.isOverdue = true;
+          } else {
+            item.isOverdue = false;
+          }
+          
+          return item;
+        });
+
         this.setData({
           customerList: reset ? newData : this.data.customerList.concat(newData),
-          hasMore: newData.length === this.data.pageSize,
+          hasMore: res.data.length === this.data.pageSize,
           isLoading: false
         });
         if (reset) wx.hideLoading();
@@ -139,7 +173,36 @@ Page({
     return `${year}-${month}-${day}`;
   },
 
-  makePhoneCall(e) { wx.makePhoneCall({ phoneNumber: e.currentTarget.dataset.phone }); },
+  makePhoneCall(e) { 
+    const phoneNum = String(e.currentTarget.dataset.phone);
+    if (!phoneNum) {
+      wx.showToast({ title: 'No phone number', icon: 'none' });
+      return;
+    }
+  
+    // 🌟 改进一：自定义英文提示，去除模拟字样
+    wx.showModal({
+      title: 'Call Confirmation',
+      content: 'Do you want to call ' + phoneNum + '?',
+      confirmText: 'Call',
+      cancelText: 'Cancel',
+      success: (res) => {
+        if (res.confirm) {
+          // 🌟 改进二：标记正在拨号，防止返回时刷新列表
+          this.setData({ isCalling: true });
+          
+          wx.makePhoneCall({ 
+            phoneNumber: phoneNum,
+            fail: () => {
+              // 如果拨打失败（例如用户在系统层级取消），也要重置状态
+              this.setData({ isCalling: false });
+            }
+          });
+        }
+      }
+    });
+  },
+
   goToFollowUp(e) { wx.navigateTo({ url: `/pages/follow-up/follow-up?id=${e.currentTarget.dataset.id}` }); },
   goToDetail(e) { wx.navigateTo({ url: `/pages/customer-detail/customer-detail?id=${e.currentTarget.dataset.id}` }); }
 })

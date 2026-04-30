@@ -16,8 +16,11 @@ const zh = {
   lblCity: "城市",
   lblPayload: "需求",
   lblNextTime: "约定跟进",
+  lblOverdue: "已逾期",
+  lblFirstAssign: "首次分配",
   status: {
     'pending': '待处理',
+    'No Answer': '未接通 (需重拨)',
     'Contacted': '初步沟通',
     'FollowUp': '再次跟进',
     'Strong Intent': '意向强烈',
@@ -30,15 +33,15 @@ const zh = {
 
   // --- 授权中转页 (index) ---
   idxTitle: "身份验证",
-  idxChecking: "正在识别身份，请稍候...",
+  idxChecking: "正在识别身份...",
   idxNoAuth: "尚未开通账号",
-  idxGuide: "请将下方 ID 发送给管理员开通权限",
-  idxCopyBtn: "一键复制 ID",
-  idxRefreshBtn: "刷新结果",
-  idxCopySuccess: "复制成功",
-  idxNotAdded: "管理员尚未添加您的 ID",
+  idxInputPlaceholder: "请输入真实姓名",
+  idxSubmitBtn: "提交申请加入",
+  idxPending: "申请已提交，等待主管审批",
+  idxRefreshBtn: "刷新审核状态",
   idxAuthLoading: "权限核验中...",
-   // --- 客户详情/时间轴页 (customer-detail) ---
+
+   // --- 客户详情/时间轴页 ---
    cdTitle: "客户详情",
    cdBaseInfo: "基本信息",
    cdName: "姓名",
@@ -49,7 +52,7 @@ const zh = {
    cdEmptyTimeline: "暂无跟进记录，赶快去联系客户吧！",
    cdBtnFollowUp: "新增跟进",
  
-   // --- 写跟进页 (follow-up) ---
+   // --- 写跟进页 ---
    fuTitle: "记录跟进详情",
    fuType: "沟通方式",
    fuTypePlaceholder: "请选择沟通方式 ▾",
@@ -83,8 +86,11 @@ const th = {
   lblCity: "เมือง",
   lblPayload: "ความต้องการ",
   lblNextTime: "นัดหมายครั้งต่อไป",
+  lblOverdue: "เลยกำหนด",
+  lblFirstAssign: "เวลาที่ได้รับ",
   status: {
     'pending': 'รอดำเนินการ',
+    'No Answer': 'ไม่รับสาย (ต้องโทรซ้ำ)',
     'Contacted': 'ติดต่อเบื้องต้น',
     'FollowUp': 'ติดตามอีกครั้ง',
     'Strong Intent': 'สนใจมาก',
@@ -97,15 +103,15 @@ const th = {
 
   // --- 授权中转页 (index) ---
   idxTitle: "ยืนยันตัวตน",
-  idxChecking: "กำลังตรวจสอบสิทธิ์ กรุณารอสักครู่...",
+  idxChecking: "กำลังตรวจสอบสิทธิ์...",
   idxNoAuth: "ยังไม่มีบัญชีใช้งาน",
-  idxGuide: "กรุณาส่ง ID ด้านล่างให้ผู้ดูแลระบบเพื่อเปิดสิทธิ์",
-  idxCopyBtn: "คัดลอก ID",
-  idxRefreshBtn: "คลิกที่นี่เพื่อเข้าสู่ระบบ",
-  idxCopySuccess: "คัดลอกสำเร็จ",
-  idxNotAdded: "ผู้ดูแลระบบยังไม่ได้เพิ่ม ID ของคุณ",
+  idxInputPlaceholder: "กรุณากรอกชื่อจริง",
+  idxSubmitBtn: "ส่งคำขอเข้าใช้งาน",
+  idxPending: "ส่งคำขอแล้ว รอการอนุมัติ",
+  idxRefreshBtn: "คลิกเพื่อรีเฟรชสถานะ",
   idxAuthLoading: "กำลังตรวจสอบ...",
-  // --- 客户详情/时间轴页 (customer-detail) ---
+
+  // --- 客户详情/时间轴页 ---
   cdTitle: "รายละเอียดลูกค้า",
   cdBaseInfo: "ข้อมูลพื้นฐาน",
   cdName: "ชื่อ",
@@ -116,7 +122,7 @@ const th = {
   cdEmptyTimeline: "ยังไม่มีบันทึกการติดตาม รีบติดต่อลูกค้าเลย!",
   cdBtnFollowUp: "เพิ่มการติดตาม",
 
-  // --- 写跟进页 (follow-up) ---
+  // --- 写跟进页 ---
   fuTitle: "บันทึกรายละเอียด",
   fuType: "ช่องทางการติดต่อ",
   fuTypePlaceholder: "กรุณาเลือกช่องทาง ▾",
@@ -134,7 +140,7 @@ const th = {
 
 module.exports = {
   getLang: function() {
-    return wx.getStorageSync('language') || 'th'; // 默认泰语
+    return wx.getStorageSync('language') || 'th';
   },
   setLang: function(lang) {
     wx.setStorageSync('language', lang);

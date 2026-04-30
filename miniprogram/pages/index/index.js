@@ -35,7 +35,7 @@ Page({
       name: 'login',
       success: res => {
         // const id = res.result.openid;
-        const id = 'o6WpV3ZD942ytdWL-5wcwrsDR0wI';
+        const id = 'o6WpV3bCQ3YezfL7drNZ19N4XAwg';
         this.setData({ tempOpenId: id });
         wx.setStorageSync('myOpenId', id);
         this.checkAuth();
