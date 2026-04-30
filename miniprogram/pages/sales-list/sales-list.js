@@ -1,5 +1,3 @@
-const db = wx.cloud.database();
-const _ = db.command;
 const i18n = require('../../utils/i18n.js'); 
 
 Page({
@@ -28,15 +26,28 @@ Page({
   onShow() {
     this.initLanguage();
   
-    // 🌟 改进二：如果是因为拨号返回，直接拦截刷新
+    // 防止拨打电话返回时触发页面刷新
     if (this.data.isCalling) {
-      this.setData({ isCalling: false }); // 重置状态
+      this.setData({ isCalling: false }); 
       return; 
     }
   
-    const salesId = wx.getStorageSync('myOpenId');
-    this.setData({ myOpenId: salesId }, () => {
-      this.fetchData(true); 
+    // 🌟 核心防御一：优先使用内存中已经存在的 myOpenId，避免从详情页返回时 Storage 读取发生竞态异常
+    let currentId = this.data.myOpenId;
+    if (!currentId) {
+      currentId = wx.getStorageSync('myOpenId');
+    }
+
+    if (!currentId) {
+      console.warn('⚠️ 未获取到身份 ID，取消加载');
+      return;
+    }
+
+    this.setData({ myOpenId: currentId }, () => {
+      // 🌟 核心防御二：增加短暂延迟，确保小程序的返回动画 (Pop 动画) 彻底结束后再发起请求，防止请求被系统静默挂起
+      setTimeout(() => {
+        this.fetchData(true); 
+      }, 150);
     });
   },
 
@@ -74,35 +85,46 @@ Page({
   },
 
   fetchData(reset = false) {
+    if (this.data.isLoading) return;
+
+    let currentPage = this.data.page;
+
     if (reset) {
-      this.setData({ page: 0, hasMore: true, customerList: [] });
+      currentPage = 0;
+      // 🌟 核心防御三：【绝对不要】在这里使用 customerList: [] 清空列表！
+      // 让旧数据保留在屏幕上，只重置页码参数。等新数据到了，直接覆盖。
+      this.setData({ page: 0, hasMore: true });
     }
     
-    if (!this.data.hasMore || this.data.isLoading) return;
+    if (!reset && !this.data.hasMore) return;
 
     this.setData({ isLoading: true });
-    if (reset) wx.showLoading({ title: '加载中' });
+    if (reset) {
+      // 使用顶部导航栏的菊花图，不打断用户视觉
+      wx.showNavigationBarLoading();
+    }
+
+    // 🌟 在函数内部初始化，防止页面切换导致上下文丢失
+    const db = wx.cloud.database();
+    const _ = db.command;
 
     let conditions = [];
     conditions.push({ assigned_sales_id: this.data.myOpenId });
 
-    // === 核心：今日待办的过滤逻辑 ===
     if (this.data.currentType === 'todo') {
       const todayStr = this.getTodayString();
       
-      // 1. 踢出已经完结的客户（成交、战败、无效）
       conditions.push({ 
         status: _.nin(['Closed Won', 'Closed Lost', 'Invalid']) 
       });
 
-      // 2. 只保留：下次跟进日期在今天及以前的、或者没填日期的、或者刚分配还是pending的
       conditions.push(
         _.or([
-          { next_follow_up: _.lte(todayStr) }, // 约定的日期 <= 今天
-          { next_follow_up: _.eq('') },        
-          { next_follow_up: _.exists(false) }, 
-          { status: 'pending' },
-          { status: 'No Answer' } // 保留未接通客户高频显示逻辑           
+          { next_follow_up: _.lte(todayStr) }, 
+          { next_follow_up: '' },              
+          { next_follow_up: null },            
+          { status: 'pending' },               
+          { status: 'No Answer' }              
         ])
       );
     }
@@ -119,15 +141,13 @@ Page({
     db.collection('customers')
       .where(_.and(conditions))
       .orderBy('createTime', 'desc')
-      .skip(this.data.page * this.data.pageSize)
+      .skip(currentPage * this.data.pageSize) 
       .limit(this.data.pageSize)
       .get()
       .then(res => {
         const todayStr = this.getTodayString();
 
-        // 🌟 改进一 & 改进二：数据二次加工，计算时间与逾期状态
         const newData = res.data.map(item => {
-          // 格式化创建/分配时间
           let createDateStr = '';
           if (item.createTime) {
             const cd = new Date(item.createTime);
@@ -138,28 +158,27 @@ Page({
           }
           item.formattedCreateTime = createDateStr || todayStr;
 
-          // 判断是否逾期 (时间早于今天，且未完结的客户)
           let compareDate = item.next_follow_up || createDateStr;
           if (compareDate && compareDate < todayStr && !['Closed Won', 'Closed Lost', 'Invalid'].includes(item.status)) {
             item.isOverdue = true;
           } else {
             item.isOverdue = false;
           }
-          
           return item;
         });
 
         this.setData({
+          // 🌟 拿到真实数据后，再进行覆盖更新
           customerList: reset ? newData : this.data.customerList.concat(newData),
           hasMore: res.data.length === this.data.pageSize,
           isLoading: false
         });
-        if (reset) wx.hideLoading();
+        if (reset) wx.hideNavigationBarLoading();
       })
       .catch(err => {
         this.setData({ isLoading: false });
-        if (reset) wx.hideLoading();
-        console.error(err);
+        if (reset) wx.hideNavigationBarLoading();
+        console.error('查询列表失败:', err);
       });
   },
 
@@ -175,12 +194,8 @@ Page({
 
   makePhoneCall(e) { 
     const phoneNum = String(e.currentTarget.dataset.phone);
-    if (!phoneNum) {
-      wx.showToast({ title: 'No phone number', icon: 'none' });
-      return;
-    }
+    if (!phoneNum) return wx.showToast({ title: 'No phone number', icon: 'none' });
   
-    // 🌟 改进一：自定义英文提示，去除模拟字样
     wx.showModal({
       title: 'Call Confirmation',
       content: 'Do you want to call ' + phoneNum + '?',
@@ -188,15 +203,10 @@ Page({
       cancelText: 'Cancel',
       success: (res) => {
         if (res.confirm) {
-          // 🌟 改进二：标记正在拨号，防止返回时刷新列表
           this.setData({ isCalling: true });
-          
           wx.makePhoneCall({ 
             phoneNumber: phoneNum,
-            fail: () => {
-              // 如果拨打失败（例如用户在系统层级取消），也要重置状态
-              this.setData({ isCalling: false });
-            }
+            fail: () => { this.setData({ isCalling: false }); }
           });
         }
       }
@@ -205,4 +215,4 @@ Page({
 
   goToFollowUp(e) { wx.navigateTo({ url: `/pages/follow-up/follow-up?id=${e.currentTarget.dataset.id}` }); },
   goToDetail(e) { wx.navigateTo({ url: `/pages/customer-detail/customer-detail?id=${e.currentTarget.dataset.id}` }); }
-})
+});

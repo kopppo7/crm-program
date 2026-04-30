@@ -15,33 +15,24 @@
       <text class="value">{{customer.city}}</text>
     </view>
     
-    <!-- 🌟 改进一：改用按需展示的纵向列表块 -->
     <view class="extra-info-box" wx:if="{{customer.payload || customer.timeline || customer.interested_model}}">
-      
-      <!-- 按需展示：需求 -->
       <view class="extra-item" wx:if="{{customer.payload}}">
         <text class="label">{{t.cdPayload || '需求'}}：</text>
         <text class="value">{{customer.payload}}</text>
       </view>
-      
-      <!-- 按需展示：预计购买时间 -->
       <view class="extra-item" wx:if="{{customer.timeline}}">
         <text class="label">{{currentLang === 'zh' ? '预计购买' : 'คาดว่าจะซื้อ'}}：</text>
         <text class="value">{{customer.timeline}}</text>
       </view>
-
-      <!-- 按需展示：意向机型 -->
       <view class="extra-item" wx:if="{{customer.interested_model}}">
         <text class="label">意向机型：</text>
         <text class="value">{{customer.interested_model}}</text>
       </view>
-      
     </view>
   </view>
 
   <view class="timeline-section">
     <view class="section-title">{{t.cdTimeline || '跟进时间轴'}}</view>
-    
     <view wx:if="{{logs.length === 0}}" class="empty-logs">{{t.cdEmptyTimeline || '暂无跟进记录'}}</view>
 
     <view class="timeline-item" wx:for="{{logs}}" wx:key="_id">
@@ -57,27 +48,25 @@
         </view>
         <view class="log-tag">{{t.status[item.result_tag] || item.result_tag}}</view>
         <view class="log-note">{{item.note}}</view>
-        
         <view class="log-reason" wx:if="{{item.lost_reason}}">战败原因：{{item.lost_reason}}</view>
         
         <view class="log-images" wx:if="{{item.screenshot_files.length > 0}}">
-          <image 
-            wx:for="{{item.screenshot_files}}" 
-            wx:for-item="img" 
-            wx:key="*this" 
-            src="{{img}}" 
-            mode="aspectFill" 
-            class="log-img" 
-            bindtap="previewImage" 
-            data-current="{{img}}" 
-            data-all="{{item.screenshot_files}}"
-          ></image>
+          <image wx:for="{{item.screenshot_files}}" wx:for-item="img" wx:key="*this" src="{{img}}" mode="aspectFill" class="log-img" bindtap="previewImage" data-current="{{img}}" data-all="{{item.screenshot_files}}"></image>
         </view>
       </view>
     </view>
   </view>
 
+  <!-- 底部双按钮布局 -->
   <view class="footer-action">
-    <button class="follow-btn" bindtap="goToFollowUp">{{t.cdBtnFollowUp || '新增跟进记录'}}</button>
+    <view class="btn-group">
+      <!-- 🌟 仅管理员可见：重新分配按钮 -->
+      <picker wx:if="{{isAdmin}}" class="reassign-picker" mode="selector" range="{{salesList}}" range-key="name" bindchange="onReassignChange">
+        <button class="reassign-btn">{{currentLang === 'zh' ? '🔄 重新分配' : '🔄 มอบหมายใหม่'}}</button>
+      </picker>
+      
+      <!-- 原有的跟进按钮 -->
+      <button class="follow-btn" bindtap="goToFollowUp">{{t.cdBtnFollowUp || '新增跟进记录'}}</button>
+    </view>
   </view>
 </view>
