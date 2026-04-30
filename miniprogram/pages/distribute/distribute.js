@@ -7,16 +7,15 @@ Page({
       payload: '',
       timeline: ''
     },
-    salesList: [], // 存储从数据库拉取的销售列表
-    selectedSales: null // 当前选中的销售对象
+    smartText: '', // 🌟 新增：用于绑定智能解析输入框的内容
+    salesList: [], 
+    selectedSales: null 
   },
 
   onLoad() {
-    // 页面加载时自动获取销售列表
     this.fetchSalesList();
   },
 
-  // 连接云数据库，拉取销售人员
   fetchSalesList() {
     wx.cloud.database().collection('users')
       .where({
@@ -39,6 +38,9 @@ Page({
     const text = e.detail.value;
     if (!text) return;
 
+    // 🌟 将输入的文本同步到 data，以便后续清空
+    this.setData({ smartText: text });
+
     const nameMatch = text.match(/Full name:\s*(.*)/i);
     const cityMatch = text.match(/City:\s*(.*)/i);
     const phoneMatch = text.match(/Phone number:\s*(.*)/i);
@@ -54,7 +56,6 @@ Page({
     });
   },
 
-  // 监听手动修改输入框
   handleInput(e) {
     const field = e.currentTarget.dataset.field;
     this.setData({
@@ -62,7 +63,6 @@ Page({
     });
   },
 
-  // 监听下拉框选择销售
   onSalesChange(e) {
     const index = e.detail.value;
     this.setData({
@@ -70,9 +70,7 @@ Page({
     });
   },
 
-  // 提交并存入数据库
   submitCustomer() {
-    // 基础校验
     if (!this.data.customer.name || !this.data.customer.phone) {
       return wx.showToast({ title: '姓名和电话不能为空', icon: 'none' });
     }
@@ -82,27 +80,35 @@ Page({
 
     wx.showLoading({ title: '正在分配...' });
 
-    // 写入 customers 集合
     wx.cloud.database().collection('customers').add({
       data: {
         ...this.data.customer,
-        assigned_sales_id: this.data.selectedSales.openid, // 绑定销售的唯一ID
-        sales_name: this.data.selectedSales.name, // 冗余存一下名字方便后续展示
-        status: 'pending', // 初始状态为待跟进
-        createTime: wx.cloud.database().serverDate() // 记录录入时间
+        assigned_sales_id: this.data.selectedSales._openid, //[cite: 11]
+        sales_name: this.data.selectedSales.name, //[cite: 11]
+        status: 'pending', //[cite: 11]
+        createTime: wx.cloud.database().serverDate() //[cite: 11]
       }
     }).then(res => {
       wx.hideLoading();
       wx.showToast({ title: '分配成功', icon: 'success' });
       
-      // 延迟 1.5 秒后返回主页工作台
-      setTimeout(() => {
-        wx.navigateBack();
-      }, 1500);
+      // 🌟 核心修改：成功后清空表单、销售选择以及信息粘贴区域[cite: 11]
+      this.setData({
+        customer: {
+          name: '',
+          phone: '',
+          city: '',
+          payload: '',
+          timeline: ''
+        },
+        selectedSales: null,
+        smartText: '' // 🌟 这里会清空 WXML 中绑定了 value="{{smartText}}" 的 textarea
+      });
+
     }).catch(err => {
       wx.hideLoading();
       console.error('入库失败', err);
       wx.showToast({ title: '分配失败，请重试', icon: 'none' });
     });
   }
-})
+});

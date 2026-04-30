@@ -149,3 +149,17 @@ page {
   transform: scale(0.98);
   opacity: 0.9;
 }
+
+/* 智能解析文本框样式 */
+.smart-textarea {
+  width: 100%;
+  height: 120rpx;      /* 🌟 核心修改：减小高度（原默认通常是 300rpx 左右） */
+  background: #f8f9fb; /* 浅灰色背景，更有“粘贴区”的感觉 */
+  border-radius: 8rpx;
+  padding: 20rpx;
+  box-sizing: border-box;
+  font-size: 26rpx;    /* 字体稍微小一点，显得更紧凑 */
+  color: #666;
+  border: 1px solid #eee;
+  margin-top: 10rpx;
+}

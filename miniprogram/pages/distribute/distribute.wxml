@@ -1,16 +1,15 @@
 <view class="container">
   <view class="card parse-card">
     <textarea 
-      class="parse-input"
-      maxlength="-1"
-      placeholder="请在此粘贴整段线索内容，系统将自动提取信息..." 
-      placeholder-class="placeholder-style"
-      bindinput="handleSmartParse" 
-    ></textarea>
+    class="smart-textarea" 
+    placeholder="请粘贴 Facebook 表单原文..." 
+    bindinput="handleSmartParse" 
+    value="{{smartText}}" 
+  />
   </view>
 
   <view class="card">
-    
+
     <view class="form-group">
       <view class="form-item">
         <text class="label">客户姓名</text>
