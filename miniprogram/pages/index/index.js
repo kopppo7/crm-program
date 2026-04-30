@@ -34,9 +34,9 @@ Page({
     wx.cloud.callFunction({
       name: 'login',
       success: res => {
-        // const id = res.result.openid;
+        const id = res.result.openid;
         // const id = 'o6WpV3bCQ3YezfL7drNZ19N4XAwg'  // 泰1
-        const id = 'o6WpV3ZD942ytdWL-5wcwrsDR0wI';  // k
+        // const id = 'o6WpV3ZD942ytdWL-5wcwrsDR0wI';  // k
         this.setData({ tempOpenId: id });
         wx.setStorageSync('myOpenId', id);
         this.checkAuth();

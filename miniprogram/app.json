@@ -8,6 +8,7 @@
     "pages/follow-up/follow-up",
     "pages/customer-detail/customer-detail",
     "pages/member-mgmt/member-mgmt",
+    "pages/admin-logs/admin-logs",
     "pages/customer-view/customer-view"
   ],
   "window": {

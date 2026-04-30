@@ -18,7 +18,15 @@
 
     <view class="menu-card" bindtap="goToMemberMgmt">
       <view class="icon-box">⚙️</view>
-      <text class="menu-name">团队成员管理</text>
+      <text class="card-name">团队成员管理</text>
+      <text class="card-desc">人员与权限设置</text>
+    </view>
+
+    <!-- 🌟 新增的审计日志入口 -->
+    <view class="menu-card" bindtap="goToAdminLogs">
+      <view class="icon-box">🕒</view>
+      <text class="card-name">操作日志</text>
+      <text class="card-desc">重分配与操作审计</text>
     </view>
 
   </view>
