@@ -44,6 +44,7 @@ Page({
       count: remainCount,
       mediaType: ['image'],
       sourceType: ['album', 'camera'],
+      sizeType: ['compressed'],
       success: (res) => {
         const tempFiles = res.tempFiles.map(file => file.tempFilePath);
         this.setData({ tempImgPaths: this.data.tempImgPaths.concat(tempFiles) });

@@ -33,16 +33,20 @@ Page({
   getOpenID() {
     wx.cloud.callFunction({
       name: 'login',
+      config: {
+        env: 'cloud1-d1gdd35vq77ab5c2f' 
+      },
       success: res => {
-        const id = res.result.openid;
+        // const id = res.result.openid;
         // const id = 'o6WpV3bCQ3YezfL7drNZ19N4XAwg'  // 泰1
-        // const id = 'o6WpV3ZD942ytdWL-5wcwrsDR0wI';  // k
+        const id = 'o6WpV3ZD942ytdWL-5wcwrsDR0wI';  // k
         this.setData({ tempOpenId: id });
         wx.setStorageSync('myOpenId', id);
         this.checkAuth();
       },
       fail: err => {
         this.setData({ authStatus: 'unregistered' });
+        console.error('❌ login云函数调用失败:', err);
       }
     });
   },

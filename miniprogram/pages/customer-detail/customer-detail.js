@@ -9,7 +9,7 @@ Page({
     t: {},
     currentLang: 'zh',
     salesList: [], 
-    isAdmin: false // 🌟 新增：标记当前用户是否为管理员
+    isAdmin: false 
   },
 
   onLoad(options) {
@@ -22,10 +22,9 @@ Page({
 
   onShow() {
     wx.cloud.callFunction({
-      name: 'login', // 🌟 确保你的云函数里有一个叫 login 的函数
+      name: 'login', 
       success: res => {
         console.log('✅ 腾讯服务器返回的真实 OpenID:', res.result.openid);
-        // 你可以顺便更新一下缓存，确保之后逻辑正确
         wx.setStorageSync('myOpenId', res.result.openid);
       },
       fail: err => {
@@ -33,7 +32,7 @@ Page({
       }
     });
     this.initLanguage();
-    this.checkAdminRole(); // 🌟 校验当前用户的权限
+    this.checkAdminRole(); 
     
     if (this.data.customerId) {
       this.fetchCustomerDetail().then(() => {
@@ -51,10 +50,9 @@ Page({
     wx.setNavigationBarTitle({ title: lang === 'zh' ? '客户详情' : 'รายละเอียดลูกค้า' });
   },
 
-  // 🌟 新增：检查当前登录用户是否为 admin
   checkAdminRole() {
     const myOpenId = wx.getStorageSync('myOpenId');
-    console.log("👉 小程序缓存里的 ID 是:", myOpenId); // 🌟 关键：看控制台输出了什么
+    console.log("👉 小程序缓存里的 ID 是:", myOpenId); 
     
     if (!myOpenId) {
       console.error("❌ 缓存中没有 myOpenId，请重新进入授权页录入身份");
@@ -69,7 +67,6 @@ Page({
         
         this.setData({ isAdmin: isUserAdmin });
 
-        // 🌟 性能优化：只有管理员才需要拉取销售列表用于重新分配
         if (isUserAdmin) {
           this.fetchSalesList();
         }
@@ -77,7 +74,6 @@ Page({
     }).catch(err => console.error('检查权限失败', err));
   },
 
-  // 拉取销售人员列表（仅管理员调用）
   fetchSalesList() {
     db.collection('users').where({ role: 'sales' }).get().then(res => {
       this.setData({ salesList: res.data });
@@ -106,15 +102,24 @@ Page({
       .orderBy('createTime', 'desc')
       .get()
       .then(res => {
-        let fetchedLogs = res.data;
+        // 🌟 核心修复：在这里清洗图片路径，解决报错导致白屏的问题[cite: 8]
+        let fetchedLogs = res.data.map(log => {
+          if (log.screenshot_files && log.screenshot_files.length > 0) {
+            log.screenshot_files = log.screenshot_files.map(url => {
+              // 强制截取真实的 cloud:// 路径
+              if (typeof url === 'string' && url.includes('cloud://')) {
+                return url.substring(url.indexOf('cloud://'));
+              }
+              return url;
+            });
+          }
+          return log;
+        });
 
-        // 🌟 改进：检测历史记录中是否已经有“重新分配”的系统日志
-        // 我们通过之前写死的关键词 【主管操作】 或 [แอดมิน] 来识别
         const hasReassignLog = fetchedLogs.some(log => 
           log.note && (log.note.includes('【主管操作】') || log.note.includes('[แอดมิน]'))
         );
 
-        // 如果没有发生过重新分配，才在最底部显示初始录入记录
         if (!hasReassignLog) {
           let createDateStr = '';
           if (this.data.customer && this.data.customer.createTime) {

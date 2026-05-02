@@ -1,16 +1,16 @@
-// 云函数入口文件
 const cloud = require('wx-server-sdk')
+// 🌟 必须初始化，env 不要写死，用 DYNAMIC_TYPE_CA_ENV 最稳妥
+cloud.init({ env: cloud.DYNAMIC_TYPE_CA_ENV })
 
-cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV }) // 使用当前云环境
-
-// 云函数入口函数
 exports.main = async (event, context) => {
+  // 获取微信上下文
   const wxContext = cloud.getWXContext()
 
+  // 🌟 核心：必须确保有返回值，且不能包含无法序列化的对象
   return {
-    event,
     openid: wxContext.OPENID,
     appid: wxContext.APPID,
     unionid: wxContext.UNIONID,
+    env: wxContext.ENV
   }
 }
