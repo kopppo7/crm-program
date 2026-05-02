@@ -127,3 +127,23 @@ page {
   font-weight: bold;
   font-family: monospace;
 }
+
+/* 🌟 新增的红点角标样式 */
+.badge {
+  position: absolute;
+  top: -12rpx;
+  right: -12rpx;
+  background-color: #ff4d4f; /* 醒目的红色 */
+  color: #ffffff;
+  font-size: 22rpx;
+  padding: 0 10rpx;
+  height: 32rpx;
+  line-height: 32rpx;
+  border-radius: 16rpx;
+  font-weight: bold;
+  border: 4rpx solid #ffffff; /* 白色描边，避免红点和图标粘连 */
+  box-shadow: 0 4rpx 8rpx rgba(255, 77, 79, 0.3);
+  z-index: 10;
+  min-width: 16rpx;
+  text-align: center;
+}

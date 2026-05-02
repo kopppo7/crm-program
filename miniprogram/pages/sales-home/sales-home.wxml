@@ -16,7 +16,11 @@
   <view class="menu-list">
     <view class="menu-card" bindtap="goToTodo">
       <view class="card-left">
-        <view class="icon-box todo-bg">📅</view>
+        <!-- 🌟 重点改动：给 icon-box 增加相对定位，并塞入红点角标 -->
+        <view class="icon-box todo-bg" style="position: relative;">
+          <text>📅</text>
+          <view class="badge" wx:if="{{todoCount > 0}}">{{todoCount}}</view>
+        </view>
         <view class="card-text">
           <text class="menu-name">{{t.homeTodo}}</text>
           <text class="menu-desc">{{currentLang === 'zh' ? '查看今天需要联系的客户' : 'ลูกค้าที่ต้องติดต่อวันนี้'}}</text>

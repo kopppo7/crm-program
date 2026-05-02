@@ -1,13 +1,17 @@
+const db = wx.cloud.database();
+const _ = db.command;
 const i18n = require('../../utils/i18n.js');
 
 Page({
   data: {
     t: {},
-    currentLang: 'th' // 默认泰文
+    currentLang: 'th', // 默认泰文
+    todoCount: 0       // 🌟 新增：用于存储待办数量的变量
   },
 
   onShow() {
     this.initLanguage();
+    this.fetchTodoCount(); // 🌟 新增：每次显示页面拉取待办数量
   },
 
   initLanguage() {
@@ -24,6 +28,38 @@ Page({
     const newLang = this.data.currentLang === 'zh' ? 'th' : 'zh';
     i18n.setLang(newLang); // 存入全局缓存
     this.initLanguage();   // 立刻刷新当前页面文字
+  },
+
+  // 🌟 新增核心功能：拉取今日待办数量
+  fetchTodoCount() {
+    const myOpenId = wx.getStorageSync('myOpenId');
+    if (!myOpenId) return;
+
+    const d = new Date();
+    const year = d.getFullYear();
+    let month = d.getMonth() + 1;
+    let day = d.getDate();
+    if (month < 10) month = '0' + month;
+    if (day < 10) day = '0' + day;
+    const todayStr = `${year}-${month}-${day}`;
+
+    // 使用聚合查询 .count() 快速获取数量，不消耗性能
+    db.collection('customers').where(_.and([
+      { assigned_sales_id: myOpenId },
+      { status: _.nin(['Closed Won', 'Closed Lost', 'Invalid']) },
+      _.or([
+        { next_follow_up: _.lte(todayStr) },
+        { next_follow_up: '' },
+        { next_follow_up: null },
+        { next_follow_up: _.exists(false) },
+        { status: 'pending' },
+        { status: 'No Answer' }
+      ])
+    ])).count().then(res => {
+      this.setData({ todoCount: res.total });
+    }).catch(err => {
+      console.error('获取待办数量失败:', err);
+    });
   },
 
   goToTodo() {
