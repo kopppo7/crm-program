@@ -69,23 +69,63 @@ Page({
     if (!this.data.selectedStatus) return wx.showToast({ title: '请选择跟进结果', icon: 'none' });
     if (!this.data.note) return wx.showToast({ title: '请填写简述', icon: 'none' });
 
-    wx.showLoading({ title: '正在上传数据...', mask: true });
+    wx.showLoading({ title: '准备数据...', mask: true });
 
     try {
-      // 🌟 1. 处理图片上传 (将 wxfile:// 转换为 cloud://)
+      wx.cloud.init({
+        env: 'cloud1-d1gdd35vq77ab5c2f',
+        traceUser: true
+      });
+
       let cloudFileIDs = [];
-      if (this.data.tempImgPaths.length > 0) {
-        const uploadTasks = this.data.tempImgPaths.map((filePath, index) => {
-          const extension = filePath.split('.').pop(); // 获取后缀名
-          const cloudPath = `follow_ups/${Date.now()}-${index}.${extension}`; // 定义云端路径
-          return wx.cloud.uploadFile({
-            cloudPath: cloudPath,
-            filePath: filePath
+      const totalImgs = this.data.tempImgPaths.length;
+
+      if (totalImgs > 0) {
+        for (let i = 0; i < totalImgs; i++) {
+          let filePath = this.data.tempImgPaths[i];
+          const extension = filePath.split('.').pop(); 
+          const cloudPath = `follow_ups/${Date.now()}-${i}.${extension}`; 
+          
+          // 极限压缩！强行把图片质量压到 20%
+          try {
+            const compressRes = await wx.compressImage({
+              src: filePath,
+              quality: 20 
+            });
+            filePath = compressRes.tempFilePath; 
+          } catch (compressErr) {
+            console.warn('图片压缩失败，将使用原体积上传', compressErr);
+          }
+
+          // 🌟 核心修复：用 new Promise 手动包装，强制获取 UploadTask 对象
+          const uploadRes = await new Promise((resolve, reject) => {
+            const uploadTask = wx.cloud.uploadFile({
+              cloudPath: cloudPath,
+              filePath: filePath,
+              config: {
+                env: 'cloud1-d1gdd35vq77ab5c2f' 
+              },
+              success: res => resolve(res), // 上传成功时放行
+              fail: err => reject(err)      // 上传失败时抛出错误
+            });
+
+            // 因为加了 success/fail，此时的 uploadTask 才是真正的任务对象，可以监听进度了
+            uploadTask.onProgressUpdate((res) => {
+              const overallProgress = Math.round(((i * 100) + res.progress) / totalImgs);
+              wx.showLoading({ 
+                title: `上传中 ${overallProgress}%`, 
+                mask: true 
+              });
+            });
           });
-        });
-        const uploadResults = await Promise.all(uploadTasks);
-        cloudFileIDs = uploadResults.map(res => res.fileID); // 拿到云端永久 ID[cite: 8]
+
+          // 把成功上传拿到的 fileID 存起来
+          cloudFileIDs.push(uploadRes.fileID); 
+        }
       }
+
+      // 图片传完了，提示保存数据库
+      wx.showLoading({ title: '保存记录...', mask: true });
 
       // 2. 获取旧数据处理逻辑 (5次未接通判定)
       const custRes = await db.collection('customers').doc(this.data.customerId).get();
@@ -126,7 +166,7 @@ Page({
           lost_reason: this.data.lostReason || '',
           note: this.data.note,
           sales_id: wx.getStorageSync('myOpenId') || '',
-          screenshot_files: cloudFileIDs, // 🌟 存储的是云端路径 cloud://[cite: 8]
+          screenshot_files: cloudFileIDs, 
           createTimeStr: this.formatDate(new Date()),
           createTime: db.serverDate()
         }
@@ -138,8 +178,8 @@ Page({
 
     } catch (err) {
       wx.hideLoading();
-      wx.showModal({ title: '保存失败', content: err.message, showCancel: false });
-      console.error(err);
+      wx.showModal({ title: '网络超时，请切换WiFi或4G重试', content: err.message, showCancel: false });
+      console.error('❌ 上传或保存失败:', err);
     }
   },
 

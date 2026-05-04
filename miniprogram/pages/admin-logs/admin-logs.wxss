@@ -54,3 +54,59 @@ page {
   color: #e6a23c;
   font-weight: 500;
 }
+/* ================= 顶部筛选器全新美化 ================= */
+.filter-section {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 24rpx 32rpx;
+  margin-bottom: 24rpx;
+  /* 增加轻微的底部阴影，让筛选器有悬浮的立体感 */
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04); 
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filter-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+/* 胶囊形状的下拉按钮 */
+.picker-btn {
+  display: flex;
+  align-items: center;
+  background-color: #f0f9eb; /* 清新的浅绿色底色 */
+  padding: 10rpx 28rpx;
+  border-radius: 32rpx; /* 大圆角胶囊 */
+  border: 1rpx solid #c2e7b0; /* 极细的边框增加精致感 */
+}
+
+.user-name {
+  font-size: 26rpx;
+  color: #07c160; /* 微信主题绿 */
+  font-weight: 500;
+  margin-right: 12rpx;
+  max-width: 200rpx; /* 名字过长时自动打点，防止撑破布局 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 纯 CSS 绘制的精致倒三角箭头，替代粗糙的 Emoji 🔽 */
+.arrow-down {
+  width: 0;
+  height: 0;
+  border-left: 8rpx solid transparent;
+  border-right: 8rpx solid transparent;
+  border-top: 10rpx solid #07c160;
+  margin-top: 4rpx;
+  border-radius: 2rpx;
+}

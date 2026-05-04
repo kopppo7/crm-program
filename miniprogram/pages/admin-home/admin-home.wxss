@@ -1,45 +1,81 @@
 page {
   background-color: #f5f7fa;
 }
+
 .work-station {
-  padding: 20px;
+  padding: 40rpx;
 }
+
 .header {
-  margin-bottom: 30px;
+  margin-bottom: 60rpx;
 }
+
 .title {
-  font-size: 24px;
+  font-size: 44rpx;
   font-weight: bold;
   color: #333;
 }
-.menu-grid {
+
+/* 改为垂直方向排列 */
+.menu-list {
   display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
+  flex-direction: column;
+  gap: 30rpx; 
 }
+
+/* 单个卡片样式：横向拉通，两端对齐 */
 .menu-card {
-  width: 45%;
   background: #ffffff;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  border-radius: 24rpx;
+  padding: 40rpx 30rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+}
+
+.menu-card:active {
+  background: #f8f8f8;
+  transform: scale(0.98);
+}
+
+.card-left {
+  display: flex;
+  align-items: center;
+}
+
+/* 图标的独立背景和圆角 */
+.icon-box {
+  font-size: 48rpx;
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 30rpx;
+}
+
+.card-text {
   display: flex;
   flex-direction: column;
 }
-.menu-card:active {
-  background: #f0f0f0;
-}
-.icon-box {
-  font-size: 32px;
-  margin-bottom: 10px;
-}
+
 .card-name {
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 32rpx;
+  font-weight: bold;
   color: #333;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
+
 .card-desc {
-  font-size: 12px;
+  font-size: 24rpx;
   color: #888;
+}
+
+.card-arrow {
+  font-size: 36rpx;
+  color: #ccc;
+  font-weight: 300;
 }

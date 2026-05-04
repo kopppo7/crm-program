@@ -47,12 +47,16 @@ Page({
     wx.navigateTo({ url: '/pages/member-mgmt/member-mgmt' });
   },
 
-  // 🌟 新增的跳转方法
   goToAdminLogs() {
     wx.navigateTo({ url: '/pages/admin-logs/admin-logs' });
   },
 
   submitCustomer() {
     console.log("最终准备分发的数据：", this.data.customer);
+  },
+
+  // 🌟 新增的跳转方法：去查看销售每日处理量
+  goToDailyStats() {
+    wx.navigateTo({ url: '/pages/sales-stats/sales-stats' });
   }
 })

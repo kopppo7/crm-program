@@ -1,0 +1,56 @@
+<view class="container">
+  
+  <view class="page-header">
+    <view class="header-left">
+      <text class="title">销售数据统计</text>
+      <text class="subtitle">实时掌控团队执行力</text>
+    </view>
+    <view class="date-badge">
+      <text class="icon">📅</text>
+      <text>{{todayStr}}</text>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{salesStats.length === 0 && !isLoading}}">
+    暂无销售数据
+  </view>
+
+  <view class="stats-list" wx:else>
+    <view class="sales-card" wx:for="{{salesStats}}" wx:key="name">
+      
+      <view class="card-header">
+        <view class="avatar">{{item.avatarText}}</view>
+        <text class="sales-name">{{item.name}}</text>
+        <view class="rank-badge" wx:if="{{index === 0}}">🏆 勤奋之星</view>
+      </view>
+
+      <view class="data-grid">
+        <!-- 指标 1 -->
+        <view class="data-item">
+          <text class="data-num">{{item.totalCustomers}}</text>
+          <text class="data-label">总客户</text>
+        </view>
+        
+        <!-- 指标 2 -->
+        <view class="data-item">
+          <text class="data-num highlight-blue">{{item.todayFollowUps}}</text>
+          <text class="data-label">今日跟进</text>
+        </view>
+
+        <!-- 🌟 指标 3：新增 明日计划 -->
+        <view class="data-item">
+          <text class="data-num highlight-orange">{{item.tomorrowFollowUps}}</text>
+          <text class="data-label">明日跟进</text>
+        </view>
+        
+        <!-- 指标 4 -->
+        <view class="data-item">
+          <text class="data-num {{item.overdueCount > 0 ? 'highlight-red' : ''}}">{{item.overdueCount}}</text>
+          <text class="data-label">逾期待办</text>
+        </view>
+      </view>
+
+    </view>
+  </view>
+
+</view>

@@ -101,21 +101,11 @@ Page({
       .where({ customer_id: this.data.customerId })
       .orderBy('createTime', 'desc')
       .get()
-      .then(res => {
-        // 🌟 核心修复：在这里清洗图片路径，解决报错导致白屏的问题[cite: 8]
-        let fetchedLogs = res.data.map(log => {
-          if (log.screenshot_files && log.screenshot_files.length > 0) {
-            log.screenshot_files = log.screenshot_files.map(url => {
-              // 强制截取真实的 cloud:// 路径
-              if (typeof url === 'string' && url.includes('cloud://')) {
-                return url.substring(url.indexOf('cloud://'));
-              }
-              return url;
-            });
-          }
-          return log;
-        });
+      .then(res => { 
+        // 直接拿到数据库里的原始数据 (里面包含的图片路径就是原生的 cloud://)
+        let fetchedLogs = res.data;
 
+        // --- 直接保留你原本处理初始记录的代码 ---
         const hasReassignLog = fetchedLogs.some(log => 
           log.note && (log.note.includes('【主管操作】') || log.note.includes('[แอดมิน]'))
         );
@@ -141,6 +131,7 @@ Page({
           fetchedLogs.push(initialLog); 
         }
 
+        // 直接把数据丢给页面渲染，极速出图！
         this.setData({ logs: fetchedLogs });
       }).catch(err => {
         console.error('获取时间轴失败', err);

@@ -3,30 +3,65 @@
     <text class="title">Agritech 管理后台</text>
   </view>
 
-  <view class="menu-grid">
+  <view class="menu-list">
+    <!-- 1. 分配客户 -->
     <view class="menu-card" bindtap="goToDistribute">
-      <view class="icon-box">📋</view>
-      <text class="card-name">分配客户</text>
-      <text class="card-desc">录入并下发线索</text>
+      <view class="card-left">
+        <view class="icon-box" style="background: #e6f7ff;">📋</view>
+        <view class="card-text">
+          <text class="card-name">分配客户</text>
+          <text class="card-desc">录入并下发线索</text>
+        </view>
+      </view>
+      <text class="card-arrow">></text>
     </view>
 
+    <!-- 2. 查看客户 -->
     <view class="menu-card" bindtap="goToCustomerView">
-      <view class="icon-box">👥</view>
-      <text class="card-name">查看客户</text>
-      <text class="card-desc">监控销售跟进进度</text>
+      <view class="card-left">
+        <view class="icon-box" style="background: #f6ffed;">👥</view>
+        <view class="card-text">
+          <text class="card-name">查看客户</text>
+          <text class="card-desc">监控销售跟进进度</text>
+        </view>
+      </view>
+      <text class="card-arrow">></text>
     </view>
 
+    <!-- 3. 团队成员管理 -->
     <view class="menu-card" bindtap="goToMemberMgmt">
-      <view class="icon-box">⚙️</view>
-      <text class="card-name">团队成员管理</text>
-      <text class="card-desc">人员与权限设置</text>
+      <view class="card-left">
+        <view class="icon-box" style="background: #fff0f6;">⚙️</view>
+        <view class="card-text">
+          <text class="card-name">团队成员管理</text>
+          <text class="card-desc">人员与权限设置</text>
+        </view>
+      </view>
+      <text class="card-arrow">></text>
     </view>
 
-    <!-- 🌟 新增的审计日志入口 -->
+    <!-- 4. 操作日志 -->
     <view class="menu-card" bindtap="goToAdminLogs">
-      <view class="icon-box">🕒</view>
-      <text class="card-name">操作日志</text>
-      <text class="card-desc">重分配与操作审计</text>
+      <view class="card-left">
+        <view class="icon-box" style="background: #fffbe6;">🕒</view>
+        <view class="card-text">
+          <text class="card-name">操作日志</text>
+          <text class="card-desc">重分配与操作审计</text>
+        </view>
+      </view>
+      <text class="card-arrow">></text>
+    </view>
+
+    <!-- 🌟 5. 新增功能：销售跟进统计 -->
+    <view class="menu-card" bindtap="goToDailyStats">
+      <view class="card-left">
+        <view class="icon-box" style="background: #f9f0ff;">📈</view>
+        <view class="card-text">
+          <text class="card-name">销售数据统计</text>
+          <text class="card-desc">查看各销售处理数据统计</text>
+        </view>
+      </view>
+      <text class="card-arrow">></text>
     </view>
 
   </view>
