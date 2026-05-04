@@ -1,72 +1,172 @@
 <view class="container">
-  <view class="customer-info-card">
-    <view class="info-header">
+
+<!-- 1. 基础信息卡片 -->
+<view class="customer-info-card">
+  <view class="info-header">
+    <view>
       <text class="name">{{customer.name}}</text>
       <text class="status-tag status-{{customer.status}}">{{t.status[customer.status] || customer.status}}</text>
     </view>
-    
+    <!-- 🌟 管理员专属：全局档案提取与编辑 -->
+    <view class="boss-actions" wx:if="{{isAdmin}}">
+      <view class="action-btn copy-btn" bindtap="copyAllContext">📄 一键复制</view>
+      <view class="action-btn trans-btn" bindtap="openGlobalTransModal">🇨🇳 中文信息</view>
+    </view>
+  </view>
+  
+  <view class="info-list">
     <view class="info-item" bindtap="makePhoneCall" data-phone="{{customer.phone}}">
-      <text class="label">{{t.cdPhone || '电话'}}：</text>
+      <text class="label">{{t.cdPhone || '电话'}}:</text>
       <text class="value highlight">{{customer.phone}} 📞</text>
     </view>
-    
     <view class="info-item">
-      <text class="label">{{t.cdCity || '城市'}}：</text>
+      <text class="label">{{t.cdCity || '城市'}}:</text>
       <text class="value">{{customer.city}}</text>
     </view>
+    <view class="info-item" wx:if="{{customer.payload}}">
+      <text class="label">{{t.cdPayload || '需求'}}:</text>
+      <text class="value">{{customer.payload}}</text>
+    </view>
+    <view class="info-item" wx:if="{{customer.timeline}}">
+      <text class="label">{{currentLang === 'zh' ? '预计购买' : 'คาดว่าจะซื้อ'}}:</text>
+      <text class="value">{{customer.timeline}}</text>
+    </view>
+      <!-- 🌟 新增：下次跟进时间提醒，用橙色加粗高亮 -->
+      <view class="info-item" wx:if="{{customer.next_follow_up}}">
+        <text class="label">{{currentLang === 'zh' ? '下次跟进' : 'ติดตามครั้งต่อไป'}}:</text>
+        <text class="value" style="color: #ff9800; font-weight: bold;">{{customer.next_follow_up}}</text>
+      </view>
+  </view>
+</view>
+
+<!-- 2. 客户画像模块 -->
+<view class="profile-card">
+  <view class="profile-header {{isProfileExpanded ? '' : 'collapsed'}}" bindtap="toggleProfile">
+    <view class="title-box">
+      <text class="title">{{t.profileTitle}}</text>
+      <text class="desc" wx:if="{{isProfileExpanded}}">{{t.profileDesc}}</text>
+      <text class="desc highlight-text" wx:else>{{t.profileClickToExpand}}</text>
+    </view>
+    <view class="header-action">
+      <view class="edit-btn" catchtap="openProfileModal" wx:if="{{isProfileExpanded}}">{{t.edit}}</view>
+      <view class="toggle-text">{{isProfileExpanded ? t.collapse : t.expand}}</view>
+    </view>
+  </view>
+
+  <view class="profile-list" wx:if="{{isProfileExpanded}}">
+    <view class="profile-item">
+      <view class="label">{{t.profileDemand}}</view>
+      <text class="value {{!customer.profile.demand ? 'unknown' : ''}}">{{customer.profile.demand || t.unknown}}</text>
+    </view>
+    <view class="profile-item">
+      <view class="label">{{t.profileMotivation}}</view>
+      <text class="value {{!customer.profile.motivation ? 'unknown' : ''}}">{{customer.profile.motivation || t.unknown}}</text>
+    </view>
+    <view class="profile-item">
+      <view class="label">{{t.profileUserType}}</view>
+      <text class="value {{!customer.profile.userType ? 'unknown' : ''}}">{{customer.profile.userType || t.unknown}}</text>
+    </view>
+    <view class="profile-item">
+      <view class="label">{{t.profileScenario}}</view>
+      <text class="value {{!customer.profile.scenario ? 'unknown' : ''}}">{{customer.profile.scenario || t.unknown}}</text>
+    </view>
+    <view class="profile-item">
+      <view class="label">{{t.profileTimeframe}}</view>
+      <text class="value {{!customer.profile.timeframe ? 'unknown' : ''}}">{{customer.profile.timeframe || t.unknown}}</text>
+    </view>
+    <view class="profile-item">
+      <view class="label">{{t.profileBudget}}</view>
+      <text class="value {{!customer.profile.budget ? 'unknown' : ''}}">{{customer.profile.budget || t.unknown}}</text>
+    </view>
+  </view>
+</view>
+
+<!-- 3. 跟进时间轴 (已彻底清理) -->
+<view class="timeline-section">
+  <view class="section-title">{{t.cdTimeline || '跟进时间轴'}}</view>
+  <view wx:if="{{logs.length === 0}}" class="empty-logs">{{t.cdEmptyTimeline || '暂无跟进记录'}}</view>
+
+  <view class="timeline-item" wx:for="{{logs}}" wx:key="_id">
+    <view class="line-box">
+      <view class="dot"></view>
+      <view class="line"></view>
+    </view>
     
-    <view class="extra-info-box" wx:if="{{customer.payload || customer.timeline || customer.interested_model}}">
-      <view class="extra-item" wx:if="{{customer.payload}}">
-        <text class="label">{{t.cdPayload || '需求'}}：</text>
-        <text class="value">{{customer.payload}}</text>
-      </view>
-      <view class="extra-item" wx:if="{{customer.timeline}}">
-        <text class="label">{{currentLang === 'zh' ? '预计购买' : 'คาดว่าจะซื้อ'}}：</text>
-        <text class="value">{{customer.timeline}}</text>
-      </view>
-      <view class="extra-item" wx:if="{{customer.interested_model}}">
-        <text class="label">意向机型：</text>
-        <text class="value">{{customer.interested_model}}</text>
-      </view>
-    </view>
-  </view>
-
-  <view class="timeline-section">
-    <view class="section-title">{{t.cdTimeline || '跟进时间轴'}}</view>
-    <view wx:if="{{logs.length === 0}}" class="empty-logs">{{t.cdEmptyTimeline || '暂无跟进记录'}}</view>
-
-    <view class="timeline-item" wx:for="{{logs}}" wx:key="_id">
-      <view class="line-box">
-        <view class="dot"></view>
-        <view class="line"></view>
-      </view>
-      
-      <view class="log-content">
-        <view class="log-header">
-          <text class="log-date">{{item.createTimeStr}}</text>
+    <view class="log-content">
+      <view class="log-header">
+        <text class="log-date">{{item.displayTime || item.createTimeStr}}</text>
           <text class="log-type">{{item.follow_type}}</text>
-        </view>
-        <view class="log-tag">{{t.status[item.result_tag] || item.result_tag}}</view>
-        <view class="log-note">{{item.note}}</view>
-        <view class="log-reason" wx:if="{{item.lost_reason}}">战败原因：{{item.lost_reason}}</view>
-        
-        <view class="log-images" wx:if="{{item.screenshot_files.length > 0}}">
-          <image wx:for="{{item.screenshot_files}}" wx:for-item="img" wx:key="*this" src="{{img}}" mode="aspectFill" class="log-img" bindtap="previewImage" data-current="{{img}}" data-all="{{item.screenshot_files}}"></image>
-        </view>
+      </view>
+      <view class="log-tag">{{t.status[item.result_tag] || item.result_tag}}</view>
+      
+      <text class="log-note" user-select="true">{{item.note}}</text>
+      <view class="log-reason" wx:if="{{item.lost_reason}}">战败原因：<text user-select="true">{{item.lost_reason}}</text></view>
+      
+      <view class="log-images" wx:if="{{item.screenshot_files.length > 0}}">
+        <image wx:for="{{item.screenshot_files}}" wx:for-item="img" wx:key="*this" src="{{img}}" mode="aspectFill" class="log-img" bindtap="previewImage" data-current="{{img}}" data-all="{{item.screenshot_files}}"></image>
       </view>
     </view>
   </view>
+</view>
 
-  <!-- 底部双按钮布局 -->
-  <view class="footer-action">
-    <view class="btn-group">
-      <!-- 🌟 仅管理员可见：重新分配按钮 -->
-      <picker wx:if="{{isAdmin}}" class="reassign-picker" mode="selector" range="{{salesList}}" range-key="name" bindchange="onReassignChange">
-        <button class="reassign-btn">{{currentLang === 'zh' ? '🔄 重新分配' : '🔄 มอบหมายใหม่'}}</button>
-      </picker>
-      
-      <!-- 原有的跟进按钮 -->
-      <button class="follow-btn" bindtap="goToFollowUp">{{t.cdBtnFollowUp || '新增跟进记录'}}</button>
+<!-- 4. 客户画像编辑弹窗 -->
+<view class="modal-mask" wx:if="{{showProfileModal}}" bindtap="closeProfileModal"></view>
+<view class="modal-content" wx:if="{{showProfileModal}}">
+  <view class="modal-header">{{t.editProfileTitle}}</view>
+  <scroll-view scroll-y class="modal-scroll">
+    <view class="form-group">
+      <text class="form-label">{{t.profileDemand}}</text>
+      <input class="form-input" value="{{editProfileForm.demand}}" data-field="demand" bindinput="onProfileInput" />
     </view>
+    <view class="form-group">
+      <text class="form-label">{{t.profileMotivation}}</text>
+      <input class="form-input" value="{{editProfileForm.motivation}}" data-field="motivation" bindinput="onProfileInput" />
+    </view>
+    <view class="form-group">
+      <text class="form-label">{{t.profileUserType}}</text>
+      <input class="form-input" value="{{editProfileForm.userType}}" data-field="userType" bindinput="onProfileInput" />
+    </view>
+    <view class="form-group">
+      <text class="form-label">{{t.profileScenario}}</text>
+      <input class="form-input" value="{{editProfileForm.scenario}}" data-field="scenario" bindinput="onProfileInput" />
+    </view>
+    <view class="form-group">
+      <text class="form-label">{{t.profileTimeframe}}</text>
+      <input class="form-input" value="{{editProfileForm.timeframe}}" data-field="timeframe" bindinput="onProfileInput" />
+    </view>
+    <view class="form-group">
+      <text class="form-label">{{t.profileBudget}}</text>
+      <input class="form-input" value="{{editProfileForm.budget}}" data-field="budget" bindinput="onProfileInput" />
+    </view>
+  </scroll-view>
+  <view class="modal-footer">
+    <button class="btn-cancel" bindtap="closeProfileModal">{{t.cancel}}</button>
+    <button class="btn-save" bindtap="saveProfile">{{t.saveProfile}}</button>
   </view>
+</view>
+
+<!-- 🌟 5. 新增：全局档案中文备注弹窗 -->
+<view class="modal-mask" wx:if="{{showGlobalTransModal}}" bindtap="closeGlobalTransModal"></view>
+<view class="modal-content" wx:if="{{showGlobalTransModal}}">
+  <view class="modal-header">客户全局中文档案</view>
+  <view class="modal-scroll" style="padding: 30rpx;">
+    <!-- 多行输入框，随意记录，永久保存 -->
+    <textarea class="trans-textarea" placeholder="请将整体提取翻译后的中文，或者您的跟进备注粘贴到这里..." value="{{globalTransText}}" bindinput="onGlobalTransInput" maxlength="-1" auto-height></textarea>
+  </view>
+  <view class="modal-footer">
+    <button class="btn-cancel" bindtap="closeGlobalTransModal">取消</button>
+    <button class="btn-save" bindtap="saveGlobalTranslation">保存档案</button>
+  </view>
+</view>
+
+<!-- 6. 底部双按钮 -->
+<view class="footer-action">
+  <view class="btn-group">
+    <picker wx:if="{{isAdmin}}" class="reassign-picker" mode="selector" range="{{salesList}}" range-key="name" bindchange="onReassignChange">
+      <button class="reassign-btn">{{currentLang === 'zh' ? '🔄 重新分配' : '🔄 มอบหมายใหม่'}}</button>
+    </picker>
+    <button class="follow-btn" bindtap="goToFollowUp">{{t.cdBtnFollowUp || '新增跟进记录'}}</button>
+  </view>
+</view>
+
 </view>

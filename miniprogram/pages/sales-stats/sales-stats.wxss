@@ -140,3 +140,26 @@ page {
 .highlight-red {
   color: #ff4d4f; /* 红色代表危险/逾期待办 */
 }
+
+/* 优化卡片头部布局 */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+/* 🌟 新增的总客户 Tag 样式 */
+.total-tag {
+  font-size: 22rpx;
+  color: #888888;
+  background-color: #f4f5f7;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  margin-left: 16rpx;
+  font-weight: 500;
+}

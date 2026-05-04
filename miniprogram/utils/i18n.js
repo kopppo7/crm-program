@@ -68,7 +68,30 @@ const zh = {
    fuNotePlaceholder: "简单记录一下沟通内容及客户痛点...",
    fuUpload: "上传截图 (最多3张)",
    fuSubmit: "保存记录",
-   fuSuccess: "保存成功"
+   fuSuccess: "保存成功",
+   // --- 🎯 客户画像模块 (中文) ---
+   profileTitle: '🎯 客户画像',
+   profileDesc: '完善画像，提高精准推荐与成交率',
+   profileClickToExpand: '点击展开查看或编辑详细画像...',
+   profileDemand: '需求内容',
+   profileDemandSub: '(需要什么样的产品)',
+   profileMotivation: '购买动机',
+   profileMotivationSub: '(为什么要使用这个设备)',
+   profileUserType: '谁使用',
+   profileUserTypeSub: '(公司 / 个人)',
+   profileScenario: '使用场景',
+   profileScenarioSub: '(在哪里收货、什么场景下使用)',
+   profileTimeframe: '采购时间',
+   profileTimeframeSub: '(准备什么时候买)',
+   profileBudget: '预算区间',
+   profileBudgetSub: '(经济承受能力)',
+   unknown: '未知',
+   edit: '编辑',
+   collapse: '收起 ᐱ',
+   expand: '展开 ᐯ',
+   editProfileTitle: '编辑客户画像',
+   cancel: '取消',
+   saveProfile: '保存画像'
 };
 
 const th = {
@@ -141,7 +164,30 @@ const th = {
   fuNotePlaceholder: "บันทึกสรุปการพูดคุยและปัญหาของลูกค้า...",
   fuUpload: "อัปโหลดภาพ (สูงสุด 3 รูป)",
   fuSubmit: "บันทึกข้อมูล",
-  fuSuccess: "บันทึกสำเร็จ"
+  fuSuccess: "บันทึกสำเร็จ",
+  // --- 🎯 客户画像模块 (泰文) ---
+  profileTitle: '🎯 ข้อมูลลูกค้า (Profile)',
+  profileDesc: 'กรอกข้อมูลให้ครบถ้วนเพื่อเพิ่มโอกาสในการขาย',
+  profileClickToExpand: 'คลิกเพื่อดูหรือแก้ไขข้อมูลลูกค้า...',
+  profileDemand: 'ความต้องการ',
+  profileDemandSub: '(ต้องการสินค้าประเภทใด)',
+  profileMotivation: 'แรงจูงใจในการซื้อ',
+  profileMotivationSub: '(ทำไมถึงต้องการใช้เครื่องจักรนี้)',
+  profileUserType: 'ผู้ใช้งาน',
+  profileUserTypeSub: '(บริษัท / บุคคลทั่วไป)',
+  profileScenario: 'สถานที่และลักษณะการใช้งาน',
+  profileScenarioSub: '(รับสินค้าที่ไหน ใช้งานในสภาพแวดล้อมใด)',
+  profileTimeframe: 'ระยะเวลาที่คาดว่าจะซื้อ',
+  profileTimeframeSub: '(วางแผนจะซื้อเมื่อไหร่)',
+  profileBudget: 'งบประมาณ',
+  profileBudgetSub: '(ความสามารถในการจ่าย)',
+  unknown: 'ไม่ระบุ',
+  edit: 'แก้ไข',
+  collapse: 'ย่อ ᐱ',
+  expand: 'ขยาย ᐯ',
+  editProfileTitle: 'แก้ไขข้อมูลลูกค้า',
+  cancel: 'ยกเลิก',
+  saveProfile: 'บันทึกข้อมูล',
 };
 
 module.exports = {

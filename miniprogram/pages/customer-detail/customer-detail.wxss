@@ -1,372 +1,343 @@
 page {
   background-color: #f4f6f9;
-  padding-bottom: 80px; /* 给底部悬浮按钮留出空间 */
+  padding-bottom: 100px; /* 适配底部双按钮悬浮区 */
 }
 
 .container {
-  padding: 15px;
+  padding: 15px 0; /* 左右边距由内部卡片的 margin 控制 */
 }
 
-/* --- 顶部客户信息卡片 --- */
+/* ================= 1. 紧凑型基础信息卡片 ================= *//* ================= 1. 基础信息卡片 (单列布局) ================= */
 .customer-info-card {
-  width: 90%;
-  background: #fff;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-  margin-bottom: 20px;
+  width: 85%;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx 30rpx;
+  margin: 0 30rpx 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
 }
 
 .info-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 15px;
-  border-bottom: 1px dashed #eee;
+  margin-bottom: 20rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx dashed #eeeeee;
 }
 
-.name {
-  font-size: 20px;
+.info-header .name {
+  font-size: 32rpx;
   font-weight: bold;
-  color: #333;
+  color: #333333;
 }
 
 .status-tag {
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 20px;
+  font-size: 24rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 30rpx;
   background: #e6f7ff;
   color: #1890ff;
   font-weight: bold;
 }
 
-.info-item {
-  margin-bottom: 12px;
+/* 核心修改：改回单列垂直排列 */
+.info-list {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 16rpx; /* 控制每一行之间的间距 */
 }
 
-.label {
-  font-size: 14px;
-  color: #888;
-  width: 100px;
+.info-item {
+  display: flex;
+  align-items: flex-start; /* 确保长文本换行时，左侧标签依然在顶部对齐 */
+  font-size: 28rpx;
+  line-height: 1.5;
 }
 
-.value {
-  font-size: 14px;
-  color: #333;
+.info-item .label {
+  color: #888888;
+  margin-right: 16rpx;
+  white-space: nowrap; /* 保证左侧的标签不被折行 */
+  flex-shrink: 0; /* 保证标签不被右侧长文本挤压变形 */
+}
+
+.info-item .value {
+  color: #333333;
   font-weight: 500;
+  flex: 1; /* 值占满右侧所有剩余空间 */
+  word-break: break-all; /* 支持超长泰文/英文换行 */
 }
 
-.highlight {
+.info-item .highlight {
   color: #07c160;
   font-weight: bold;
 }
 
-.info-grid {
-  display: flex;
-  background: #f8f9fb;
-  border-radius: 8px;
-  padding: 12px;
-  margin-top: 15px;
+/* ================= 2. 客户画像模块 (支持折叠) ================= */
+.profile-card {
+  width: 85%;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin: 0 30rpx 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
 }
 
-.grid-cell {
-  flex: 1;
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  padding-bottom: 16rpx;
+  transition: all 0.3s ease;
+}
+
+.profile-header.collapsed {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.title-box {
   display: flex;
   flex-direction: column;
 }
 
-.grid-cell .label {
-  font-size: 12px;
-  color: #999;
-  margin-bottom: 4px;
+.profile-header .title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
 }
 
-.grid-cell .value {
-  font-size: 13px;
-  color: #333;
+.profile-header .desc {
+  font-size: 22rpx;
+  color: #888888;
+  margin-top: 6rpx;
+}
+
+.header-action {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.edit-btn {
+  background-color: #f0f9eb;
+  color: #07c160;
+  font-size: 24rpx;
+  padding: 8rpx 24rpx;
+  border-radius: 24rpx;
+  border: 1rpx solid #c2e7b0;
+}
+
+.toggle-text {
+  font-size: 24rpx;
+  color: #999999;
+  font-weight: 500;
+}
+
+.highlight-text {
+  color: #07c160 !important;
+}
+
+.profile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.profile-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-item .label {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #555555;
+  margin-bottom: 6rpx;
+}
+
+.profile-item .sub-label {
+  font-size: 22rpx;
+  font-weight: normal;
+  color: #999999;
+}
+
+.profile-item .value {
+  font-size: 28rpx;
+  color: #333333;
+  line-height: 1.4;
+}
+
+.profile-item .value.unknown {
+  color: #ff4d4f;
   font-weight: bold;
 }
 
-/* --- 时间轴区域 --- */
+/* ================= 3. 时间轴区域 ================= */
 .timeline-section {
-  width: 90%;
-  background: #fff;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  width: 85%;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin: 0 30rpx 30rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
 }
 
 .section-title {
-  font-size: 16px;
+  font-size: 32rpx;
   font-weight: bold;
-  color: #333;
-  margin-bottom: 20px;
-  border-left: 4px solid #07c160;
-  padding-left: 10px;
+  color: #333333;
+  margin-bottom: 30rpx;
+  border-left: 8rpx solid #07c160;
+  padding-left: 16rpx;
 }
 
 .empty-logs {
   text-align: center;
-  color: #999;
-  font-size: 14px;
-  padding: 30px 0;
+  color: #999999;
+  font-size: 28rpx;
+  padding: 40rpx 0;
 }
 
-/* 时间轴核心布局 */
 .timeline-item {
   display: flex;
-  margin-bottom: 20px;
+  margin-bottom: 40rpx;
 }
 
-/* 左侧轴线 */
 .line-box {
-  width: 20px;
+  width: 40rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-right: 15px;
+  margin-right: 20rpx;
 }
 
 .dot {
-  width: 10px;
-  height: 10px;
+  width: 20rpx;
+  height: 20rpx;
   border-radius: 50%;
   background: #07c160;
-  border: 3px solid #e1f5e8;
+  border: 6rpx solid #e1f5e8;
   z-index: 2;
 }
 
 .line {
   flex: 1;
-  width: 2px;
-  background: #eee;
-  margin-top: 4px;
-  margin-bottom: -24px; /* 让线段连接到下一个元素 */
-}
-.timeline-item:last-child .line {
-  display: none; /* 最后一个元素不需要向下的连接线 */
+  width: 4rpx;
+  background: #eeeeee;
+  margin-top: 8rpx;
+  margin-bottom: -48rpx;
 }
 
-/* 右侧内容卡片 */
+.timeline-item:last-child .line {
+  display: none;
+}
+
 .log-content {
   flex: 1;
   background: #fcfcfc;
-  border: 1px solid #f0f0f0;
-  border-radius: 12px;
-  padding: 15px;
+  border: 1rpx solid #f0f0f0;
+  border-radius: 16rpx;
+  padding: 24rpx;
 }
 
 .log-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 12rpx;
 }
 
 .log-date {
-  font-size: 12px;
-  color: #999;
+  font-size: 24rpx;
+  color: #999999;
 }
 
 .log-type {
-  font-size: 12px;
+  font-size: 24rpx;
   color: #fa8c16;
   background: #fff7e6;
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
 }
 
 .log-tag {
-  font-size: 13px;
+  font-size: 26rpx;
   font-weight: bold;
-  color: #333;
-  margin-bottom: 6px;
+  color: #333333;
+  margin-bottom: 10rpx;
 }
 
 .log-note {
-  font-size: 14px;
-  color: #555;
+  font-size: 28rpx;
+  color: #555555;
   line-height: 1.5;
-  margin-bottom: 10px;
+  margin-bottom: 16rpx;
 }
 
 .log-reason {
-  font-size: 12px;
+  font-size: 24rpx;
   color: #ff4d4f;
   background: #fff1f0;
-  padding: 8px;
-  border-radius: 6px;
-  margin-bottom: 10px;
+  padding: 12rpx;
+  border-radius: 8rpx;
+  margin-bottom: 16rpx;
 }
 
-/* 缩略图区域 */
 .log-images {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 16rpx;
 }
 
 .log-img {
-  width: 70px;
-  height: 70px;
-  border-radius: 8px;
-  background: #eee;
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 12rpx;
+  background: #eeeeee;
 }
 
-/* --- 底部固定按钮 --- */
+/* ================= 4. 底部固定按钮组 ================= */
 .footer-action {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 15px 20px 25px;
-  background: #fff;
-  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-  z-index: 100;
-}
-
-.follow-btn {
-  background: #07c160;
-  color: #fff;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 25px;
-  height: 48px;
-  line-height: 48px;
-  box-shadow: 0 4px 10px rgba(7,193,96,0.3);
-}
-.follow-btn:active {
-  transform: scale(0.98);
-  background: #06ad56;
-}
-
-/* --- 替换原来的 info-grid 样式 --- */
-.extra-info-box {
-  background: #f8f9fb;
-  border-radius: 8px;
-  padding: 12px 15px;
-  margin-top: 15px;
-  display: flex;
-  flex-direction: column; /* 🌟 强制纵向排列，彻底解决挤压重叠 */
-  gap: 10px; /* 项目间距 */
-}
-
-.extra-item {
-  display: flex;
-  align-items: flex-start;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.extra-item .label {
-  color: #888;
-  width: 90px; /* 给左侧标签固定宽度 */
-  flex-shrink: 0; /* 禁止左侧标签被压缩 */
-}
-
-.extra-item .value {
-  color: #333;
-  font-weight: bold;
-  flex: 1; /* 右侧内容占据所有剩余空间 */
-  word-break: break-all; /* 允许长单词或泰语换行 */
-}
-
-/* --- 底部固定按钮 --- */
-.footer-action {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 10px 15px 25px; /* 适配底部安全区 */
-  background: #fff;
-  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+  padding: 20rpx 30rpx 60rpx; /* 适配全面屏底部安全区 */
+  background: #ffffff;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.08);
   z-index: 100;
 }
 
 .btn-group {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  align-items: center;
+  gap: 24rpx;
 }
 
 .reassign-picker {
-  flex: 1; /* 让分配按钮占据一定宽度 */
+  flex: 1;
 }
 
-.reassign-btn {
-  background: #f0f2f5;
-  color: #333;
-  font-size: 15px;
-  font-weight: bold;
-  border-radius: 25px;
-  height: 48px;
-  line-height: 48px;
-  width: 100%;
-}
-.reassign-btn:active {
-  background: #e4e6e9;
-}
-
-.follow-btn {
-  flex: 1.5; /* 跟进按钮比分配按钮宽一点，突出主次 */
-  background: #07c160;
-  color: #fff;
-  font-size: 15px;
-  font-weight: bold;
-  border-radius: 25px;
-  height: 48px;
-  line-height: 32px;
-  box-shadow: 0 4px 10px rgba(7,193,96,0.3);
-  margin: 0 !important; /* 覆盖小程序默认 margin */
-}
-.follow-btn:active {
-  transform: scale(0.98);
-  background: #06ad56;
-}
-
-/* --- 底部固定区域布局 --- */
-.footer-action {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 10px 15px 30px; /* 增加底部间距，适配全面屏 */
-  background: #fff;
-  box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
-  z-index: 100;
-}
-
-.btn-group {
-  display: flex;
-  justify-content: space-between;
-  align-items: center; /* 🌟 确保垂直居中对齐 */
-  gap: 12px;
-}
-
-.reassign-picker {
-  flex: 1; /* 占据较小比例 */
-}
-
-/* 🌟 核心修复：重新分配按钮样式优化 */
 .reassign-btn {
   background: #f5f7fa !important;
   color: #606266 !important;
-  font-size: 14px !important;
+  font-size: 28rpx !important;
   font-weight: bold;
-  border-radius: 24px;
-  height: 48px;
-  line-height: 48px;
+  border-radius: 48rpx;
+  height: 88rpx;
   width: 100% !important;
-  padding: 0 !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: none !important; /* 🌟 去除默认边框 */
+  border: none !important;
+  padding: 0 !important;
 }
 
-/* 🌟 关键补丁：彻底清除小程序按钮的自带伪元素边框 */
 .reassign-btn::after {
   border: none !important;
 }
@@ -376,18 +347,19 @@ page {
   opacity: 0.8;
 }
 
-/* 🌟 核心修复：跟进按钮样式优化 */
 .follow-btn {
-  flex: 1.6; /* 🌟 占据更多比例，突出主要操作 */
+  flex: 1.6;
   background: #07c160 !important;
-  color: #fff !important;
-  font-size: 16px !important;
+  color: #ffffff !important;
+  font-size: 32rpx !important;
   font-weight: bold;
-  border-radius: 24px;
-  height: 48px;
-  line-height: 48px;
-  box-shadow: 0 4px 12px rgba(7,193,96,0.2);
-  margin: 0 !important; 
+  border-radius: 48rpx;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(7, 193, 96, 0.2);
+  margin: 0 !important;
   padding: 0 !important;
   border: none !important;
 }
@@ -400,3 +372,87 @@ page {
   transform: scale(0.97);
   background: #06ad56 !important;
 }
+
+/* ================= 5. 编辑画像底部弹窗 ================= */
+.modal-mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 999;
+}
+
+.modal-content {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #ffffff;
+  border-radius: 32rpx 32rpx 0 0;
+  z-index: 1000;
+  padding-bottom: env(safe-area-inset-bottom);
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+}
+
+.modal-header {
+  font-size: 32rpx;
+  font-weight: bold;
+  text-align: center;
+  padding: 30rpx 0;
+  border-bottom: 1rpx solid #eeeeee;
+}
+
+.modal-scroll {
+  padding: 30rpx;
+  box-sizing: border-box;
+}
+
+.form-group {
+  margin-bottom: 30rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 26rpx;
+  color: #333333;
+  margin-bottom: 12rpx;
+  font-weight: 500;
+}
+
+.form-input {
+  background-color: #f7f7f7;
+  height: 80rpx;
+  border-radius: 12rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+  color: #333333;
+}
+
+.modal-footer {
+  display: flex;
+  padding: 20rpx 30rpx 40rpx;
+  border-top: 1rpx solid #eeeeee;
+  gap: 20rpx;
+}
+
+.btn-cancel {
+  flex: 1;
+  background-color: #f5f5f5;
+  color: #666666;
+  font-size: 30rpx;
+  border-radius: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-save {
+  flex: 2;
+  background-color: #07c160;
+  color: #ffffff;
+  font-size: 30rpx;
+  border-radius: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+

@@ -50,9 +50,9 @@
         </view>
 
       </view>
-      <view class="card-action">
+      <!-- <view class="card-action">
         <button class="action-btn" bindtap="goToFollowUp" data-id="{{item._id}}">{{t.btnFollowUp}}</button>
-      </view>
+      </view> -->
     </view>
 
     <view class="loading-bottom" wx:if="{{customerList.length > 0}}">

@@ -9,7 +9,15 @@ Page({
     t: {},
     currentLang: 'zh',
     salesList: [], 
-    isAdmin: false 
+    isAdmin: false,
+
+    isProfileExpanded: false,
+    showProfileModal: false, 
+    editProfileForm: {},
+
+    // 🌟 全局中文备忘录相关状态
+    showGlobalTransModal: false,
+    globalTransText: ''
   },
 
   onLoad(options) {
@@ -21,24 +29,46 @@ Page({
   },
 
   onShow() {
+    this.initLanguage();
+    
+    wx.showNavigationBarLoading();
     wx.cloud.callFunction({
       name: 'login', 
       success: res => {
-        console.log('✅ 腾讯服务器返回的真实 OpenID:', res.result.openid);
-        wx.setStorageSync('myOpenId', res.result.openid);
+        const openid = res.result.openid;
+        wx.setStorageSync('myOpenId', openid);
+        this.checkAdminRole(openid);
       },
       fail: err => {
-        console.error('❌ 获取失败，请检查云函数是否部署:', err);
+        console.error('❌ 登录失败', err);
+        wx.hideNavigationBarLoading();
       }
     });
-    this.initLanguage();
-    this.checkAdminRole(); 
-    
+
     if (this.data.customerId) {
       this.fetchCustomerDetail().then(() => {
         this.fetchFollowUpLogs();
       });
     }
+  },
+
+  checkAdminRole(myOpenId) {
+    if (!myOpenId) return;
+    db.collection('users').where({ _openid: myOpenId }).get().then(res => {
+      if (res.data && res.data.length > 0) {
+        const role = res.data[0].role;
+        const isUserAdmin = (role === 'admin');
+        
+        this.setData({ isAdmin: isUserAdmin });
+        if (isUserAdmin) {
+          this.fetchSalesList();
+        }
+      }
+      wx.hideNavigationBarLoading();
+    }).catch(err => {
+      console.error('检查权限失败', err);
+      wx.hideNavigationBarLoading();
+    });
   },
 
   initLanguage() {
@@ -48,30 +78,6 @@ Page({
       t: i18n.t()
     });
     wx.setNavigationBarTitle({ title: lang === 'zh' ? '客户详情' : 'รายละเอียดลูกค้า' });
-  },
-
-  checkAdminRole() {
-    const myOpenId = wx.getStorageSync('myOpenId');
-    console.log("👉 小程序缓存里的 ID 是:", myOpenId); 
-    
-    if (!myOpenId) {
-      console.error("❌ 缓存中没有 myOpenId，请重新进入授权页录入身份");
-      return;
-    }
-  
-    db.collection('users').where({ _openid: myOpenId }).get().then(res => {
-      console.log("👉 数据库查询结果:", res.data);
-      if (res.data && res.data.length > 0) {
-        const role = res.data[0].role;
-        const isUserAdmin = (role === 'admin');
-        
-        this.setData({ isAdmin: isUserAdmin });
-
-        if (isUserAdmin) {
-          this.fetchSalesList();
-        }
-      }
-    }).catch(err => console.error('检查权限失败', err));
   },
 
   fetchSalesList() {
@@ -88,9 +94,7 @@ Page({
         wx.hideLoading();
         resolve(res.data);
       }).catch(err => {
-        console.error('获取客户详情失败', err);
         wx.hideLoading();
-        wx.showToast({ title: '获取数据失败', icon: 'none' });
         reject(err);
       });
     });
@@ -102,10 +106,16 @@ Page({
       .orderBy('createTime', 'desc')
       .get()
       .then(res => { 
-        // 直接拿到数据库里的原始数据 (里面包含的图片路径就是原生的 cloud://)
-        let fetchedLogs = res.data;
+        // 🌟 核心升级：遍历获取到的记录，将原始的 createTime 转化为带具体时间的格式
+        let fetchedLogs = res.data.map(log => {
+          if (log.createTime) {
+            log.displayTime = this.formatDateTime(log.createTime);
+          } else {
+            log.displayTime = log.createTimeStr || '';
+          }
+          return log;
+        });
 
-        // --- 直接保留你原本处理初始记录的代码 ---
         const hasReassignLog = fetchedLogs.some(log => 
           log.note && (log.note.includes('【主管操作】') || log.note.includes('[แอดมิน]'))
         );
@@ -113,29 +123,49 @@ Page({
         if (!hasReassignLog) {
           let createDateStr = '';
           if (this.data.customer && this.data.customer.createTime) {
-            const cd = new Date(this.data.customer.createTime);
-            createDateStr = `${cd.getFullYear()}-${('0' + (cd.getMonth() + 1)).slice(-2)}-${('0' + cd.getDate()).slice(-2)}`;
+            // 系统初次录入的时间也精确到分钟
+            createDateStr = this.formatDateTime(this.data.customer.createTime);
           } else {
             createDateStr = 'Initial';
           }
 
-          const initialLog = {
+          fetchedLogs.push({
             _id: 'sys_init_001',
+            displayTime: createDateStr, 
             createTimeStr: createDateStr,
             follow_type: this.data.currentLang === 'zh' ? '系统自动记录' : 'บันทึกระบบ',
             result_tag: 'pending',
             note: this.data.currentLang === 'zh' ? '线索成功录入并分配给销售' : 'รับข้อมูลลูกค้าและมอบหมายสำเร็จ',
             screenshot_files: []
-          };
-
-          fetchedLogs.push(initialLog); 
+          }); 
         }
-
-        // 直接把数据丢给页面渲染，极速出图！
         this.setData({ logs: fetchedLogs });
-      }).catch(err => {
-        console.error('获取时间轴失败', err);
       });
+  },
+
+  // ... 保持原有 onReassignChange 等方法不变 ...
+
+  // 🌟 新增：精确到分钟的时间格式化工具
+  formatDateTime(dateStrOrObj) {
+    if (!dateStrOrObj) return '';
+    const date = new Date(dateStrOrObj);
+    if (isNaN(date.getTime())) return dateStrOrObj; 
+
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+  },
+
+  // 原有的仅日期格式化保留（给部分旧逻辑兼容用）
+  formatDate(date) {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
   },
 
   onReassignChange(e) {
@@ -162,7 +192,6 @@ Page({
 
   executeReassign(newSales, oldSalesName) {
     wx.showLoading({ title: '分配中...' });
-
     db.collection('customers').doc(this.data.customerId).update({
       data: {
         assigned_sales_id: newSales._openid,
@@ -190,10 +219,6 @@ Page({
       this.fetchCustomerDetail().then(() => {
         this.fetchFollowUpLogs();
       });
-    }).catch(err => {
-      wx.hideLoading();
-      wx.showToast({ title: '分配失败', icon: 'none' });
-      console.error(err);
     });
   },
 
@@ -207,18 +232,7 @@ Page({
   makePhoneCall(e) {
     const phoneNum = String(e.currentTarget.dataset.phone);
     if (!phoneNum || phoneNum === 'undefined') return;
-
-    wx.showModal({
-      title: 'Call Confirmation',
-      content: 'Do you want to call ' + phoneNum + '?',
-      confirmText: 'Call',
-      cancelText: 'Cancel',
-      success: (res) => {
-        if (res.confirm) {
-          wx.makePhoneCall({ phoneNumber: phoneNum });
-        }
-      }
-    });
+    wx.makePhoneCall({ phoneNumber: phoneNum });
   },
 
   goToFollowUp() {
@@ -230,5 +244,105 @@ Page({
     const current = e.currentTarget.dataset.current;
     const urls = e.currentTarget.dataset.all;
     wx.previewImage({ current: current, urls: urls });
+  },
+
+  toggleProfile() {
+    this.setData({ isProfileExpanded: !this.data.isProfileExpanded });
+  },
+
+  openProfileModal() {
+    const currentProfile = this.data.customer.profile || {};
+    this.setData({
+      editProfileForm: JSON.parse(JSON.stringify(currentProfile)),
+      showProfileModal: true
+    });
+  },
+
+  closeProfileModal() {
+    this.setData({ showProfileModal: false });
+  },
+
+  onProfileInput(e) {
+    const field = e.currentTarget.dataset.field; 
+    const value = e.detail.value;
+    this.setData({ [`editProfileForm.${field}`]: value });
+  },
+
+  saveProfile() {
+    wx.showLoading({ title: '保存中...', mask: true });
+    db.collection('customers').doc(this.data.customerId).update({
+      data: {
+        profile: this.data.editProfileForm,
+        updateTime: db.serverDate()
+      }
+    }).then(() => {
+      this.setData({
+        'customer.profile': this.data.editProfileForm,
+        showProfileModal: false
+      });
+      wx.hideLoading();
+      wx.showToast({ title: '保存成功', icon: 'success' });
+    });
+  },
+
+  // ================= 🌟 核心：全局档案提取与中文存档 =================
+  
+  // 1. 一键复制：提取整页重要信息
+  copyAllContext() {
+    const p = this.data.customer.profile || {};
+    let text = `【客户画像】\n需求: ${p.demand || '未填'}\n动机: ${p.motivation || '未填'}\n使用者: ${p.userType || '未填'}\n场景: ${p.scenario || '未填'}\n时间: ${p.timeframe || '未填'}\n预算: ${p.budget || '未填'}\n\n【跟进记录】\n`;
+    
+    // 遍历拼装时间轴日志
+    this.data.logs.forEach(log => {
+      const statusStr = this.data.t.status[log.result_tag] || log.result_tag;
+      text += `[${log.createTimeStr}] 状态:${statusStr}\n内容: ${log.note}\n`;
+      if (log.lost_reason) text += `原因: ${log.lost_reason}\n`;
+      text += `---\n`;
+    });
+
+    wx.setClipboardData({
+      data: text,
+      success: () => wx.showToast({ title: '已复制全局档案，请去翻译', icon: 'none' })
+    });
+  },
+
+  // 2. 录入全局中文信息
+  openGlobalTransModal() {
+    this.setData({
+      showGlobalTransModal: true,
+      // 提取该客户下已保存的中文备忘录
+      globalTransText: this.data.customer.translated_context || ''
+    });
+  },
+
+  closeGlobalTransModal() {
+    this.setData({ showGlobalTransModal: false });
+  },
+
+  onGlobalTransInput(e) {
+    this.setData({ globalTransText: e.detail.value });
+  },
+
+  saveGlobalTranslation() {
+    wx.showLoading({ title: '保存中...', mask: true });
+
+    // 直接保存在 customers 表的新增字段 translated_context 中
+    db.collection('customers').doc(this.data.customerId).update({
+      data: {
+        translated_context: this.data.globalTransText,
+        updateTime: db.serverDate()
+      }
+    }).then(() => {
+      this.setData({
+        'customer.translated_context': this.data.globalTransText,
+        showGlobalTransModal: false
+      });
+      wx.hideLoading();
+      wx.showToast({ title: '中文档案保存成功', icon: 'success' });
+    }).catch(err => {
+      wx.hideLoading();
+      wx.showToast({ title: '保存失败', icon: 'none' });
+      console.error(err);
+    });
   }
 });

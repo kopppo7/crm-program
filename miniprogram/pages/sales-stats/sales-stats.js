@@ -59,12 +59,12 @@ Page({
         const openid = sales._openid || sales.openid; 
         if (!openid) continue;
 
-        // 指标 A：名下总客户数
+        // A：名下总客户数 (移动到名字后面)
         const totalRes = await db.collection('customers')
           .where({ assigned_sales_id: openid })
           .count();
 
-        // 指标 B：今日跟进次数
+        // B：今日跟进次数（今天实际写的跟进记录）
         const todayRes = await db.collection('follow_up_logs')
           .where({ 
             sales_id: openid,
@@ -72,7 +72,21 @@ Page({
           })
           .count();
 
-        // 指标 C：逾期待办数量
+        // 🌟 C：新增 今日待办剩余（状态未结案，且约定时间刚好是今天）
+        const todayTasksRes = await db.collection('customers').where(_.and([
+          { assigned_sales_id: openid },
+          { status: _.nin(['Closed Won', 'Closed Lost', 'Invalid']) },
+          { next_follow_up: today } 
+        ])).count();
+
+        // D：明日计划跟进
+        const tomorrowRes = await db.collection('customers').where(_.and([
+          { assigned_sales_id: openid },
+          { status: _.nin(['Closed Won', 'Closed Lost', 'Invalid']) },
+          { next_follow_up: tomorrow } 
+        ])).count();
+
+        // E：逾期待办数量
         const overdueRes = await db.collection('customers').where(_.and([
           { assigned_sales_id: openid },
           { status: _.nin(['Closed Won', 'Closed Lost', 'Invalid']) },
@@ -81,20 +95,14 @@ Page({
           { next_follow_up: _.neq(null) }
         ])).count();
 
-        // 🌟 指标 D：新增 明日跟进数量（状态未结案，且约定时间等于明天）
-        const tomorrowRes = await db.collection('customers').where(_.and([
-          { assigned_sales_id: openid },
-          { status: _.nin(['Closed Won', 'Closed Lost', 'Invalid']) },
-          { next_follow_up: tomorrow } 
-        ])).count();
-
         statsArr.push({
           name: sales.name || '未知销售',
           avatarText: (sales.name || 'S').substring(0, 1).toUpperCase(),
           totalCustomers: totalRes.total,
           todayFollowUps: todayRes.total,
-          overdueCount: overdueRes.total,
-          tomorrowFollowUps: tomorrowRes.total // 🌟 压入数组中供页面显示
+          todayRemaining: todayTasksRes.total, // 🌟 新增的数据
+          tomorrowFollowUps: tomorrowRes.total,
+          overdueCount: overdueRes.total
         });
       }
 
