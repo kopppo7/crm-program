@@ -1,0 +1,16 @@
+<view class="container">
+  <view class="tips">{{t.manualDetailTips}}</view>
+  
+  <view class="image-list">
+    <image 
+      wx:for="{{images}}" 
+      wx:key="*this" 
+      src="{{item}}" 
+      mode="widthFix" 
+      class="product-img" 
+      lazy-load="true"
+      bindtap="previewImage" 
+      data-src="{{item}}"
+    ></image>
+  </view>
+</view>

@@ -3,6 +3,7 @@ const zh = {
   homeTitle: "销售工作台",
   homeTodo: "今日待办",
   homeAll: "我的客户",
+  homeStudy: "学习手册",
   
   // --- 销售列表页 ---
   searchPlaceholder: "搜索姓名、电话、城市、需求...",
@@ -91,7 +92,18 @@ const zh = {
    expand: '展开 ᐯ',
    editProfileTitle: '编辑客户画像',
    cancel: '取消',
-   saveProfile: '保存画像'
+   saveProfile: '保存画像',
+   // 🌟 学习手册模块
+   manualTitle: '销售学习手册',
+   manualHeader: '内部资料库',
+   manualSub: 'Internal Sales Manual',
+   manualTag: '绝密资料 · 禁止外传',
+   modProdTitle: '产品资料',
+   modProdDesc: '各型号挖掘机、履带车参数与高清大图',
+   modSalesTitle: '销售话术',
+   modSalesDesc: '客户异议解答与竞品话术应对(即将开放)',
+   modDevToast: '该模块正在整理中',
+   manualDetailTips: '💡 点击图片可放大全屏预览，支持左右滑动'
 };
 
 const th = {
@@ -99,6 +111,7 @@ const th = {
   homeTitle: "หน้าหลักฝ่ายขาย",
   homeTodo: "งานวันนี้",
   homeAll: "ลูกค้าของฉัน",
+  homeStudy: "คู่มือการศึกษา",
   
   // --- 销售列表页 ---
   searchPlaceholder: "ค้นหาชื่อ, เบอร์โทร, เมือง, ความต้องการ...",
@@ -188,6 +201,17 @@ const th = {
   editProfileTitle: 'แก้ไขข้อมูลลูกค้า',
   cancel: 'ยกเลิก',
   saveProfile: 'บันทึกข้อมูล',
+  // 🌟 学习手册模块 (泰文翻译)
+  manualTitle: 'คู่มือการเรียนรู้การขาย',
+  manualHeader: 'ฐานข้อมูลภายใน',
+  manualSub: 'Internal Sales Manual',
+  manualTag: 'ข้อมูลลับ · ห้ามเผยแพร่',
+  modProdTitle: 'ข้อมูลผลิตภัณฑ์',
+  modProdDesc: 'พารามิเตอร์และรูปภาพความละเอียดสูงของรถขุดและรถตีนตะขาบแต่ละรุ่น',
+  modSalesTitle: 'บทสนทนาการขาย',
+  modSalesDesc: 'การตอบข้อโต้แย้งและรับมือคู่แข่ง (เปิดให้บริการเร็วๆ นี้)',
+  modDevToast: 'โมดูลนี้กำลังอยู่ระหว่างการจัดทำ',
+  manualDetailTips: '💡 คลิกที่รูปเพื่อดูแบบเต็มจอ และปัดซ้ายขวาเพื่อเลื่อนดู'
 };
 
 module.exports = {

@@ -12,6 +12,16 @@
     "pages/admin-logs/admin-logs",
     "pages/customer-view/customer-view"
   ],
+  "subPackages": [
+    {
+      "root": "package-learning",
+      "name": "learning",
+      "pages": [
+        "pages/manual-list/manual-list",
+        "pages/manual-detail/manual-detail"
+      ]
+    }
+  ],
   "window": {
     "backgroundColor": "#F6F6F6",
     "backgroundTextStyle": "light",

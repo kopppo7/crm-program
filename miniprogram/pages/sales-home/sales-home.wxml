@@ -39,5 +39,16 @@
       </view>
       <view class="card-arrow">></view>
     </view>
+
+    <view class="menu-card" bindtap="goToLearningManual" wx:if="{{!isVisitor}}">
+      <view class="card-left">
+        <view class="icon-box study-bg">📖</view>
+        <view class="card-text">
+          <text class="menu-name">{{t.homeStudy}}</text>
+          <text class="menu-desc">{{currentLang === 'zh' ? '帮助快速上手并持续提升工作效率' : 'ช่วยให้เริ่มต้นใช้งานได้อย่างรวดเร็วและเพิ่มประสิทธิภาพการทำงานอย่างต่อเนื่อง'}}</text>
+        </view>
+      </view>
+      <view class="card-arrow">></view>
+    </view>
   </view>
 </view>

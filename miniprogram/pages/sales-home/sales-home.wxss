@@ -147,3 +147,7 @@ page {
   min-width: 16rpx;
   text-align: center;
 }
+
+.study-bg {
+  background: #e3d9c6;
+}

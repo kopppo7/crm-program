@@ -1,0 +1,25 @@
+page { background-color: #000000; /* 资料页用黑色背景，显得图片更高级且专注 */ }
+
+.container {
+  padding-bottom: 60rpx;
+}
+
+.tips {
+  color: #a1a1aa;
+  font-size: 24rpx;
+  text-align: center;
+  padding: 20rpx 0;
+  background-color: #18181b;
+}
+
+.image-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.product-img {
+  width: 100%; /* 图片宽度 100% 撑满屏幕 */
+  display: block; /* 去除图片底部的默认空白间隙 */
+  margin-bottom: 10rpx; /* 图片之间留一点极小的缝隙区分 */
+}
