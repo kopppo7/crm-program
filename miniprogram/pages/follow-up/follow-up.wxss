@@ -20,3 +20,51 @@ page { background-color: #f5f7fa; }
 .plus { font-size: 30px; color: #999; margin-bottom: 4px; }
 
 .submit-btn { background: #07c160; color: #fff; margin-top: 20px; border-radius: 8px; font-weight: bold;}
+
+/* --- 音频上传样式 --- */
+.audio-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  margin-top: 10rpx;
+}
+
+.audio-box {
+  display: flex;
+  align-items: center;
+  background-color: #f8f9fa;
+  padding: 16rpx 20rpx;
+  border-radius: 8rpx;
+  position: relative;
+  border: 1px solid #e9ecef;
+}
+
+.audio-icon {
+  font-size: 32rpx;
+  margin-right: 12rpx;
+}
+
+.audio-name {
+  font-size: 26rpx;
+  color: #333;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 40rpx;
+}
+
+.audio-del {
+  position: absolute;
+  right: -10rpx;
+  top: -10rpx;
+  background-color: #ff4d4f;
+  color: #fff;
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 28rpx;
+  font-size: 24rpx;
+  z-index: 10;
+}

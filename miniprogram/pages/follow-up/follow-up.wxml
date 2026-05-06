@@ -32,7 +32,31 @@
       <text class="label">{{t.fuNote}}</text>
       <textarea class="note-input" placeholder="{{t.fuNotePlaceholder}}" bindinput="onNoteInput"></textarea>
     </view>
+    
+    <!-- 🌟 录音文件上传模块 (上传后隐藏加号版) -->
+    <view class="form-item column">
+      <text class="label">{{t.fuUploadAudio}}</text>
+      
+      <view class="audio-list">
+        <view class="audio-box" wx:for="{{tempAudioFiles}}" wx:key="path">
+          <text class="audio-icon">🎵</text>
+          <text class="audio-name">{{item.name}}</text>
+          <view class="del-btn audio-del" bindtap="removeAudio" data-index="{{index}}">×</view>
+        </view>
+        
+        <!-- 核心修改：长度为0时才显示长条形按钮，只要选了1个就立刻隐藏 -->
+        <view class="audio-upload-btn" bindtap="chooseAudio" wx:if="{{tempAudioFiles.length === 0}}">
+          <text>+ {{currentLang === 'zh' ? '点击添加录音' : 'คลิกเพื่อเพิ่มเสียง'}}</text>
+        </view>
+        
+        <!-- 提示语同样在上传后隐藏，保持界面清爽 -->
+        <view class="tips" wx:if="{{tempAudioFiles.length === 0}}" style="font-size:22rpx;color:#999;margin-top:10rpx;">
+          {{t.fuAudioTips}}
+        </view>
+      </view>
+    </view>
 
+    <!-- 原有图片上传模块 -->
     <view class="form-item column">
       <text class="label">{{t.fuUpload}}</text>
       <view class="image-grid">

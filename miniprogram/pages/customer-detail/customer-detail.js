@@ -15,7 +15,6 @@ Page({
     showProfileModal: false, 
     editProfileForm: {},
 
-    // 🌟 全局中文备忘录相关状态
     showGlobalTransModal: false,
     globalTransText: ''
   },
@@ -30,7 +29,6 @@ Page({
 
   onShow() {
     this.initLanguage();
-    
     wx.showNavigationBarLoading();
     wx.cloud.callFunction({
       name: 'login', 
@@ -106,7 +104,6 @@ Page({
       .orderBy('createTime', 'desc')
       .get()
       .then(res => { 
-        // 🌟 核心升级：遍历获取到的记录，将原始的 createTime 转化为带具体时间的格式
         let fetchedLogs = res.data.map(log => {
           if (log.createTime) {
             log.displayTime = this.formatDateTime(log.createTime);
@@ -123,7 +120,6 @@ Page({
         if (!hasReassignLog) {
           let createDateStr = '';
           if (this.data.customer && this.data.customer.createTime) {
-            // 系统初次录入的时间也精确到分钟
             createDateStr = this.formatDateTime(this.data.customer.createTime);
           } else {
             createDateStr = 'Initial';
@@ -143,9 +139,6 @@ Page({
       });
   },
 
-  // ... 保持原有 onReassignChange 等方法不变 ...
-
-  // 🌟 新增：精确到分钟的时间格式化工具
   formatDateTime(dateStrOrObj) {
     if (!dateStrOrObj) return '';
     const date = new Date(dateStrOrObj);
@@ -160,7 +153,6 @@ Page({
     return `${year}-${month}-${day} ${hours}:${minutes}`;
   },
 
-  // 原有的仅日期格式化保留（给部分旧逻辑兼容用）
   formatDate(date) {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -222,13 +214,6 @@ Page({
     });
   },
 
-  formatDate(date) {
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  },
-
   makePhoneCall(e) {
     const phoneNum = String(e.currentTarget.dataset.phone);
     if (!phoneNum || phoneNum === 'undefined') return;
@@ -285,14 +270,10 @@ Page({
     });
   },
 
-  // ================= 🌟 核心：全局档案提取与中文存档 =================
-  
-  // 1. 一键复制：提取整页重要信息
   copyAllContext() {
     const p = this.data.customer.profile || {};
     let text = `【客户画像】\n需求: ${p.demand || '未填'}\n动机: ${p.motivation || '未填'}\n使用者: ${p.userType || '未填'}\n场景: ${p.scenario || '未填'}\n时间: ${p.timeframe || '未填'}\n预算: ${p.budget || '未填'}\n\n【跟进记录】\n`;
     
-    // 遍历拼装时间轴日志
     this.data.logs.forEach(log => {
       const statusStr = this.data.t.status[log.result_tag] || log.result_tag;
       text += `[${log.createTimeStr}] 状态:${statusStr}\n内容: ${log.note}\n`;
@@ -302,15 +283,13 @@ Page({
 
     wx.setClipboardData({
       data: text,
-      success: () => wx.showToast({ title: '已复制全局档案，请去翻译', icon: 'none' })
+      success: () => wx.showToast({ title: '已复制全局档案', icon: 'none' })
     });
   },
 
-  // 2. 录入全局中文信息
   openGlobalTransModal() {
     this.setData({
       showGlobalTransModal: true,
-      // 提取该客户下已保存的中文备忘录
       globalTransText: this.data.customer.translated_context || ''
     });
   },
@@ -326,7 +305,6 @@ Page({
   saveGlobalTranslation() {
     wx.showLoading({ title: '保存中...', mask: true });
 
-    // 直接保存在 customers 表的新增字段 translated_context 中
     db.collection('customers').doc(this.data.customerId).update({
       data: {
         translated_context: this.data.globalTransText,
@@ -343,6 +321,97 @@ Page({
       wx.hideLoading();
       wx.showToast({ title: '保存失败', icon: 'none' });
       console.error(err);
+    });
+  },
+
+  // ================= 🌟 最终修复版：音频处理核心逻辑 =================
+  handleAudioClick(e) {
+    const fileID = e.currentTarget.dataset.fileid;
+    if (!fileID) return wx.showToast({ title: '音频路径丢失', icon: 'none' });
+
+    wx.showActionSheet({
+      itemList: this.data.currentLang === 'zh' ? ['▶️ 播放录音', '🔗 复制下载链接'] : ['▶️ เล่นเสียง', '🔗 คัดลอกลิงก์'],
+      success: (res) => {
+        if (res.tapIndex === 0) this.playAudio(fileID);
+        else if (res.tapIndex === 1) this.copyAudioLink(fileID);
+      }
+    });
+  },
+
+  playAudio(url) {
+    // 1. 如果是旧数据 (cloud://开头)，去微信云下载
+    if (url.indexOf('cloud://') !== -1) {
+      wx.showLoading({ title: '加载旧录音...', mask: true });
+      wx.cloud.downloadFile({
+        fileID: url,
+        config: { env: 'cloud1-d1gdd35vq77ab5c2f' },
+        success: res => {
+          wx.hideLoading();
+          this.startAudioPlayer(res.tempFilePath);
+        },
+        fail: err => {
+          wx.hideLoading();
+          wx.showToast({ title: '旧录音已失效', icon: 'none' });
+        }
+      });
+    } else {
+      // 2. 如果是新数据 (https://开头)，千万不要下载！直接推流秒播！
+      this.startAudioPlayer(url);
+    }
+  },
+
+  startAudioPlayer(src) {
+    if (this.innerAudioContext) {
+      this.innerAudioContext.stop();
+      this.innerAudioContext.destroy();
+    }
+
+    wx.showLoading({ title: '缓冲中...', mask: true });
+    const player = wx.createInnerAudioContext();
+    this.innerAudioContext = player;
+    player.src = src;
+    
+    player.onPlay(() => {
+      wx.hideLoading();
+      wx.showToast({ title: '🎵 正在播放', icon: 'success' });
+    });
+    
+    player.onError((err) => {
+      wx.hideLoading();
+      wx.showModal({ title: '播放失败', content: '音频格式不支持或无权访问', showCancel: false });
+    });
+
+    player.play();
+  },
+
+  copyAudioLink(url) {
+    if (url.indexOf('cloud://') !== -1) {
+      wx.showLoading({ title: '转换中...' });
+      wx.cloud.getTempFileURL({
+        fileList: [url],
+        config: { env: 'cloud1-d1gdd35vq77ab5c2f' },
+        success: res => {
+          wx.hideLoading();
+          if (res.fileList[0].tempFileURL) this.executeCopy(res.fileList[0].tempFileURL);
+        }
+      });
+    } else {
+      this.executeCopy(url);
+    }
+  },
+
+  executeCopy(text) {
+    wx.setClipboardData({
+      data: text,
+      success: () => {
+        setTimeout(() => {
+          wx.showModal({ 
+            title: this.data.currentLang === 'zh' ? '✅ 复制成功' : '✅ คัดลอกลิงก์แล้ว', 
+            content: text + '\n\n👆 请粘贴至手机自带浏览器下载', 
+            showCancel: false 
+          });
+        }, 300);
+      }
     });
   }
 });
