@@ -74,10 +74,10 @@
       <view class="label">{{t.profileTimeframe}}</view>
       <text class="value {{!customer.profile.timeframe ? 'unknown' : ''}}">{{customer.profile.timeframe || t.unknown}}</text>
     </view>
-    <view class="profile-item">
+    <!-- <view class="profile-item">
       <view class="label">{{t.profileBudget}}</view>
       <text class="value {{!customer.profile.budget ? 'unknown' : ''}}">{{customer.profile.budget || t.unknown}}</text>
-    </view>
+    </view> -->
   </view>
 </view>
 
@@ -134,10 +134,10 @@
       <text class="form-label">{{t.profileTimeframe}}</text>
       <input class="form-input" value="{{editProfileForm.timeframe}}" data-field="timeframe" bindinput="onProfileInput" />
     </view>
-    <view class="form-group">
+    <!-- <view class="form-group">
       <text class="form-label">{{t.profileBudget}}</text>
       <input class="form-input" value="{{editProfileForm.budget}}" data-field="budget" bindinput="onProfileInput" />
-    </view>
+    </view> -->
   </scroll-view>
   <view class="modal-footer">
     <button class="btn-cancel" bindtap="closeProfileModal">{{t.cancel}}</button>

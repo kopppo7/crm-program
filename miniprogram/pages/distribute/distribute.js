@@ -32,7 +32,7 @@ Page({
         wx.showToast({ title: '网络异常', icon: 'none' });
       });
   },
-
+  
   // 监听智能解析粘贴
   handleSmartParse(e) {
     const text = e.detail.value;
@@ -47,15 +47,23 @@ Page({
     const payloadMatch = text.match(/น้ำหนักบรรทุกสูงสุดที่คุณต้องการคือเท่าไหร่\?:\s*(.*)/);
     const timelineMatch = text.match(/คุณวางแผนจะสั่งซื้ออุปกรณ์นี้เมื่อไหร่\?:\s*(.*)/);
 
+    // 🌟 核心修改：定义一个辅助函数。如果没匹配到，或者匹配到了但内容全是空格/为空，强制返回 'none'
+    const parseValue = (match) => {
+      if (match && match[1] && match[1].trim() !== '') {
+        return match[1].trim();
+      }
+      return 'none';
+    };
+
     this.setData({
-      'customer.name': nameMatch ? nameMatch[1].trim() : this.data.customer.name,
-      'customer.city': cityMatch ? cityMatch[1].trim() : this.data.customer.city,
-      'customer.phone': phoneMatch ? phoneMatch[1].trim() : this.data.customer.phone,
-      'customer.payload': payloadMatch ? payloadMatch[1].trim() : this.data.customer.payload,
-      'customer.timeline': timelineMatch ? timelineMatch[1].trim() : this.data.customer.timeline,
+      'customer.name': parseValue(nameMatch),
+      'customer.city': parseValue(cityMatch),
+      'customer.phone': parseValue(phoneMatch),
+      'customer.payload': parseValue(payloadMatch),
+      'customer.timeline': parseValue(timelineMatch),
     });
   },
-
+  
   handleInput(e) {
     const field = e.currentTarget.dataset.field;
     this.setData({
