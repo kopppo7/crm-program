@@ -23,3 +23,7 @@ page { background-color: #000000; /* 资料页用黑色背景，显得图片更�
   display: block; /* 去除图片底部的默认空白间隙 */
   margin-bottom: 10rpx; /* 图片之间留一点极小的缝隙区分 */
 }
+
+.product-grid {
+  width: 95%;
+}

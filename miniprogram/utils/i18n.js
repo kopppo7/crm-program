@@ -104,6 +104,12 @@ const zh = {
    modSalesDesc: '客户异议解答与竞品话术应对(即将开放)',
    modDevToast: '该模块正在整理中',
    manualDetailTips: '💡 点击图片可放大全屏预览，支持左右滑动',
+   modIntroTitle: '产品介绍',
+    modIntroDesc: '各系列产品详细介绍与规格参数',
+    prodCrawler: '履带运输车',
+    prodExcavator: '小型挖掘机',
+    prodTiller: '微耕机',
+    prodHarvester: '收割机',
    // 跟进记录 - 录音模块
    fuUploadAudio: '上传录音 (m4a/mp3等)',
    fuAudioTips: '提示：请先将录音发给微信“文件传输助手”，再点击“+”从聊天记录选择。'
@@ -215,6 +221,12 @@ const th = {
   modSalesDesc: 'การตอบข้อโต้แย้งและรับมือคู่แข่ง (เปิดให้บริการเร็วๆ นี้)',
   modDevToast: 'โมดูลนี้กำลังอยู่ระหว่างการจัดทำ',
   manualDetailTips: '💡 คลิกที่รูปเพื่อดูแบบเต็มจอ และปัดซ้ายขวาเพื่อเลื่อนดู',
+  modIntroTitle: 'แนะนำผลิตภัณฑ์',
+    modIntroDesc: 'รายละเอียดผลิตภัณฑ์และข้อมูลจำเพาะของแต่ละซีรีส์',
+    prodCrawler: 'รถบรรทุกตีนตะขาบ',
+    prodExcavator: 'รถขุดขนาดเล็ก',
+    prodTiller: 'รถไถเดินตาม',
+    prodHarvester: 'รถเกี่ยวนวดข้าว',
   // 跟进记录 - 录音模块 (泰文翻译)
   fuUploadAudio: 'อัปโหลดไฟล์เสียง (m4a/mp3 ฯลฯ)',
   fuAudioTips: 'คำแนะนำ: โปรดส่งไฟล์เสียงไปยัง "File Transfer" ใน WeChat ก่อน แล้วคลิก "+" เพื่อเลือกจากประวัติการแชท'

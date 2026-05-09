@@ -1,5 +1,7 @@
 <view class="container">
-  <view class="tips">{{t.manualDetailTips}}</view>
+  <view class="tips">
+    <text>💡 {{t.manualDetailTips || (currentLang === 'zh' ? '建议点击图片放大查看高清细节' : 'แนะนำให้คลิกที่รูปภาพเพื่อขยายดูรายละเอียด')}}</text>
+  </view>
   
   <view class="image-list">
     <image 
@@ -13,4 +15,6 @@
       data-src="{{item}}"
     ></image>
   </view>
+
+  <view class="footer-safe-area"></view>
 </view>

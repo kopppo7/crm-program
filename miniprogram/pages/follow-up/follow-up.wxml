@@ -35,7 +35,7 @@
     
     <!-- 🌟 录音文件上传模块 (上传后隐藏加号版) -->
     <view class="form-item column">
-      <text class="label">{{t.fuUploadAudio}}</text>
+      <text class="label" style="width: 100%;">{{t.fuUploadAudio}}</text>
       
       <view class="audio-list">
         <view class="audio-box" wx:for="{{tempAudioFiles}}" wx:key="path">

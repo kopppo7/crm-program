@@ -23,6 +23,15 @@ Page({
       // 🌟 动态生成模块列表，为了保持双语 UI 的高级感，副标题自动取另一种语言
       moduleList: [
         {
+          id: 'product_introduction', // 🌟 新增模块
+          titleMain: t.modIntroTitle,
+          titleSub: lang === 'zh' ? 'แนะนำผลิตภัณฑ์' : '产品介绍',
+          icon: '🚜',
+          desc: t.modIntroDesc,
+          iconBg: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+          iconColor: '#d97706'
+        },
+        {
           id: 'product_info',
           titleMain: t.modProdTitle,
           titleSub: lang === 'zh' ? 'ข้อมูลผลิตภัณฑ์' : '产品资料',
@@ -46,13 +55,11 @@ Page({
 
   goToDetail(e) {
     const moduleId = e.currentTarget.dataset.id;
-    
-    if(moduleId === 'sales_script') {
+    if (moduleId === 'product_introduction' || moduleId === 'product_info') { 
+      // 🌟 跳转到新增的产品选择列表页
+      wx.navigateTo({ url: `/package-learning/pages/product-intro-menu/product-intro-menu?type=${moduleId}` });
+    } else if(moduleId === 'sales_script') {
       return wx.showToast({ title: this.data.t.modDevToast, icon: 'none' });
     }
-
-    wx.navigateTo({
-      url: `/package-learning/pages/manual-detail/manual-detail?id=${moduleId}`
-    });
   }
 });

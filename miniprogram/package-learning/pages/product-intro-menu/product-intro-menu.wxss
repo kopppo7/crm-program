@@ -1,0 +1,9 @@
+page { background-color: #f8fafc; padding: 20rpx; }
+.product-grid { display: flex; flex-direction: column; gap: 20rpx; }
+.product-item {
+  background: #fff; border-radius: 16rpx; padding: 40rpx;
+  display: flex; align-items: center; box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.05);
+}
+.prod-icon { font-size: 60rpx; margin-right: 30rpx; }
+.prod-name { font-size: 32rpx; font-weight: bold; color: #1e293b; display: block; }
+.prod-arrow { font-size: 24rpx; color: #94a3b8; margin-top: 10rpx; display: block; }

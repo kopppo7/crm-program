@@ -18,7 +18,8 @@
       "name": "learning",
       "pages": [
         "pages/manual-list/manual-list",
-        "pages/manual-detail/manual-detail"
+        "pages/manual-detail/manual-detail",
+        "pages/product-intro-menu/product-intro-menu"
       ]
     }
   ],
