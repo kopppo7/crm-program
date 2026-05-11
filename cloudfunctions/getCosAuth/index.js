@@ -5,8 +5,8 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
 exports.main = async (event, context) => {
   // ⚠️ 请把这里替换为你刚刚在腾讯云后台拿到的真实密钥！
-  const secretId = 'AKID6FF3d0CeuwnSvLdmqjPzOZWJVaS6Zqy3';
-  const secretKey = '3xsiOtCKG6qPnQq57wZ1HKBuSp0BE5B6';
+const SecretId = process.env.TENCENT_SECRET_ID;
+const SecretKey = process.env.TENCENT_SECRET_KEY;
   
   const now = Math.floor(Date.now() / 1000);
   const exp = now + 900; // 这个签名 15 分钟内有效，过期作废，极度安全
