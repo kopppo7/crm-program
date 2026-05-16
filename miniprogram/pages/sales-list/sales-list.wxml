@@ -22,18 +22,22 @@
     <view class="customer-card" wx:for="{{customerList}}" wx:key="_id">
       <view class="card-content" bindtap="goToDetail" data-id="{{item._id}}">
         
-        <!-- 头部区域：名字 + 右侧标签组 -->
         <view class="header">
           <text class="name">{{item.name}}</text>
           
           <view class="tags-container">
-            <!-- 改进二：按需显示已逾期 Tag -->
-            <text wx:if="{{item.isOverdue}}" class="tag overdue-tag">{{currentLang === 'zh' ? '已逾期' : 'เลยกำหนด'}}</text>
-            <text class="tag status-{{item.status}}">{{statusMap[item.status] || (currentLang === 'zh' ? '待处理' : 'รอดำเนินการ')}}</text>
+            <text wx:if="{{item.isOverdue && item.status !== 'Closed Won' && item.status !== 'Closed Lost' && item.status !== 'Invalid'}}" class="tag tag-overdue">{{currentLang === 'zh' ? '已逾期' : 'เลยกำหนด'}}</text>
+            
+            <text wx:if="{{item.status === 'pending' || !item.status}}" class="tag tag-pending">{{currentLang === 'zh' ? '待处理' : 'รอดำเนินการ'}}</text>
+            
+            <text wx:if="{{item.status === 'No Answer'}}" class="tag tag-warning">{{currentLang === 'zh' ? '未接通(需重拨)' : 'ไม่รับสาย(โทรซ้ำ)'}}</text>
+            
+            <text wx:if="{{item.status !== 'pending' && item.status !== 'No Answer' && item.status !== 'Closed Won' && item.status !== 'Closed Lost' && item.status !== 'Invalid' && item.status}}" class="tag tag-following">{{currentLang === 'zh' ? '再次跟进' : 'ติดตามอีกครั้ง'}}</text>
+            
+            <text wx:if="{{item.status === 'Closed Won' || item.status === 'Closed Lost' || item.status === 'Invalid'}}" class="tag tag-closed">{{statusMap[item.status] || item.status}}</text>
           </view>
         </view>
         
-        <!-- 改进三：修复电话拨号，独立可点击区域并增加链接样式 -->
         <view class="info phone-row">
           <text>📞 </text>
           <text class="phone-link" catchtap="makePhoneCall" data-phone="{{item.phone}}">{{item.phone}}</text>
@@ -41,7 +45,6 @@
         
         <view class="info text-gray">{{t.lblPayload}}: {{item.payload || '--'}} | {{t.lblCity}}: {{item.city || '--'}}</view>
         
-        <!-- 改进一：约定跟进时间 vs 首次处理时间 -->
         <view class="info text-alert" wx:if="{{item.next_follow_up}}">
           ⏰ {{t.lblNextTime || (currentLang === 'zh' ? '约定跟进' : 'นัดหมาย')}}: {{item.next_follow_up}}
         </view>
@@ -50,9 +53,6 @@
         </view>
 
       </view>
-      <!-- <view class="card-action">
-        <button class="action-btn" bindtap="goToFollowUp" data-id="{{item._id}}">{{t.btnFollowUp}}</button>
-      </view> -->
     </view>
 
     <view class="loading-bottom" wx:if="{{customerList.length > 0}}">

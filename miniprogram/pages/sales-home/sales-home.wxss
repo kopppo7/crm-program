@@ -151,3 +151,8 @@ page {
 .study-bg {
   background: #e3d9c6;
 }
+
+.disabled-card {
+  filter: grayscale(100%);
+  opacity: 1;
+}

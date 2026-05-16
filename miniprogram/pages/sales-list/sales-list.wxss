@@ -164,3 +164,43 @@ page {
   padding: 15px; 
   box-sizing: border-box; 
 }
+
+/* --- 智能状态标签颜色体系 --- */
+.tag {
+  padding: 4rpx 14rpx;
+  border-radius: 8rpx;
+  font-size: 22rpx;
+  font-weight: bold;
+  margin-left: 12rpx;
+}
+
+/* 红色：已逾期 (最紧急) */
+.tag-overdue {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+/* 蓝色：待处理 (新线索) */
+.tag-pending {
+  background-color: #e0f2fe;
+  color: #0284c7;
+}
+
+/* 橙黄色：未接通 (需重拨) */
+.tag-warning {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+/* 紫色：再次跟进 (进行中的各种状态) */
+.tag-following {
+  background-color: #f3e8ff;
+  color: #7e22ce;
+}
+
+/* 灰色：已完结 (已成交、拒绝、无效) */
+.tag-closed {
+  background-color: #f1f5f9;
+  color: #64748b;
+  font-weight: normal; /* 完结的单子不再加粗，降低视觉干扰 */
+}

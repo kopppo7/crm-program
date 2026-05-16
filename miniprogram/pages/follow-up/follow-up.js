@@ -31,7 +31,19 @@ Page({
     const t = i18n.t();
     const lang = i18n.getLang();
     const types = lang === 'zh' ? ['电话沟通', 'Line', '线下拜访'] : ['โทรศัพท์ (Phone)', 'Line', 'พบปะลูกค้า (Visit)'];
-    const rawStatuses = ['Contacted', 'Strong Intent', 'Quoted', 'Demo Scheduled', 'Closed Won', 'Closed Lost', 'Invalid', 'No Answer'];
+    
+    // 🌟 核心修改：将销售可选的状态严格限制为这7个真实跟进结果
+    // 注意：绝对不要在这里放 'pending' 或 'FollowUp'
+    const rawStatuses = [
+      'Quoted',          // 已发资料
+      'Considering',     // 还在考虑
+      'No Answer',       // 未接电话
+      'Demo Scheduled',  // 约定看机
+      'Closed Won',      // 已成交
+      'Closed Lost',     // 明确拒绝
+      'Invalid'          // 无效线索
+    ];
+    
     const options = rawStatuses.map(status => ({ value: status, label: t.status[status] || status }));
     this.setData({ t: t, followTypes: types, statusOptions: options });
     wx.setNavigationBarTitle({ title: t.fuTitle });

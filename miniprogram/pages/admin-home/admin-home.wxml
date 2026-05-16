@@ -1,64 +1,66 @@
-<view class="work-station">
+<view class="work-station"> 
+  <view class="lang-switch-bar">
+    <view class="lang-btn" bindtap="switchLang">
+      <text class="icon">🌐</text>
+      <text>{{currentLang === 'zh' ? 'เปลี่ยนเป็นภาษาไทย' : '切换为中文'}}</text>
+    </view>
+  </view>
+
   <view class="header">
-    <text class="title">Agritech 管理后台</text>
+    <text class="title">{{t.adminTitle}}</text>
   </view>
 
   <view class="menu-list">
-    <!-- 1. 分配客户 -->
     <view class="menu-card" bindtap="goToDistribute">
       <view class="card-left">
         <view class="icon-box" style="background: #e6f7ff;">📋</view>
         <view class="card-text">
-          <text class="card-name">分配客户</text>
-          <text class="card-desc">录入并下发线索</text>
+          <text class="card-name">{{t.adminDistribute}}</text>
+          <text class="card-desc">{{t.adminDistributeDesc}}</text>
         </view>
       </view>
       <text class="card-arrow">></text>
     </view>
 
-    <!-- 2. 查看客户 -->
     <view class="menu-card" bindtap="goToCustomerView">
       <view class="card-left">
         <view class="icon-box" style="background: #f6ffed;">👥</view>
         <view class="card-text">
-          <text class="card-name">查看客户</text>
-          <text class="card-desc">监控销售跟进进度</text>
+          <text class="card-name">{{t.adminView}}</text>
+          <text class="card-desc">{{t.adminViewDesc}}</text>
         </view>
       </view>
       <text class="card-arrow">></text>
     </view>
 
-    <!-- 3. 团队成员管理 -->
-    <view class="menu-card" bindtap="goToMemberMgmt">
+    <view class="menu-card" bindtap="goToMemberMgmt" wx:if="{{userRole === 'admin'}}">
       <view class="card-left">
         <view class="icon-box" style="background: #fff0f6;">⚙️</view>
         <view class="card-text">
-          <text class="card-name">团队成员管理</text>
-          <text class="card-desc">人员与权限设置</text>
+          <text class="card-name">{{t.adminMember}}</text>
+          <text class="card-desc">{{t.adminMemberDesc}}</text>
         </view>
       </view>
       <text class="card-arrow">></text>
     </view>
 
-    <!-- 4. 操作日志 -->
-    <view class="menu-card" bindtap="goToAdminLogs">
+    <view class="menu-card" bindtap="goToAdminLogs" wx:if="{{userRole === 'admin'}}">
       <view class="card-left">
         <view class="icon-box" style="background: #fffbe6;">🕒</view>
         <view class="card-text">
-          <text class="card-name">操作日志</text>
-          <text class="card-desc">重分配与操作审计</text>
+          <text class="card-name">{{t.adminLog}}</text>
+          <text class="card-desc">{{t.adminLogDesc}}</text>
         </view>
       </view>
       <text class="card-arrow">></text>
     </view>
 
-    <!-- 🌟 5. 新增功能：销售跟进统计 -->
-    <view class="menu-card" bindtap="goToDailyStats">
+    <view class="menu-card" bindtap="goToDailyStats" wx:if="{{userRole === 'admin'}}">
       <view class="card-left">
         <view class="icon-box" style="background: #f9f0ff;">📈</view>
         <view class="card-text">
-          <text class="card-name">销售数据统计</text>
-          <text class="card-desc">查看各销售处理数据统计</text>
+          <text class="card-name">{{t.adminStats}}</text>
+          <text class="card-desc">{{t.adminStatsDesc}}</text>
         </view>
       </view>
       <text class="card-arrow">></text>

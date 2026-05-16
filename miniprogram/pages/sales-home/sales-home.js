@@ -5,14 +5,15 @@ const i18n = require('../../utils/i18n.js');
 Page({
   data: {
     isVisitor: true,
+    isDisabled: false, // 🌟 极简状态：标记是否被禁用
     t: {},
-    currentLang: 'th', // 默认泰文
-    todoCount: 0       // 🌟 新增：用于存储待办数量的变量
+    currentLang: 'th', 
+    todoCount: 0       
   },
 
   onShow() {
     this.initLanguage();
-    this.fetchTodoCount(); // 🌟 新增：每次显示页面拉取待办数量
+    this.fetchTodoCount(); 
     this.checkUserRole();
   },
 
@@ -25,18 +26,14 @@ Page({
     wx.setNavigationBarTitle({ title: this.data.t.homeTitle });
   },
 
-  // 核心：点击切换语言
   switchLang() {
     const newLang = this.data.currentLang === 'zh' ? 'th' : 'zh';
-    i18n.setLang(newLang); // 存入全局缓存
-    this.initLanguage();   // 立刻刷新当前页面文字
+    i18n.setLang(newLang); 
+    this.initLanguage();   
   },
 
-  // 🌟 新增：检查当前用户的身份
   checkUserRole() {
     const myOpenId = wx.getStorageSync('myOpenId');
-    
-    // 如果没有 OpenID，说明根本没登录，绝对是访客
     if (!myOpenId) {
       this.setData({ isVisitor: true });
       return;
@@ -44,15 +41,12 @@ Page({
 
     db.collection('users').where({ _openid: myOpenId }).get().then(res => {
       if (res.data && res.data.length > 0) {
-        const role = res.data[0].role;
-        // 如果是管理员或销售，就不是访客 (isVisitor 设为 false)
-        if (role === 'admin' || role === 'sales') {
-          this.setData({ isVisitor: false });
-        } else {
-          this.setData({ isVisitor: true });
-        }
+        const user = res.data[0];
+        this.setData({ 
+          isDisabled: user.status === 'disabled', // 🌟 获取禁用状态
+          isVisitor: !(user.role === 'admin' || user.role === 'sales')
+        });
       } else {
-        // 数据库里没这个人，也是访客
         this.setData({ isVisitor: true });
       }
     }).catch(err => {
@@ -61,20 +55,13 @@ Page({
     });
   },
   
-  // 🌟 新增核心功能：拉取今日待办数量
   fetchTodoCount() {
     const myOpenId = wx.getStorageSync('myOpenId');
     if (!myOpenId) return;
 
     const d = new Date();
-    const year = d.getFullYear();
-    let month = d.getMonth() + 1;
-    let day = d.getDate();
-    if (month < 10) month = '0' + month;
-    if (day < 10) day = '0' + day;
-    const todayStr = `${year}-${month}-${day}`;
+    const todayStr = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
 
-    // 使用聚合查询 .count() 快速获取数量，不消耗性能
     db.collection('customers').where(_.and([
       { assigned_sales_id: myOpenId },
       { status: _.nin(['Closed Won', 'Closed Lost', 'Invalid']) },
@@ -88,23 +75,34 @@ Page({
       ])
     ])).count().then(res => {
       this.setData({ todoCount: res.total });
-    }).catch(err => {
-      console.error('获取待办数量失败:', err);
-    });
+    }).catch(err => console.error('获取待办失败:', err));
+  },
+
+  // 🌟 极简拦截器：判断被禁用的弹窗提示
+  checkDisabled() {
+    if (this.data.isDisabled) {
+      wx.showModal({
+        title: this.data.currentLang === 'zh' ? '提示' : 'เตือน',
+        content: this.data.currentLang === 'zh' ? '账号已被禁用，请联系管理员' : 'บัญชีของคุณถูกระงับ',
+        showCancel: false
+      });
+      return true; // 返回 true 表示应该拦截
+    }
+    return false; // 正常
   },
 
   goToTodo() {
+    if (this.checkDisabled()) return; // 🌟 拦截：如果是禁用状态，直接退出函数
     wx.navigateTo({ url: '/pages/sales-list/sales-list?type=todo' });
   },
 
   goToLearningManual() {
-    // 必须以 / 开头，加上分包的 root 路径
-    wx.navigateTo({
-      url: '/package-learning/pages/manual-list/manual-list'
-    });
+    if (this.checkDisabled()) return; // 🌟 拦截
+    wx.navigateTo({ url: '/package-learning/pages/manual-list/manual-list' });
   },
 
   goToAll() {
+    if (this.checkDisabled()) return; // 🌟 拦截
     wx.navigateTo({ url: '/pages/sales-list/sales-list?type=all' });
   }
 });

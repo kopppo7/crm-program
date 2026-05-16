@@ -14,9 +14,8 @@
   </view>
 
   <view class="menu-list">
-    <view class="menu-card" bindtap="goToTodo">
+    <view class="menu-card {{isDisabled ? 'disabled-card' : ''}}" bindtap="goToTodo">
       <view class="card-left">
-        <!-- 🌟 重点改动：给 icon-box 增加相对定位，并塞入红点角标 -->
         <view class="icon-box todo-bg" style="position: relative;">
           <text>📅</text>
           <view class="badge" wx:if="{{todoCount > 0}}">{{todoCount}}</view>
@@ -29,7 +28,7 @@
       <view class="card-arrow">></view>
     </view>
 
-    <view class="menu-card" bindtap="goToAll">
+    <view class="menu-card {{isDisabled ? 'disabled-card' : ''}}" bindtap="goToAll">
       <view class="card-left">
         <view class="icon-box all-bg">👥</view>
         <view class="card-text">
@@ -40,7 +39,7 @@
       <view class="card-arrow">></view>
     </view>
 
-    <view class="menu-card" bindtap="goToLearningManual" wx:if="{{!isVisitor}}">
+    <view class="menu-card {{isDisabled ? 'disabled-card' : ''}}" bindtap="goToLearningManual" wx:if="{{!isVisitor}}">
       <view class="card-left">
         <view class="icon-box study-bg">📖</view>
         <view class="card-text">

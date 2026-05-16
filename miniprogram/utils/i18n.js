@@ -20,16 +20,15 @@ const zh = {
   lblOverdue: "已逾期",
   lblFirstAssign: "首次分配",
   status: {
-    'pending': '待处理',
-    'No Answer': '未接通 (需重拨)',
-    'Contacted': '初步沟通',
-    'FollowUp': '再次跟进',
-    'Strong Intent': '意向强烈',
+    'pending': '待处理',          // 保持不动
+    'FollowUp': '再次跟进',        // 系统自动判断展示用，销售不可选
     'Quoted': '已发资料',
+    'Considering': '还在考虑 (需写明原因)', // 🌟 新增
+    'No Answer': '未接电话 (需重拨)',
     'Demo Scheduled': '约定看机',
     'Closed Won': '✅ 已成交',
-    'Closed Lost': '❌ 战败',
-    'Invalid': '无效线索'
+    'Closed Lost': '❌ 明确拒绝',
+    'Invalid': '无效线索 (空号/错误)'
   },
 
   // --- 授权中转页 (index) ---
@@ -112,7 +111,19 @@ const zh = {
     prodHarvester: '收割机',
    // 跟进记录 - 录音模块
    fuUploadAudio: '上传录音 (m4a/mp3等)',
-   fuAudioTips: '提示：请先将录音发给微信“文件传输助手”，再点击“+”从聊天记录选择。'
+   fuAudioTips: '提示：请先将录音发给微信“文件传输助手”，再点击“+”从聊天记录选择。',
+   // --- 管理后台 (Admin Home) ---
+   adminTitle: "Agritech 管理后台",
+   adminDistribute: "分配客户",
+   adminDistributeDesc: "录入并下发线索",
+   adminView: "查看客户",
+   adminViewDesc: "监控销售跟进进度",
+   adminMember: "团队成员管理",
+   adminMemberDesc: "人员与权限设置",
+   adminLog: "操作日志",
+   adminLogDesc: "重分配与操作审计",
+   adminStats: "销售数据统计",
+   adminStatsDesc: "查看各销售处理数据统计"
 };
 
 const th = {
@@ -138,14 +149,13 @@ const th = {
   lblFirstAssign: "เวลาที่ได้รับ",
   status: {
     'pending': 'รอดำเนินการ',
+    'FollowUp': 'ติดตามอีกครั้ง', 
+    'Quoted': 'ส่งข้อมูลแล้ว',
+    'Considering': 'กำลังตัดสินใจ (โปรดระบุเหตุผล)', // 🌟 新增
     'No Answer': 'ไม่รับสาย (ต้องโทรซ้ำ)',
-    'Contacted': 'ติดต่อเบื้องต้น',
-    'FollowUp': 'ติดตามอีกครั้ง',
-    'Strong Intent': 'สนใจมาก',
-    'Quoted': 'ส่งข้อมูล/เสนอราคาแล้ว',
     'Demo Scheduled': 'นัดดูเครื่อง',
     'Closed Won': '✅ ปิดการขาย',
-    'Closed Lost': '❌ ปฏิเสธ',
+    'Closed Lost': '❌ ปฏิเสธอย่างชัดเจน',
     'Invalid': 'เบอร์ผิด/ไม่มีความต้องการ'
   },
 
@@ -229,7 +239,19 @@ const th = {
     prodHarvester: 'รถเกี่ยวนวดข้าว',
   // 跟进记录 - 录音模块 (泰文翻译)
   fuUploadAudio: 'อัปโหลดไฟล์เสียง (m4a/mp3 ฯลฯ)',
-  fuAudioTips: 'คำแนะนำ: โปรดส่งไฟล์เสียงไปยัง "File Transfer" ใน WeChat ก่อน แล้วคลิก "+" เพื่อเลือกจากประวัติการแชท'
+  fuAudioTips: 'คำแนะนำ: โปรดส่งไฟล์เสียงไปยัง "File Transfer" ใน WeChat ก่อน แล้วคลิก "+" เพื่อเลือกจากประวัติการแชท',
+  // --- 管理后台 (Admin Home) ---
+  adminTitle: "ระบบจัดการ Agritech",
+  adminDistribute: "มอบหมายลูกค้า",
+  adminDistributeDesc: "เพิ่มข้อมูลและมอบหมายลูกค้า",
+  adminView: "ดูข้อมูลลูกค้า",
+  adminViewDesc: "ตรวจสอบความคืบหน้าของฝ่ายขาย",
+  adminMember: "จัดการสมาชิกทีม",
+  adminMemberDesc: "ตั้งค่าบุคลากรและสิทธิ์การใช้งาน",
+  adminLog: "ประวัติการใช้งาน",
+  adminLogDesc: "ตรวจสอบการมอบหมายใหม่และประวัติการทำงาน",
+  adminStats: "สถิติข้อมูลการขาย",
+  adminStatsDesc: "ดูสถิติการทำงานของฝ่ายขายแต่ละคน"
 };
 
 module.exports = {

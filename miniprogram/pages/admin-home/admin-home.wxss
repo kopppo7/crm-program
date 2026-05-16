@@ -79,3 +79,34 @@ page {
   color: #ccc;
   font-weight: 300;
 }
+/* ==========================================
+   🌟 新增：管理后台多语言切换栏样式 
+   ========================================== */
+   .lang-switch-bar {
+    display: flex;
+    justify-content: flex-end; /* 让语言切换按钮整体靠右对齐 */
+    padding: 20rpx 30rpx 10rpx 30rpx;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .lang-btn {
+    display: flex;
+    align-items: center;
+    background-color: #f1f5f9; /* 浅灰色背景，低调不抢主视觉 */
+    padding: 12rpx 24rpx;
+    border-radius: 30rpx; /* 圆角胶囊形状 */
+    font-size: 24rpx;
+    color: #334155;
+    box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.05); /* 淡淡的阴影增加质感 */
+  }
+  
+  .lang-btn .icon {
+    margin-right: 8rpx; /* 地球图标和文字之间的间距 */
+    font-size: 26rpx;
+  }
+  
+  /* 激活点击反馈效果 */
+  .lang-btn:active {
+    opacity: 0.7;
+  }

@@ -13,8 +13,16 @@
       <icon wx:if="{{searchKeyword}}" type="clear" size="14" color="#ccc" bindtap="clearSearch" style="padding: 10px;" />
     </view>
   </view>
-
+  
   <view class="filter-bar">
+    <picker class="filter-picker" mode="date" bindchange="onDateChange">
+      <view class="filter-item">
+        <text>{{selectedDate ? selectedDate : (currentLang === 'zh' ? '全部时间' : 'ทุกเวลา')}}</text>
+        <text class="arrow" wx:if="{{!selectedDate}}">▾</text>
+        <text class="clear-icon" catchtap="clearDate" wx:if="{{selectedDate}}" style="margin-left:10rpx; color:#ff4d4f; font-size:28rpx; padding: 0 10rpx;">✖</text>
+      </view>
+    </picker>
+
     <picker class="filter-picker" mode="selector" range="{{salesOptions}}" range-key="name" bindchange="onSalesChange">
       <view class="filter-item">
         <text>{{salesOptions[selectedSalesIndex].name}}</text>
@@ -29,7 +37,7 @@
       </view>
     </picker>
   </view>
-
+  
   <scroll-view class="list-container" scroll-y bindscrolltolower="loadMore">
     <view wx:if="{{customerList.length === 0 && !isLoading}}" class="empty-state">
       <text>{{currentLang === 'zh' ? '暂无符合条件的客户数据' : 'ไม่พบข้อมูลลูกค้าที่ตรงกัน'}}</text>
@@ -42,8 +50,15 @@
           <text class="name">{{item.name}}</text>
           
           <view class="tags-container">
-            <text wx:if="{{item.isOverdue}}" class="tag overdue-tag">{{t.lblOverdue || (currentLang === 'zh' ? '已逾期' : 'เลยกำหนด')}}</text>
-            <text class="tag status-{{item.status}}">{{statusMap[item.status] || item.status || (currentLang === 'zh' ? '待处理' : 'รอดำเนินการ')}}</text>
+            <text wx:if="{{item.isOverdue && item.status !== 'Closed Won' && item.status !== 'Closed Lost' && item.status !== 'Invalid'}}" class="tag tag-overdue">{{currentLang === 'zh' ? '已逾期' : 'เลยกำหนด'}}</text>
+            
+            <text wx:if="{{item.status === 'pending' || !item.status}}" class="tag tag-pending">{{currentLang === 'zh' ? '待处理' : 'รอดำเนินการ'}}</text>
+            
+            <text wx:if="{{item.status === 'No Answer'}}" class="tag tag-warning">{{currentLang === 'zh' ? '未接通(需重拨)' : 'ไม่รับสาย(โทรซ้ำ)'}}</text>
+            
+            <text wx:if="{{item.status !== 'pending' && item.status !== 'No Answer' && item.status !== 'Closed Won' && item.status !== 'Closed Lost' && item.status !== 'Invalid' && item.status}}" class="tag tag-following">{{currentLang === 'zh' ? '再次跟进' : 'ติดตามอีกครั้ง'}}</text>
+            
+            <text wx:if="{{item.status === 'Closed Won' || item.status === 'Closed Lost' || item.status === 'Invalid'}}" class="tag tag-closed">{{statusMap[item.status] || item.status}}</text>
           </view>
         </view>
 

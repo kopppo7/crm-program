@@ -30,18 +30,15 @@ Page({
   onShow() {
     this.initLanguage();
     wx.showNavigationBarLoading();
-    wx.cloud.callFunction({
-      name: 'login', 
-      success: res => {
-        const openid = res.result.openid;
-        wx.setStorageSync('myOpenId', openid);
-        this.checkAdminRole(openid);
-      },
-      fail: err => {
-        console.error('❌ 登录失败', err);
-        wx.hideNavigationBarLoading();
-      }
-    });
+
+    // 🌟 核心修改：直接拿大门(index.js)发给我们的身份牌，不要再去调用微信服务器覆盖了！
+    const myOpenId = wx.getStorageSync('myOpenId');
+    if (myOpenId) {
+      this.checkAdminRole(myOpenId);
+    } else {
+      wx.hideNavigationBarLoading();
+      wx.showToast({ title: '身份丢失，请重新进入', icon: 'none' });
+    }
 
     if (this.data.customerId) {
       this.fetchCustomerDetail().then(() => {

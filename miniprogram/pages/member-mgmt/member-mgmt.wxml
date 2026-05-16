@@ -31,12 +31,18 @@
       <view class="info">
         <view class="name-row">
           <text class="name">{{item.name}}</text>
-          <text class="role-badge {{item.role === 'admin' ? 'admin-bg' : 'sales-bg'}}">{{item.role === 'admin' ? '管理员' : '销售'}}</text>
+          <text class="role-badge disabled-bg" wx:if="{{item.status === 'disabled'}}">已禁用</text>
+          <text class="role-badge {{item.role === 'admin' ? 'admin-bg' : (item.role === 'manager' ? 'manager-bg' : 'sales-bg')}}" wx:else>
+            {{item.role === 'admin' ? '管理员' : (item.role === 'manager' ? '主管' : '销售')}}
+          </text>
         </view>
         <view class="openid-text">ID: {{item.openid}}</view>
       </view>
       <view class="actions">
-        <text class="btn-delete" bindtap="removeMember" data-id="{{item._id}}" data-name="{{item.name}}" data-type="active">移除</text>
+        <text class="btn-disable" bindtap="toggleMemberStatus" 
+              data-id="{{item._id}}" data-name="{{item.name}}" 
+              data-currentstatus="{{item.status}}">{{item.status === 'disabled' ? '恢复' : '禁用'}}</text>
+        <text class="btn-delete" style="margin-left:20rpx;" bindtap="removeMember" data-id="{{item._id}}" data-name="{{item.name}}" data-type="active">移除</text>
       </view>
     </view>
   </view>

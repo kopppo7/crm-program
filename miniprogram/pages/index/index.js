@@ -37,7 +37,8 @@ Page({
         env: 'cloud1-d1gdd35vq77ab5c2f' 
       },
       success: res => {
-        const id = res.result.openid;
+        // const id = res.result.openid;
+        const id = 'o6WpV3bKAVJMXEn4PQISU1sXSnuQ'; // chey manager
         // const id = 'o6WpV3bCQ3YezfL7drNZ19N4XAwg'  // 泰1
         // const id = 'o6WpV3ZD942ytdWL-5wcwrsDR0wI';  // k
         this.setData({ tempOpenId: id });
@@ -53,8 +54,7 @@ Page({
 
   // 权限核验核心逻辑
   checkAuth(e) {
-    // 老板你的专属 ID，请确保大小写正确 (上次抓虫记得是 WwDZ 哦，你这里传的又是 WWDZ)
-    const myBossId = "o6WpV3RofitWWDZTrwXnsR_KxKBQ"; 
+    const myBossId = "o6WpV3RofitWWDZTrwXnsR_KxKBQ";
     const currentId = (this.data.tempOpenId || "").trim();
 
     if (currentId === myBossId) {
@@ -74,14 +74,30 @@ Page({
 
       if (res.data.length > 0) {
         const user = res.data[0];
+        
+        // 🌟 1. 优先拦截：如果账号被禁用，直接提示并拦截
+        if (user.status === 'disabled') {
+          this.setData({ authStatus: 'unregistered' }); // 让界面退回未注册/被拦截状态
+          wx.showModal({
+            title: this.data.currentLang === 'zh' ? '账号异常' : 'สถานะบัญชีผิดปกติ',
+            content: this.data.currentLang === 'zh' ? '您的账号已被禁用，请联系管理员' : 'บัญชีของคุณถูกระงับ',
+            showCancel: false
+          });
+          return;
+        }
+
         if (user.status === 'pending') {
           this.setData({ authStatus: 'pending' });
           if (e && e.type === 'tap') {
             wx.showToast({ title: this.data.currentLang === 'zh' ? '还在审核中哦' : 'รอการอนุมัติ', icon: 'none' });
           }
-        } else if (user.role === 'admin') {
+        } 
+        // 🌟 2. 核心修改：admin 和 manager 都可以进入管理后台！
+        else if (user.role === 'admin' || user.role === 'manager') {
           wx.reLaunch({ url: '/pages/admin-home/admin-home' });
-        } else {
+        } 
+        // 3. 正常销售进入销售页
+        else {
           wx.reLaunch({ url: '/pages/sales-home/sales-home' });
         }
       } else {

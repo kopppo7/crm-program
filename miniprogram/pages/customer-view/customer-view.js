@@ -6,6 +6,7 @@ Page({
   data: {
     customerList: [],
     searchKeyword: '',
+    selectedDate: '', // 🌟 新增：存放选中的具体日期
     
     salesOptions: [],
     selectedSalesIndex: 0,
@@ -108,6 +109,17 @@ Page({
     if (reset) wx.showLoading({ title: this.data.currentLang === 'zh' ? '加载中...' : 'กำลังโหลด...' });
     
     let conditions = [];
+    // 🌟 新增：如果有选中某一天，查询该日 00:00:00 到 23:59:59 的所有客户
+    if (this.data.selectedDate) {
+      // 将 YYYY-MM-DD 替换为 YYYY/MM/DD 以完美兼容苹果 iOS 手机的底层日期解析
+      const dateStr = this.data.selectedDate.replace(/-/g, '/');
+      const startOfDay = new Date(`${dateStr} 00:00:00`);
+      const endOfDay = new Date(`${dateStr} 23:59:59`);
+      
+      conditions.push({
+        createTime: _.gte(startOfDay).and(_.lte(endOfDay))
+      });
+    }
 
     if (this.data.salesOptions.length > 0) {
       const selectedSales = this.data.salesOptions[this.data.selectedSalesIndex];
@@ -216,5 +228,21 @@ Page({
 
   goToDetail(e) {
     wx.navigateTo({ url: `/pages/customer-detail/customer-detail?id=${e.currentTarget.dataset.id}` });
-  }
+  },
+  onSalesChange(e) { this.setData({ selectedSalesIndex: e.detail.value }, () => { this.fetchData(true); }); },
+  onStatusFilterChange(e) { this.setData({ selectedStatusIndex: e.detail.value }, () => { this.fetchData(true); }); },
+
+  // 🌟 新增：日期选择事件
+  onDateChange(e) {
+    this.setData({ selectedDate: e.detail.value }, () => {
+      this.fetchData(true); 
+    });
+  },
+
+  // 🌟 新增：清除日期恢复全部
+  clearDate() {
+    this.setData({ selectedDate: '' }, () => {
+      this.fetchData(true);
+    });
+  },
 })
