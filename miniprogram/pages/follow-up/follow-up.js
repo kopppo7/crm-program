@@ -232,7 +232,8 @@ Page({
           status: finalStatus,
           no_answer_count: currentNoAnswerCount, 
           next_follow_up: finalNextDate || '',
-          updateTime: db.serverDate()
+          updateTime: db.serverDate(),
+          last_follow_up_time: db.serverDate() // 🌟 核心新增：专门记录销售写跟进的精准时间
         }
       });
 

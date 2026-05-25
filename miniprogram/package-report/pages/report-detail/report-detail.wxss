@@ -1,0 +1,26 @@
+page { background: #f4f6f9; color: #333; padding-bottom: 50rpx;}
+.container { padding: 30rpx; }
+
+.header-card { background: #fff; padding: 30rpx; border-radius: 16rpx; margin-bottom: 30rpx; box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.02); border-left: 8rpx solid #3b82f6; }
+.sales-info { font-size: 34rpx; font-weight: bold; color: #1f2937; margin-bottom: 10rpx;}
+.time-info { font-size: 28rpx; color: #6b7280; }
+
+.section { background: #fff; border-radius: 16rpx; padding: 30rpx; margin-bottom: 30rpx; box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.02); }
+.section-title { display: flex; justify-content: space-between; align-items: center; font-size: 30rpx; font-weight: bold; color: #374151; margin-bottom: 20rpx; padding-bottom: 16rpx; border-bottom: 2rpx solid #f3f4f6; }
+
+.copy-btn { font-size: 24rpx; color: #fff; background: #3b82f6; border-radius: 30rpx; padding: 8rpx 24rpx; margin: 0; line-height: 1.5; font-weight: normal;}
+
+.original-content { font-size: 28rpx; color: #4b5563; line-height: 1.6; white-space: pre-wrap; background: #f9fafb; padding: 20rpx; border-radius: 10rpx; }
+
+.translate-box { margin-bottom: 30rpx; }
+.translate-input { width: 100%; box-sizing: border-box; background: #fdfdfd; border: 2rpx dashed #d1d5db; border-radius: 10rpx; padding: 20rpx; font-size: 28rpx; color: #1f2937; height: 300rpx; line-height: 1.5; }
+
+.save-btn { background: #10b981; color: #fff; font-size: 32rpx; font-weight: bold; border-radius: 40rpx; padding: 20rpx 0; box-shadow: 0 6rpx 16rpx rgba(16,185,129,0.3); }
+
+.header-card {
+  width: 95%;
+}
+
+.section {
+  width: 95%;
+}

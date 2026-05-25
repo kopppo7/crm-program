@@ -1,0 +1,60 @@
+<view class="container">
+  <view class="tab-header">
+    <view class="tab-item {{currentTab === 'daily' ? 'active' : ''}}" bindtap="switchTab" data-tab="daily">
+      {{currentLang === 'zh' ? '每日工作汇报' : 'รายงานประจำวัน'}}
+    </view>
+    <view class="tab-item {{currentTab === 'weekly' ? 'active' : ''}}" bindtap="switchTab" data-tab="weekly">
+      {{currentLang === 'zh' ? '每周工作计划' : 'แผนงานประจำสัปดาห์'}}
+    </view>
+  </view>
+
+  <view class="filter-bar">
+    <picker mode="selector" range="{{salesOptions}}" range-key="name" bindchange="onSalesChange" value="{{salesIndex}}">
+      <view class="filter-cell">
+        <text class="icon">👤</text>
+        <text>{{salesOptions[salesIndex].name}}</text>
+      </view>
+    </picker>
+    <picker mode="date" bindchange="onDateChange" value="{{filterDate}}" wx:if="{{currentTab === 'daily'}}">
+      <view class="filter-cell">
+        <text class="icon">📅</text>
+        <text>{{filterDate ? filterDate : (currentLang === 'zh' ? '全部日期' : 'ทุกวัน')}}</text>
+      </view>
+    </picker>
+  </view>
+
+  <scroll-view scroll-y class="list-scroll" bindrefresherrefresh="onRefresh" refresher-enabled refresher-triggered="{{isRefreshing}}">
+    <view class="empty-tip" wx:if="{{dataList.length === 0}}">
+      <text class="empty-icon">📭</text>
+      <text>{{currentLang === 'zh' ? '暂无相关汇报记录' : 'ไม่มีบันทึกรายงาน'}}</text>
+    </view>
+
+    <block wx:if="{{currentTab === 'daily'}}">
+      <view class="report-card daily-card" wx:for="{{dataList}}" wx:key="_id" bindtap="goToDetail" data-id="{{item._id}}">
+        <view class="card-title-row">
+          <text class="sales-name">👤 {{item.sales_name}}</text>
+          <text class="report-date">{{item.report_date}} {{item.submitTime}}</text>
+        </view>
+        <view class="badge-row">
+          <view class="badge-item bg-blue">新客: <text class="num">{{item.count_new}}</text></view>
+          <view class="badge-item bg-orange">跟进: <text class="num">{{item.count_follow}}</text></view>
+          <view class="badge-item bg-green">自拓: <text class="num">{{item.count_self}}</text></view>
+        </view>
+      </view>
+    </block>
+
+    <block wx:if="{{currentTab === 'weekly'}}">
+      <view class="report-card weekly-card" wx:for="{{dataList}}" wx:key="_id" bindtap="goToDetail" data-id="{{item._id}}">
+        <view class="card-title-row">
+          <text class="sales-name">👤 {{item.sales_name}}</text>
+          <text class="week-tag">📅 {{item.week_start}} 周计划 | {{item.submitTime}}</text>
+        </view>
+        <view class="badge-row">
+          <view class="badge-item bg-blue">日均计划处理: <text class="num">{{item.plan_daily_customers}} 人</text></view>
+          <view class="badge-item bg-purple">计划自拓客: <text class="num">{{item.plan_self_expanded}} 人</text></view>
+        </view>
+        <view class="click-hint">{{currentLang === 'zh' ? '点击查看工作详情与翻译 >>' : 'คลิกเพื่อดูรายละเอียด >>'}}</view>
+      </view>
+    </block>
+  </scroll-view>
+</view>

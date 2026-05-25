@@ -21,6 +21,16 @@
         "pages/manual-detail/manual-detail",
         "pages/product-intro-menu/product-intro-menu"
       ]
+    },
+    {
+      "root": "package-report",
+      "pages": [
+        "pages/report-menu/report-menu",
+        "pages/weekly-plan/weekly-plan", 
+        "pages/daily-report/daily-report",
+        "pages/admin-report-list/admin-report-list",
+        "pages/report-detail/report-detail"
+      ]
     }
   ],
   "networkTimeout": {

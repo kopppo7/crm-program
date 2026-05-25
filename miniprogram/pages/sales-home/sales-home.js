@@ -78,6 +78,13 @@ Page({
     }).catch(err => console.error('获取待办失败:', err));
   },
 
+  // 🌟 新增：跳转到工作汇报分包的菜单页
+  goToWorkReport() {
+    if (this.checkDisabled()) return; // 🌟 拦截被禁用的账号
+    // 跳转到我们即将新建的分包路径中
+    wx.navigateTo({ url: '/package-report/pages/report-menu/report-menu' });
+  },
+
   // 🌟 极简拦截器：判断被禁用的弹窗提示
   checkDisabled() {
     if (this.data.isDisabled) {

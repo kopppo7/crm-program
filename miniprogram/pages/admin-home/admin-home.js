@@ -43,6 +43,16 @@ initLanguage() {
   }
 },
 
+goToDailyStats() {
+  wx.navigateTo({ url: '/pages/sales-stats/sales-stats' });
+},
+
+// 🌟 新增：跳转到管理员的工作汇报列表页
+goToWorkReports() {
+  // 准备跳转到 report 分包下的管理员专属页面
+  wx.navigateTo({ url: '/package-report/pages/admin-report-list/admin-report-list' });
+},
+
 // 🌟 带日志的切换语言方法
 switchLang() {
   console.log("=== 触发点击切换语言 ===");

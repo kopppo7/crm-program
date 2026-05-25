@@ -10,6 +10,8 @@ Page({
   onLoad(options) {
     // 接收上一个页面传来的 type（例如：product_introduction 或 product_info）
     this.setData({ moduleType: options.type || 'product_introduction' });
+
+    console.log(options.type, "options.type")
   },
 
   onShow() {
@@ -22,7 +24,8 @@ Page({
         { id: 'CrawlerTransporter', name: t.prodCrawler || '履带运输车', icon: '🚚' },
         { id: 'SmallExcavator', name: t.prodExcavator || '小型挖掘机', icon: '🏗️' },
         { id: 'PowerTiller', name: t.prodTiller || '微耕机', icon: '🌱' },
-        { id: 'Harvester', name: t.prodHarvester || '收割机', icon: '🌾' }
+        { id: 'Harvester', name: t.prodHarvester || '收割机', icon: '🌾' },
+        { id: 'LawnMower', name: t.lawnMower || '割草机', icon: '🌾' },
       ]
     });
 

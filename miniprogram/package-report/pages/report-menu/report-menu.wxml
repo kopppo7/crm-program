@@ -1,0 +1,26 @@
+<view class="container">
+  <view class="header">
+    <text class="title">{{currentLang === 'zh' ? '工作汇报' : 'รายงานการทำงาน'}}</text>
+    <text class="subtitle">{{currentLang === 'zh' ? '请选择您要填写的汇报类型' : 'โปรดเลือกประเภทรายงานที่คุณต้องการกรอก'}}</text>
+  </view>
+  
+  <view class="card-list">
+    <view class="report-card" bindtap="goToWeekly">
+      <view class="icon-wrap weekly-bg">📅</view>
+      <view class="text-wrap">
+        <text class="card-title">{{currentLang === 'zh' ? '周工作计划' : 'แผนงานประจำสัปดาห์'}}</text>
+        <text class="card-desc">{{currentLang === 'zh' ? '每周一填写本周核心目标与计划' : 'กรอกเป้าหมายหลักและแผนงานของสัปดาห์นี้ทุกวันจันทร์'}}</text>
+      </view>
+      <view class="arrow">></view>
+    </view>
+    
+    <view class="report-card" bindtap="goToDaily">
+      <view class="icon-wrap daily-bg">📝</view>
+      <view class="text-wrap">
+        <text class="card-title">{{currentLang === 'zh' ? '每日工作汇报' : 'รายงานการทำงานประจำวัน'}}</text>
+        <text class="card-desc">{{currentLang === 'zh' ? '记录今天跟进的客户与遇到的问题' : 'บันทึกลูกค้าที่ติดตามและปัญหาที่พบในวันนี้'}}</text>
+      </view>
+      <view class="arrow">></view>
+    </view>
+  </view>
+</view>

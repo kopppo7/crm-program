@@ -1,0 +1,30 @@
+<view class="container" wx:if="{{report}}">
+  <view class="header-card">
+    <view class="sales-info">👤 {{report.sales_name}} 的{{type === 'daily' ? '每日汇报' : '周工作计划'}}</view>
+    <view class="time-info">📅 {{type === 'daily' ? report.report_date : report.week_start}}</view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">
+      <button class="copy-btn" bindtap="copyOriginalText">一键复制原文</button>
+    </view>
+    <view class="original-content">
+      <text>{{combinedText}}</text>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">
+      <text>🇨🇳 翻译与中文存档</text>
+    </view>
+    <view class="translate-box">
+      <textarea 
+        class="translate-input" 
+        placeholder="请将翻译后的中文内容粘贴在这里，方便日后查看..." 
+        model:value="{{translatedText}}" 
+        maxlength="-1"
+      ></textarea>
+    </view>
+    <button class="save-btn" bindtap="saveTranslation">保存中文存档</button>
+  </view>
+</view>

@@ -37,8 +37,8 @@ Page({
         env: 'cloud1-d1gdd35vq77ab5c2f' 
       },
       success: res => {
-        // const id = res.result.openid;
-        const id = 'o6WpV3bKAVJMXEn4PQISU1sXSnuQ'; // chey manager
+        const id = res.result.openid;
+        // const id = 'o6WpV3bKAVJMXEn4PQISU1sXSnuQ'; // chey manager
         // const id = 'o6WpV3bCQ3YezfL7drNZ19N4XAwg'  // 泰1
         // const id = 'o6WpV3ZD942ytdWL-5wcwrsDR0wI';  // k
         this.setData({ tempOpenId: id });

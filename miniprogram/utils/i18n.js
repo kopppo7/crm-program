@@ -109,6 +109,7 @@ const zh = {
     prodExcavator: '小型挖掘机',
     prodTiller: '微耕机',
     prodHarvester: '收割机',
+    lawnMower: '割草机',
    // 跟进记录 - 录音模块
    fuUploadAudio: '上传录音 (m4a/mp3等)',
    fuAudioTips: '提示：请先将录音发给微信“文件传输助手”，再点击“+”从聊天记录选择。',
@@ -237,6 +238,7 @@ const th = {
     prodExcavator: 'รถขุดขนาดเล็ก',
     prodTiller: 'รถไถเดินตาม',
     prodHarvester: 'รถเกี่ยวนวดข้าว',
+    lawnMower: 'เครื่องตัดหญ้า',
   // 跟进记录 - 录音模块 (泰文翻译)
   fuUploadAudio: 'อัปโหลดไฟล์เสียง (m4a/mp3 ฯลฯ)',
   fuAudioTips: 'คำแนะนำ: โปรดส่งไฟล์เสียงไปยัง "File Transfer" ใน WeChat ก่อน แล้วคลิก "+" เพื่อเลือกจากประวัติการแชท',

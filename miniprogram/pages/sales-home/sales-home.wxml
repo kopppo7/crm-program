@@ -49,5 +49,15 @@
       </view>
       <view class="card-arrow">></view>
     </view>
+    <view class="menu-card {{isDisabled ? 'disabled-card' : ''}}" bindtap="goToWorkReport" wx:if="{{!isVisitor}}">
+      <view class="card-left">
+        <view class="icon-box report-bg">📊</view>
+        <view class="card-text">
+          <text class="menu-name">{{currentLang === 'zh' ? '工作汇报' : 'รายงานการทำงาน'}}</text>
+          <text class="menu-desc">{{currentLang === 'zh' ? '填写每日汇报与每周工作计划' : 'กรอกรายงานประจำวันและแผนงานประจำสัปดาห์'}}</text>
+        </view>
+      </view>
+      <view class="card-arrow">></view>
+    </view>
   </view>
 </view>

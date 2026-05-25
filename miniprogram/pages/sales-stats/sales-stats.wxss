@@ -163,3 +163,29 @@ page {
   margin-left: 16rpx;
   font-weight: 500;
 }
+
+.disabled-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30rpx 0;
+  margin-top: 20rpx;
+}
+
+.disabled-toggle .line {
+  height: 1px;
+  flex: 1;
+  background-color: #e5e7eb;
+}
+
+.disabled-toggle .toggle-text {
+  font-size: 24rpx;
+  color: #94a3b8;
+  margin: 0 20rpx;
+}
+
+.disabled-card {
+  box-shadow: none;
+  border: 1px dashed #e2e8f0;
+  background-color: #fafafa;
+}

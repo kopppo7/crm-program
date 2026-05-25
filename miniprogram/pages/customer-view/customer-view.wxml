@@ -77,6 +77,10 @@
           
           <text class="next-time" wx:if="{{item.next_follow_up}}">⏰ {{t.lblNextTime || '约定跟进'}}: {{item.next_follow_up}}</text>
           <text class="next-time text-gray-time" wx:else>⏰ {{t.lblFirstAssign || '首次分配'}}: {{item.formattedCreateTime || '--'}}</text>
+          
+          <view class="next-time" style="display: block; margin-top: 10rpx; color: #888;" wx:if="{{item.formattedUpdateTime}}">
+            📝 {{currentLang === 'zh' ? '最新记录' : 'บันทึกล่าสุด'}}: {{item.formattedUpdateTime}}
+          </view>
         </view>
       </view>
     </view>

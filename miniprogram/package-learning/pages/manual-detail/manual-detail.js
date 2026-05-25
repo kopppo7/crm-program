@@ -24,7 +24,8 @@ Page({
         'CrawlerTransporter': '运输车.png',
         'SmallExcavator': '挖掘机.png',
         'PowerTiller': '微耕机.png',
-        'Harvester': '收割机.png'
+        'Harvester': '收割机.png',
+        'LawnMower': '割草机.png'
       };
 
       // 2. 根据传过来的 folder (英文ID) 拿到对应的中文文件名

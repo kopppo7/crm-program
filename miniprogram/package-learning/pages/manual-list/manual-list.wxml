@@ -23,10 +23,6 @@
       data-id="{{item.id}}" 
     >
       
-      <view class="icon-wrap" style="background: {{item.iconBg}};">
-        <text class="icon" style="color: {{item.iconColor}}">{{item.icon}}</text>
-      </view>
-      
       <view class="info-wrap">
         <view class="title-row">
           <text class="title-zh">{{item.titleMain}}</text>

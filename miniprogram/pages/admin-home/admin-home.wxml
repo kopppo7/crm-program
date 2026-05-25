@@ -66,5 +66,16 @@
       <text class="card-arrow">></text>
     </view>
 
+    <view class="menu-card" bindtap="goToWorkReports" wx:if="{{userRole === 'admin' || userRole === 'manager'}}">
+      <view class="card-left">
+        <view class="icon-box" style="background: #f0f9eb;">📊</view>
+        <view class="card-text">
+          <text class="card-name">{{currentLang === 'zh' ? '团队工作汇报' : 'รายงานการทำงานของทีม'}}</text>
+          <text class="card-desc">{{currentLang === 'zh' ? '查阅销售周计划与每日工作汇报' : 'ดูแผนงานและรายงานประจำวันของฝ่ายขาย'}}</text>
+        </view>
+      </view>
+      <text class="card-arrow">></text>
+    </view>
+
   </view>
 </view>

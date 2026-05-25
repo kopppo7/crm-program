@@ -7,14 +7,14 @@ Page({
     customerList: [],
     searchKeyword: '',
     selectedDate: '', // 🌟 新增：存放选中的具体日期
-    
+
     salesOptions: [],
     selectedSalesIndex: 0,
-    
+
     statusFilterOptions: [],
     selectedStatusIndex: 0,
 
-    t: {}, 
+    t: {},
     currentLang: 'zh',
     statusMap: {},
     isCalling: false, // 🌟 拨号防刷新锁
@@ -31,13 +31,15 @@ Page({
 
   onShow() {
     this.initLanguage(); // 🌟 初始化语言
-    
+
     // 如果是因为拨打完电话切回来的，拦截刷新，保持阅读位置
     if (this.data.isCalling) {
-      this.setData({ isCalling: false });
-      return; 
+      this.setData({
+        isCalling: false
+      });
+      return;
     }
-    this.fetchData(true); 
+    this.fetchData(true);
   },
 
   // 🌟 初始化语言与动态下拉菜单
@@ -47,24 +49,63 @@ Page({
     this.setData({
       currentLang: lang,
       t: trans,
-      statusMap: trans.status 
+      statusMap: trans.status
     });
-    
-    wx.setNavigationBarTitle({ title: lang === 'zh' ? '全部客户' : 'ลูกค้าทั้งหมด' });
+
+    wx.setNavigationBarTitle({
+      title: lang === 'zh' ? '全部客户' : 'ลูกค้าทั้งหมด'
+    });
 
     // 动态生成状态筛选字典
-    const statusFilters = lang === 'zh' ? [
-      { value: 'all', label: '全部状态' },
-      { value: 'pending', label: '未处理(待办)' },
-      { value: 'following', label: '跟进中' },
-      { value: 'won', label: '已成交' },
-      { value: 'lost', label: '战败/无效' }
-    ] : [
-      { value: 'all', label: 'สถานะทั้งหมด' },
-      { value: 'pending', label: 'รอดำเนินการ' },
-      { value: 'following', label: 'กำลังติดตาม' },
-      { value: 'won', label: 'ปิดการขาย' },
-      { value: 'lost', label: 'ปฏิเสธ/ไม่มีประโยชน์' }
+    // 🌟 核心修改 1：动态生成最新的状态筛选字典
+    const statusFilters = lang === 'zh' ? [{
+        value: 'all',
+        label: '全部状态'
+      },
+      {
+        value: 'pending',
+        label: '待处理 (未联系)'
+      },
+      {
+        value: 'no_answer',
+        label: '未接通 (需重拨)'
+      },
+      {
+        value: 'following',
+        label: '跟进中 (进行中)'
+      },
+      {
+        value: 'won',
+        label: '已成交'
+      },
+      {
+        value: 'lost',
+        label: '拒绝 / 无效'
+      }
+    ] : [{
+        value: 'all',
+        label: 'สถานะทั้งหมด'
+      },
+      {
+        value: 'pending',
+        label: 'รอดำเนินการ'
+      },
+      {
+        value: 'no_answer',
+        label: 'ไม่รับสาย'
+      },
+      {
+        value: 'following',
+        label: 'กำลังติดตาม'
+      },
+      {
+        value: 'won',
+        label: 'ปิดการขาย'
+      },
+      {
+        value: 'lost',
+        label: 'ปฏิเสธ / ไม่มีประโยชน์'
+      }
     ];
 
     // 更新状态菜单，如果你已经获取了销售列表，顺便更新一下“全部销售”的翻译
@@ -73,94 +114,154 @@ Page({
       updatedSales[0].name = lang === 'zh' ? '全部销售' : 'พนักงานขายทั้งหมด';
     }
 
-    this.setData({ 
+    this.setData({
       statusFilterOptions: statusFilters,
       salesOptions: updatedSales
     });
   },
 
   fetchSalesList() {
-    db.collection('users').where({ role: 'sales' }).get().then(res => {
+    db.collection('users').where({
+      role: 'sales'
+    }).get().then(res => {
       const allText = this.data.currentLang === 'zh' ? '全部销售' : 'พนักงานขายทั้งหมด';
-      const list = [{ _openid: 'all', name: allText }].concat(res.data);
-      this.setData({ salesOptions: list });
+      const list = [{
+        _openid: 'all',
+        name: allText
+      }].concat(res.data);
+      this.setData({
+        salesOptions: list
+      });
     }).catch(err => console.error('获取销售列表失败', err));
   },
 
-  onSearchInput(e) { this.setData({ searchKeyword: e.detail.value.trim() }); },
-  onSearch() { this.fetchData(true); },
-  clearSearch() { this.setData({ searchKeyword: '' }, () => { this.fetchData(true); }); },
-  onSalesChange(e) { this.setData({ selectedSalesIndex: e.detail.value }, () => { this.fetchData(true); }); },
-  onStatusFilterChange(e) { this.setData({ selectedStatusIndex: e.detail.value }, () => { this.fetchData(true); }); },
+  onSearchInput(e) {
+    this.setData({
+      searchKeyword: e.detail.value.trim()
+    });
+  },
+  onSearch() {
+    this.fetchData(true);
+  },
+  clearSearch() {
+    this.setData({
+      searchKeyword: ''
+    }, () => {
+      this.fetchData(true);
+    });
+  },
+  onSalesChange(e) {
+    this.setData({
+      selectedSalesIndex: e.detail.value
+    }, () => {
+      this.fetchData(true);
+    });
+  },
+  onStatusFilterChange(e) {
+    this.setData({
+      selectedStatusIndex: e.detail.value
+    }, () => {
+      this.fetchData(true);
+    });
+  },
 
   loadMore() {
     if (this.data.hasMore && !this.data.isLoading) {
-      this.setData({ page: this.data.page + 1 }, () => {
-        this.fetchData(false); 
+      this.setData({
+        page: this.data.page + 1
+      }, () => {
+        this.fetchData(false);
       });
     }
   },
 
-  fetchData(reset = false) {
-    if (reset) this.setData({ page: 0, hasMore: true, customerList: [] });
-    if (!this.data.hasMore || this.data.isLoading) return;
-
-    this.setData({ isLoading: true });
-    if (reset) wx.showLoading({ title: this.data.currentLang === 'zh' ? '加载中...' : 'กำลังโหลด...' });
-    
-    let conditions = [];
-    // 🌟 新增：如果有选中某一天，查询该日 00:00:00 到 23:59:59 的所有客户
-    if (this.data.selectedDate) {
-      // 将 YYYY-MM-DD 替换为 YYYY/MM/DD 以完美兼容苹果 iOS 手机的底层日期解析
-      const dateStr = this.data.selectedDate.replace(/-/g, '/');
-      const startOfDay = new Date(`${dateStr} 00:00:00`);
-      const endOfDay = new Date(`${dateStr} 23:59:59`);
-      
-      conditions.push({
-        createTime: _.gte(startOfDay).and(_.lte(endOfDay))
+  // 🌟 完整版 fetchData (包含最新日期筛选与时间对齐逻辑)
+  fetchData(isRefresh = false) {
+    if (isRefresh) {
+      this.setData({
+        page: 0,
+        hasMore: true,
+        customerList: []
       });
     }
+    if (!this.data.hasMore || this.data.isLoading) return;
 
-    if (this.data.salesOptions.length > 0) {
-      const selectedSales = this.data.salesOptions[this.data.selectedSalesIndex];
-      if (selectedSales._openid !== 'all') {
-        conditions.push({ assigned_sales_id: selectedSales._openid });
-      }
-    }
+    this.setData({
+      isLoading: true
+    });
+    wx.showNavigationBarLoading();
 
-    if (this.data.statusFilterOptions.length > 0) {
-      const selectedStatusVal = this.data.statusFilterOptions[this.data.selectedStatusIndex].value;
-      if (selectedStatusVal === 'pending') {
-        conditions.push({ status: 'pending' });
-      } else if (selectedStatusVal === 'following') {
-        conditions.push({ status: _.in(['Contacted', 'Strong Intent', 'Quoted', 'Demo Scheduled']) });
-      } else if (selectedStatusVal === 'won') {
-        conditions.push({ status: 'Closed Won' });
-      } else if (selectedStatusVal === 'lost') {
-        conditions.push({ status: _.in(['Closed Lost', 'Invalid']) });
-      }
-    }
+    let conditions = {};
 
+    // 1. 关键字搜索条件
     if (this.data.searchKeyword) {
-      const regex = db.RegExp({ regexp: this.data.searchKeyword, options: 'i' });
-      conditions.push(
-        _.or([
-          { name: regex }, { phone: regex }, { city: regex }, { payload: regex }, { timeline: regex }
-        ])
-      );
+      conditions = _.or([{
+          name: db.RegExp({
+            regexp: this.data.searchKeyword,
+            options: 'i'
+          })
+        },
+        {
+          phone: db.RegExp({
+            regexp: this.data.searchKeyword,
+            options: 'i'
+          })
+        },
+        {
+          city: db.RegExp({
+            regexp: this.data.searchKeyword,
+            options: 'i'
+          })
+        }
+      ]);
     }
 
-    let queryObj = conditions.length > 0 ? _.and(conditions) : {};
+    // 2. 销售筛选条件
+    if (this.data.selectedSalesIndex > 0) {
+      const selectedSales = this.data.salesOptions[this.data.selectedSalesIndex];
+      conditions.assigned_sales_id = selectedSales._openid;
+    }
 
-    db.collection('customers')
-      .where(queryObj)
+    // 3. 状态筛选条件
+    if (this.data.selectedStatusIndex > 0) {
+      const selectedStatus = this.data.statusFilterOptions[this.data.selectedStatusIndex].value;
+      if (selectedStatus === 'pending') {
+        conditions.status = _.in(['pending', '', null]);
+      } else {
+        conditions.status = selectedStatus;
+      }
+    }
+
+    // 🌟 4. 终极日期筛选逻辑：精准查找这一天被跟进过，或新分配的客户
+    if (this.data.selectedDate) {
+      const start = new Date(this.data.selectedDate + 'T00:00:00+07:00'); // 泰国时区起点
+      const end = new Date(this.data.selectedDate + 'T23:59:59+07:00');   // 泰国时区终点
+
+      conditions = _.and([
+        conditions, 
+        _.or([
+          // 情况A：真实的跟进时间刚好在选中日期 (首选匹配)
+          { last_follow_up_time: _.gte(start).and(_.lte(end)) }, 
+          
+          // 情况B：严格兜底匹配！只有在“从来没有跟进过”的情况下，才允许去匹配更新/分配时间
+          _.and([
+            { last_follow_up_time: _.exists(false) }, // 强制要求不存在跟进记录
+            { updateTime: _.gte(start).and(_.lte(end)) }
+          ])
+        ])
+      ]);
+    }
+
+    const todayStr = this.getTodayString();
+
+    // 5. 开始查询数据库
+    db.collection('customers').where(conditions)
       .orderBy('createTime', 'desc')
       .skip(this.data.page * this.data.pageSize)
       .limit(this.data.pageSize)
       .get()
       .then(res => {
-        const todayStr = this.getTodayString();
-
+        // 🌟 6. 数据处理：提取最新跟进时间并格式化
         const newData = res.data.map(item => {
           let createDateStr = '';
           if (item.createTime) {
@@ -172,27 +273,57 @@ Page({
           }
           item.formattedCreateTime = createDateStr || todayStr;
 
+          // 🌟 优先读取专属跟进时间 last_follow_up_time
+          const ut = item.last_follow_up_time || item.updateTime;
+
+          if (ut) {
+            const ud = new Date(ut);
+            const uy = ud.getFullYear();
+            const um = ('0' + (ud.getMonth() + 1)).slice(-2);
+            const uday = ('0' + ud.getDate()).slice(-2);
+            const uh = ('0' + ud.getHours()).slice(-2);
+            const umin = ('0' + ud.getMinutes()).slice(-2);
+
+            // 严格对齐 detail 页面的格式，只保留到分钟 (YYYY-MM-DD HH:mm)
+            item.formattedUpdateTime = `${uy}-${um}-${uday} ${uh}:${umin}`;
+          } else {
+            // 如果从来没更新过，就显示为空
+            item.formattedUpdateTime = '';
+          }
+
+          // 处理逾期标签逻辑
           let compareDate = item.next_follow_up || createDateStr;
           if (compareDate && compareDate < todayStr && !['Closed Won', 'Closed Lost', 'Invalid'].includes(item.status)) {
             item.isOverdue = true;
           } else {
             item.isOverdue = false;
           }
-          
+
           return item;
         });
 
+        // 7. 更新页面数据
         this.setData({
-          customerList: reset ? newData : this.data.customerList.concat(newData),
+          customerList: isRefresh ? newData : this.data.customerList.concat(newData),
+          page: this.data.page + 1,
           hasMore: res.data.length === this.data.pageSize,
           isLoading: false
         });
-        if (reset) wx.hideLoading();
+
+        wx.hideNavigationBarLoading();
+        if (isRefresh) wx.stopPullDownRefresh();
       })
       .catch(err => {
-        this.setData({ isLoading: false });
-        if (reset) wx.hideLoading();
-        console.error(err);
+        console.error('拉取客户数据失败:', err);
+        this.setData({
+          isLoading: false
+        });
+        wx.hideNavigationBarLoading();
+        if (isRefresh) wx.stopPullDownRefresh();
+        wx.showToast({
+          title: '加载失败',
+          icon: 'none'
+        });
       });
   },
 
@@ -205,7 +336,7 @@ Page({
   },
 
   // 🌟 纯英文拨打确认，且开启防刷新锁
-  makePhoneCall(e) { 
+  makePhoneCall(e) {
     const phoneNum = String(e.currentTarget.dataset.phone);
     if (!phoneNum) return;
 
@@ -216,10 +347,16 @@ Page({
       cancelText: 'Cancel',
       success: (res) => {
         if (res.confirm) {
-          this.setData({ isCalling: true });
-          wx.makePhoneCall({ 
+          this.setData({
+            isCalling: true
+          });
+          wx.makePhoneCall({
             phoneNumber: phoneNum,
-            fail: () => { this.setData({ isCalling: false }); }
+            fail: () => {
+              this.setData({
+                isCalling: false
+              });
+            }
           });
         }
       }
@@ -227,21 +364,39 @@ Page({
   },
 
   goToDetail(e) {
-    wx.navigateTo({ url: `/pages/customer-detail/customer-detail?id=${e.currentTarget.dataset.id}` });
+    wx.navigateTo({
+      url: `/pages/customer-detail/customer-detail?id=${e.currentTarget.dataset.id}`
+    });
   },
-  onSalesChange(e) { this.setData({ selectedSalesIndex: e.detail.value }, () => { this.fetchData(true); }); },
-  onStatusFilterChange(e) { this.setData({ selectedStatusIndex: e.detail.value }, () => { this.fetchData(true); }); },
+  onSalesChange(e) {
+    this.setData({
+      selectedSalesIndex: e.detail.value
+    }, () => {
+      this.fetchData(true);
+    });
+  },
+  onStatusFilterChange(e) {
+    this.setData({
+      selectedStatusIndex: e.detail.value
+    }, () => {
+      this.fetchData(true);
+    });
+  },
 
   // 🌟 新增：日期选择事件
   onDateChange(e) {
-    this.setData({ selectedDate: e.detail.value }, () => {
-      this.fetchData(true); 
+    this.setData({
+      selectedDate: e.detail.value
+    }, () => {
+      this.fetchData(true);
     });
   },
 
   // 🌟 新增：清除日期恢复全部
   clearDate() {
-    this.setData({ selectedDate: '' }, () => {
+    this.setData({
+      selectedDate: ''
+    }, () => {
       this.fetchData(true);
     });
   },
