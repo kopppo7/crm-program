@@ -1,44 +1,53 @@
 <view class="container">
   <view class="form-header">
     <text class="page-title">{{currentLang === 'zh' ? '本周工作计划' : 'แผนงานประจำสัปดาห์นี้'}}</text>
-    <text class="page-hint">{{currentLang === 'zh' ? '请填写本周的量化目标与日常工作安排' : 'โปรดกรอกเป้าหมายเชิงปริมาณและแผนงานทั่วไปสำหรับสัปดาห์นี้'}}</text>
+    <text class="page-hint">{{currentLang === 'zh' ? '请严格按照要求填写本周的各项核心量化指标' : 'โปรดกรอกตัวชี้วัดหลักประจำสัปดาห์ตามข้อกำหนดอย่างเคร่งครัด'}}</text>
   </view>
 
-  <form bindsubmit="submitForm" style="width: 95%;">
+  <form bindsubmit="submitForm" style="width: 100%;">
     <view class="form-section">
       <view class="section-title">
         <text class="icon">📅</text>
-        <text>{{currentLang === 'zh' ? '选择当前周（默认周一）' : 'เลือกสัปดาห์ปัจจุบัน'}}</text>
+        <text>{{currentLang === 'zh' ? '当前计划周期' : 'รอบแผนงานปัจจุบัน'}}</text>
       </view>
-      <picker mode="date" bindchange="onDateChange" value="{{weekStartDate}}">
-        <view class="picker-box">
-          <text wx:if="{{weekStartDate}}">{{weekStartDate}} {{currentLang === 'zh' ? '所在周' : 'สัปดาห์นี้'}}</text>
-          <text wx:else class="placeholder">{{currentLang === 'zh' ? '点击选择日期' : 'คลิกเพื่อเลือกวันที่'}}</text>
-        </view>
-      </picker>
+      <view class="picker-box readonly-box">
+        <text style="color: #3b82f6; font-weight: bold;">{{weekRange}}</text>
+      </view>
     </view>
 
     <view class="form-section">
       <view class="section-title">
-        <text class="icon">🔢</text>
-        <text>{{currentLang === 'zh' ? '数字计划 (量化目标)' : 'แผนตัวเลข (เป้าหมายเชิงปริมาณ)'}}</text>
+        <text class="icon">🎯</text>
+        <text>{{currentLang === 'zh' ? '核心量化目标' : 'เป้าหมายเชิงปริมาณหลัก'}}</text>
       </view>
+
       <view class="input-group">
-        <text class="label">{{currentLang === 'zh' ? '每日计划处理客户数 (个)' : 'เป้าหมายจัดการลูกค้าต่อวัน (คน)'}}</text>
-        <input name="dailyCustomerCount" type="number" placeholder="{{currentLang === 'zh' ? '如：15' : 'เช่น: 15'}}" placeholder-class="placeholder-style" />
+        <text class="label">{{currentLang === 'zh' ? '1. 计划完成2分钟以上有效通话 (个)' : '1. จำนวนสายที่คุยเกิน 2 นาที (คน)'}}</text>
+        <input name="planCalls" type="number" placeholder="{{currentLang === 'zh' ? '请输入目标数量...' : 'โปรดระบุจำนวนเป้าหมาย...'}}" placeholder-class="placeholder-style" />
       </view>
+
       <view class="input-group">
-        <text class="label">{{currentLang === 'zh' ? '自主拓展客户数量 (个)' : 'จำนวนลูกค้าที่หาเพิ่มด้วยตนเอง (คน)'}}</text>
-        <input name="selfExpandedCount" type="number" placeholder="{{currentLang === 'zh' ? '如：5' : 'เช่น: 5'}}" placeholder-class="placeholder-style" />
+        <text class="label">{{currentLang === 'zh' ? '2. 计划新增 Line OA 好友人数 (人)' : '2. จำนวนเพื่อนใหม่ใน Line OA (คน)'}}</text>
+        <input name="planLine" type="number" placeholder="{{currentLang === 'zh' ? '请输入目标数量...' : 'โปรดระบุจำนวนเป้าหมาย...'}}" placeholder-class="placeholder-style" />
+      </view>
+
+      <view class="input-group">
+        <text class="label">{{currentLang === 'zh' ? '3. 计划邀约到店看车客户数量 (个)' : '3. จำนวนลูกค้าที่เชิญมาดูรถที่ร้าน (คน)'}}</text>
+        <input name="planVisit" type="number" placeholder="{{currentLang === 'zh' ? '请输入目标数量...' : 'โปรดระบุจำนวนเป้าหมาย...'}}" placeholder-class="placeholder-style" />
+      </view>
+
+      <view class="input-group">
+        <text class="label">{{currentLang === 'zh' ? '4. 计划邀约视频看车客户数量 (个)' : '4. จำนวนลูกค้าที่เชิญดูรถผ่านวิดีโอ (คน)'}}</text>
+        <input name="planVideo" type="number" placeholder="{{currentLang === 'zh' ? '请输入目标数量...' : 'โปรดระบุจำนวนเป้าหมาย...'}}" placeholder-class="placeholder-style" />
       </view>
     </view>
 
     <view class="form-section">
       <view class="section-title">
         <text class="icon">📝</text>
-        <text>{{currentLang === 'zh' ? '日常计划 (统筹安排)' : 'แผนงานทั่วไป'}}</text>
+        <text>{{currentLang === 'zh' ? '5. 其他工作安排' : '5. การจัดการงานอื่นๆ'}}</text>
       </view>
-      <textarea name="routinePlan" class="form-textarea long-textarea" placeholder="{{currentLang === 'zh' ? '填写无法用数字说明的计划，如：重点攻克清迈某大客户、发布履带车视频、熟悉新参数表等...' : 'กรอกแผนงานที่ไม่สามารถระบุเป็นตัวเลขได้ เช่น: เน้นติดตามลูกค้ารายใหญ่, โพสต์วิดีโอรถบรรทุกใหม่, ศึกษาพารามิเตอร์...'}}" maxlength="-1"></textarea>
+      <textarea name="planOther" class="form-textarea" placeholder="{{currentLang === 'zh' ? '请填写本周其他的日常或统筹工作安排...' : 'โปรดระบุแผนงานทั่วไปหรือการจัดการงานอื่นๆ ในสัปดาห์นี้...'}}" maxlength="-1"></textarea>
     </view>
 
     <button class="submit-btn" form-type="submit">{{currentLang === 'zh' ? '确认提交计划' : 'ยืนยันการส่งแผนงาน'}}</button>

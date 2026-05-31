@@ -1,4 +1,17 @@
 <view class="container">
+  
+  <!-- 🌟 新增：专属待办分类 Tab (仅在进入“今日待办”时显示) -->
+  <view class="todo-tabs" wx:if="{{currentType === 'todo'}}">
+    <view class="todo-tab {{activeTab === 'all_todo' ? 'active' : ''}}" bindtap="switchTab" data-tab="all_todo">
+      {{currentLang === 'zh' ? '常规待办' : 'งานทั่วไป'}}
+    </view>
+    <view class="todo-tab {{activeTab === 'no_answer' ? 'active' : ''}}" bindtap="switchTab" data-tab="no_answer">
+      {{currentLang === 'zh' ? '未接电话' : 'ไม่รับสาย'}}
+      <!-- 醒目的未接电话红点 -->
+      <view class="tab-badge" wx:if="{{noAnswerCount > 0}}">{{noAnswerCount}}</view>
+    </view>
+  </view>
+
   <view class="search-bar">
     <view class="search-box">
       <icon type="search" size="14" color="#999" />
@@ -35,6 +48,8 @@
             <text wx:if="{{item.status !== 'pending' && item.status !== 'No Answer' && item.status !== 'Closed Won' && item.status !== 'Closed Lost' && item.status !== 'Invalid' && item.status}}" class="tag tag-following">{{currentLang === 'zh' ? '再次跟进' : 'ติดตามอีกครั้ง'}}</text>
             
             <text wx:if="{{item.status === 'Closed Won' || item.status === 'Closed Lost' || item.status === 'Invalid'}}" class="tag tag-closed">{{statusMap[item.status] || item.status}}</text>
+
+            <text wx:if="{{item.status === 'Busy'}}" class="tag tag-busy">{{currentLang === 'zh' ? '不方便接电话' : 'ไม่สะดวกรับสาย'}}</text>
           </view>
         </view>
         

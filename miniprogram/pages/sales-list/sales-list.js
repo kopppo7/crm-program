@@ -4,6 +4,9 @@ Page({
   data: {
     isCalling: false,
     currentType: 'todo',
+    activeTab: 'all_todo', 
+    noAnswerCount: 0,      
+    
     customerList: [],
     searchKeyword: '', 
     myOpenId: '',
@@ -26,13 +29,11 @@ Page({
   onShow() {
     this.initLanguage();
   
-    // 防止拨打电话返回时触发页面刷新
     if (this.data.isCalling) {
       this.setData({ isCalling: false }); 
       return; 
     }
   
-    // 🌟 核心防御一：优先使用内存中已经存在的 myOpenId，避免从详情页返回时 Storage 读取发生竞态异常
     let currentId = this.data.myOpenId;
     if (!currentId) {
       currentId = wx.getStorageSync('myOpenId');
@@ -44,10 +45,10 @@ Page({
     }
 
     this.setData({ myOpenId: currentId }, () => {
-      // 🌟 核心防御二：增加短暂延迟，确保小程序的返回动画 (Pop 动画) 彻底结束后再发起请求，防止请求被系统静默挂起
       setTimeout(() => {
+        this.fetchNoAnswerCount(); 
         this.fetchData(true); 
-      }, 150);
+      }, 500);
     });
   },
 
@@ -72,6 +73,34 @@ Page({
     this.initLanguage();   
   },
 
+  switchTab(e) {
+    const tab = e.currentTarget.dataset.tab;
+    if (this.data.activeTab === tab) return;
+    this.setData({ activeTab: tab }, () => {
+      this.fetchData(true);
+    });
+  },
+
+  // 🌟 修复 2：改用最稳妥的对象级 _.and + _.or，杜绝底层查询报错
+  fetchNoAnswerCount() {
+    const db = wx.cloud.database();
+    const _ = db.command;
+    const todayStr = this.getTodayString();
+
+    db.collection('customers').where(_.and([
+      { assigned_sales_id: this.data.myOpenId },
+      { status: 'No Answer' },
+      _.or([
+        { next_follow_up: _.lte(todayStr) },
+        { next_follow_up: '' },
+        { next_follow_up: null },
+        { next_follow_up: _.exists(false) }
+      ])
+    ])).count().then(res => {
+      this.setData({ noAnswerCount: res.total });
+    }).catch(err => console.error('获取未接数量失败', err));
+  },
+
   onSearchInput(e) { this.setData({ searchKeyword: e.detail.value.trim() }); },
   onSearch() { this.fetchData(true); },
   clearSearch() { this.setData({ searchKeyword: '' }, () => { this.fetchData(true); }); },
@@ -91,42 +120,50 @@ Page({
 
     if (reset) {
       currentPage = 0;
-      // 🌟 核心防御三：【绝对不要】在这里使用 customerList: [] 清空列表！
-      // 让旧数据保留在屏幕上，只重置页码参数。等新数据到了，直接覆盖。
       this.setData({ page: 0, hasMore: true });
+      this.fetchNoAnswerCount(); 
     }
     
     if (!reset && !this.data.hasMore) return;
 
     this.setData({ isLoading: true });
     if (reset) {
-      // 使用顶部导航栏的菊花图，不打断用户视觉
       wx.showNavigationBarLoading();
     }
 
-    // 🌟 在函数内部初始化，防止页面切换导致上下文丢失
     const db = wx.cloud.database();
     const _ = db.command;
+    const todayStr = this.getTodayString();
 
     let conditions = [];
     conditions.push({ assigned_sales_id: this.data.myOpenId });
 
     if (this.data.currentType === 'todo') {
-      const todayStr = this.getTodayString();
-      
-      conditions.push({ 
-        status: _.nin(['Closed Won', 'Closed Lost', 'Invalid']) 
-      });
-
-      conditions.push(
-        _.or([
-          { next_follow_up: _.lte(todayStr) }, 
-          { next_follow_up: '' },              
-          { next_follow_up: null },            
-          { status: 'pending' },               
-          { status: 'No Answer' }              
-        ])
-      );
+      if (this.data.activeTab === 'all_todo') {
+        conditions.push({ 
+          status: _.nin(['Closed Won', 'Closed Lost', 'Invalid', 'No Answer']) 
+        });
+        conditions.push(
+          _.or([
+            { next_follow_up: _.lte(todayStr) }, 
+            { next_follow_up: '' },              
+            { next_follow_up: null },            
+            { next_follow_up: _.exists(false) }, 
+            { status: 'pending' }              
+          ])
+        );
+      } else if (this.data.activeTab === 'no_answer') {
+        // 🌟 修复 2同步：统一改为最稳健的对象级 or
+        conditions.push({ status: 'No Answer' });
+        conditions.push(
+          _.or([
+            { next_follow_up: _.lte(todayStr) },
+            { next_follow_up: '' },
+            { next_follow_up: null },
+            { next_follow_up: _.exists(false) }
+          ])
+        );
+      }
     }
 
     if (this.data.searchKeyword) {
@@ -145,9 +182,35 @@ Page({
       .limit(this.data.pageSize)
       .get()
       .then(res => {
-        const todayStr = this.getTodayString();
+        
+        // 🌟 修复 1：仅对 'todo' 待办列表施加严格拦截，绝不误伤 '全部客户' 列表
+        const validData = res.data.filter(item => {
+          if (this.data.currentType === 'todo') {
+            // 在待办列表中，隐藏掉已经被关闭的客户
+            if (['Closed Won', 'Closed Lost', 'Invalid'].includes(item.status)) return false;
+            
+            let compareDate = item.next_follow_up;
+            if (!compareDate) {
+              if (item.createTime) {
+                const cd = new Date(item.createTime);
+                compareDate = `${cd.getFullYear()}-${('0' + (cd.getMonth() + 1)).slice(-2)}-${('0' + cd.getDate()).slice(-2)}`;
+              } else {
+                compareDate = todayStr;
+              }
+            }
 
-        const newData = res.data.map(item => {
+            if (this.data.activeTab === 'no_answer') {
+              return item.status === 'No Answer' && compareDate <= todayStr;
+            } else {
+              return item.status !== 'No Answer' && (compareDate <= todayStr || item.status === 'pending');
+            }
+          }
+          // 如果是 "我的客户" 页面，必须一律放行，显示所有历史数据！
+          return true; 
+        });
+
+        // 格式化过检的数据
+        const newData = validData.map(item => {
           let createDateStr = '';
           if (item.createTime) {
             const cd = new Date(item.createTime);
@@ -168,7 +231,6 @@ Page({
         });
 
         this.setData({
-          // 🌟 拿到真实数据后，再进行覆盖更新
           customerList: reset ? newData : this.data.customerList.concat(newData),
           hasMore: res.data.length === this.data.pageSize,
           isLoading: false
@@ -194,7 +256,10 @@ Page({
 
   makePhoneCall(e) { 
     const phoneNum = String(e.currentTarget.dataset.phone);
-    if (!phoneNum) return wx.showToast({ title: 'No phone number', icon: 'none' });
+    // 🌟 修复 3：拦截前端转义造成的 "undefined" 和 "null" 字符串陷阱
+    if (!phoneNum || phoneNum === 'undefined' || phoneNum === 'null' || phoneNum.trim() === '') {
+      return wx.showToast({ title: '没有电话号码', icon: 'none' });
+    }
   
     wx.showModal({
       title: 'Call Confirmation',

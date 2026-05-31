@@ -204,3 +204,58 @@ page {
   color: #64748b;
   font-weight: normal; /* 完结的单子不再加粗，降低视觉干扰 */
 }
+
+/* 🌟 新增 Tab 样式 */
+.todo-tabs {
+  width: 100%;
+  display: flex;
+  background-color: #fff;
+  border-bottom: 2rpx solid #f1f2f6;
+  padding: 0 40rpx;
+  position: relative;
+  z-index: 10;
+}
+
+.todo-tab {
+  flex: 1;
+  text-align: center;
+  font-size: 30rpx;
+  color: #666;
+  padding: 24rpx 0;
+  position: relative;
+  transition: all 0.3s;
+}
+
+.todo-tab.active {
+  color: #10b981; /* 激活时变为绿色 */
+  font-weight: bold;
+}
+
+.todo-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50rpx;
+  height: 6rpx;
+  background-color: #10b981;
+  border-radius: 6rpx;
+}
+
+/* 🌟 未接电话的红点角标 */
+.tab-badge {
+  position: absolute;
+  top: 10rpx;
+  right: 60rpx; /* 根据文字长度微调 */
+  background-color: #ef4444; /* 鲜艳红 */
+  color: #fff;
+  font-size: 20rpx;
+  font-weight: bold;
+  padding: 0 10rpx;
+  min-width: 24rpx;
+  height: 30rpx;
+  line-height: 30rpx;
+  border-radius: 15rpx;
+  text-align: center;
+}

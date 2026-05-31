@@ -22,5 +22,14 @@
       </view>
       <view class="arrow">></view>
     </view>
+
+    <view class="report-card" bindtap="goToHistory">
+      <view class="icon-wrap" style="background: #eef2ff; color: #6366f1;">🕒</view>
+      <view class="text-wrap">
+        <text class="card-title">{{currentLang === 'zh' ? '历史工作汇报' : 'ประวัติรายงานการทำงาน'}}</text>
+        <text class="card-desc">{{currentLang === 'zh' ? '查看历史提交的日报与周计划' : 'ดูประวัติรายงานประจำวันและแผนงานสัปดาห์'}}</text>
+      </view>
+      <view class="arrow">></view>
+    </view>
   </view>
 </view>

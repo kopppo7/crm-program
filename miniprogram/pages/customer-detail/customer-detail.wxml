@@ -105,27 +105,6 @@
       <view class="log-images" wx:if="{{item.screenshot_files.length > 0}}">
         <image wx:for="{{item.screenshot_files}}" wx:for-item="img" wx:key="*this" src="{{img}}" mode="aspectFill" class="log-img" bindtap="previewImage" data-current="{{img}}" data-all="{{item.screenshot_files}}"></image>
       </view>
-
-      <view class="log-audio-section">
-        <!-- 无录音状态 -->
-        <view wx:if="{{!item.audio_files || item.audio_files.length === 0}}" class="no-audio">
-          <text class="icon">🔇</text> 
-          <text>{{currentLang === 'zh' ? '无录音' : 'ไม่มีการบันทึกเสียง'}}</text>
-        </view>
-        
-        <!-- 有录音状态 -->
-        <view wx:else class="audio-list">
-          <view class="audio-item" 
-      wx:for="{{item.audio_files}}" 
-      wx:key="fileID" 
-      bindtap="handleAudioClick" 
-      data-fileid="{{item.fileID}}">
-            <text class="icon">🎵</text>
-            <text class="audio-name">{{audio.name || '录音文件'}}</text>
-            <text class="download-text">{{currentLang === 'zh' ? '点击操作' : 'คลิก'}}</text>
-          </view>
-        </view>
-      </view>
     </view>
   </view>
 </view>

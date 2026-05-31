@@ -70,8 +70,8 @@ Page({
         { next_follow_up: '' },
         { next_follow_up: null },
         { next_follow_up: _.exists(false) },
-        { status: 'pending' },
-        { status: 'No Answer' }
+        { status: 'pending' }
+        // 🌟 核心修复：把下面这行 { status: 'No Answer' } 彻底删掉，让角标严格受制于日期！
       ])
     ])).count().then(res => {
       this.setData({ todoCount: res.total });

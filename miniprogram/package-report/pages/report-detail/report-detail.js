@@ -5,7 +5,7 @@ Page({
     reportId: '',
     type: 'daily', // daily 或 weekly
     report: null,
-    combinedText: '', // 拼接好的泰文原文，方便一键复制
+    combinedText: '', // 拼接好的排版原文，方便一键复制发送
     translatedText: '' // 绑定的中文翻译内容
   },
 
@@ -22,23 +22,57 @@ Page({
     try {
       const collectionName = this.data.type === 'daily' ? 'report_daily' : 'report_weekly';
       const res = await db.collection(collectionName).doc(this.data.reportId).get();
-      const data = res.data;
+      let data = res.data;
       
-      // 🌟 智能拼接员工填写的所有的文本，方便您一次性复制去翻译
-      let textToCopy = '';
+      // 🌟 1. 智能清理：把历史遗留的【undefined】删掉，把纯空格和'无'转成空
+      const cleanStr = (str) => {
+        if (!str) return '';
+        let s = str.replace(/【undefined】\s*/g, '').trim();
+        return (s === '无' || s === '0') ? '' : s;
+      };
+
       if (this.data.type === 'daily') {
-        if (data.detail_new) textToCopy += `【新客户】：\n${data.detail_new}\n\n`;
-        if (data.detail_follow) textToCopy += `【跟进客户】：\n${data.detail_follow}\n\n`;
-        if (data.detail_self) textToCopy += `【自拓客户】：\n${data.detail_self}\n\n`;
-        if (data.detail_other) textToCopy += `【其他工作】：\n${data.detail_other}`;
+        data.list_calls = cleanStr(data.list_calls);
+        data.list_visit = cleanStr(data.list_visit);
+        data.list_video = cleanStr(data.list_video);
+        data.detail_other = cleanStr(data.detail_other);
       } else {
-        textToCopy = `【日常统筹计划】：\n${data.routine_plan || '无'}`;
+        data.plan_other = cleanStr(data.plan_other);
       }
 
+      // 🌟 2. 智能组装：有数据才拼接，且序号自动排队递增
+      let textToCopy = '';
+      
+      if (this.data.type === 'daily') {
+        textToCopy = `【工作日报】 - ${data.sales_name}\n`;
+        textToCopy += `汇报日期：${data.report_date}\n`;
+        textToCopy += `----------------------\n`;
+        
+        let index = 1; // 动态序号
+        if (data.list_calls) { textToCopy += `${index}. 聊过2分钟以上的客户：\n${data.list_calls}\n\n`; index++; }
+        if (data.count_line > 0) { textToCopy += `${index}. LineOA新增好友：${data.count_line} 人\n\n`; index++; }
+        if (data.list_visit) { textToCopy += `${index}. 邀约到店看车：\n${data.list_visit}\n\n`; index++; }
+        if (data.list_video) { textToCopy += `${index}. 视频看车客户：\n${data.list_video}\n\n`; index++; }
+        if (data.detail_other) { textToCopy += `${index}. 其他工作内容：\n${data.detail_other}\n\n`; index++; }
+        
+      } else {
+        textToCopy = `【周工作计划】 - ${data.sales_name}\n`;
+        textToCopy += `计划周期：${data.week_range || data.week_start}\n`;
+        textToCopy += `----------------------\n`;
+        
+        let index = 1;
+        if (data.plan_calls > 0) { textToCopy += `${index}. 计划通话(>2分钟)：${data.plan_calls} 个\n`; index++; }
+        if (data.plan_line > 0) { textToCopy += `${index}. 计划新增Line好友：${data.plan_line} 人\n`; index++; }
+        if (data.plan_visit > 0) { textToCopy += `${index}. 计划邀约到店：${data.plan_visit} 个\n`; index++; }
+        if (data.plan_video > 0) { textToCopy += `${index}. 计划视频看车：${data.plan_video} 个\n\n`; index++; }
+        if (data.plan_other) { textToCopy += `${index}. 其他工作安排：\n${data.plan_other}`; index++; }
+      }
+
+      // 覆盖赋值，这样 WXML 里渲染的也是清理过 【undefined】 的干净数据
       this.setData({
         report: data,
-        combinedText: textToCopy.trim() || '该员工未填写任何文字详情。',
-        translatedText: data.translated_text || '' // 读取以前存过的翻译
+        combinedText: textToCopy.trim() || '未提交有效内容',
+        translatedText: data.translated_text || '' 
       });
     } catch (err) {
       console.error('获取详情失败', err);
@@ -48,16 +82,16 @@ Page({
     }
   },
 
-  // 一键复制原文
+  // 一键复制排版好的文本
   copyOriginalText() {
-    if (!this.data.combinedText || this.data.combinedText.includes('未填写任何文字')) {
+    if (!this.data.combinedText) {
       wx.showToast({ title: '没有可复制的内容', icon: 'none' });
       return;
     }
     wx.setClipboardData({
       data: this.data.combinedText,
       success: () => {
-        wx.showToast({ title: '已复制，快去翻译吧', icon: 'none' });
+        wx.showToast({ title: '已复制，可直接发送', icon: 'none' });
       }
     });
   },
@@ -67,7 +101,6 @@ Page({
     wx.showLoading({ title: '保存中...', mask: true });
     try {
       const collectionName = this.data.type === 'daily' ? 'report_daily' : 'report_weekly';
-      // 将中文翻译存入数据库专属字段 translated_text 中
       await db.collection(collectionName).doc(this.data.reportId).update({
         data: {
           translated_text: this.data.translatedText

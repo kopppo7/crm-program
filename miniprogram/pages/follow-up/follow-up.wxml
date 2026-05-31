@@ -16,49 +16,33 @@
       </picker>
     </view>
 
+    <!-- 输单原因 (仅在流失时显示) -->
     <view class="form-item column" wx:if="{{selectedStatus === 'Closed Lost'}}">
       <text class="label">{{t.fuLostReason}}</text>
       <input class="input-box" placeholder="{{t.fuLostPlaceholder}}" bindinput="onLostReasonInput" />
     </view>
 
-    <view class="form-item" wx:if="{{selectedStatus !== 'Closed Won' && selectedStatus !== 'Closed Lost' && selectedStatus !== 'Invalid'}}">
+    <!-- 🌟 下次跟进时间 (未接电话、流失、成交、无效时均隐藏) -->
+    <view class="form-item" wx:if="{{selectedStatus !== 'Closed Won' && selectedStatus !== 'Closed Lost' && selectedStatus !== 'Invalid' && selectedStatus !== 'No Answer'}}">
       <text class="label">{{t.fuNextTime}}</text>
       <picker mode="date" start="{{today}}" value="{{nextFollowUp || today}}" bindchange="onDateChange">
         <view class="picker-val {{!nextFollowUp ? 'text-gray' : ''}}">{{nextFollowUp || t.fuDatePlaceholder}}</view>
       </picker>
     </view>
 
-    <view class="form-item column">
+    <!-- 🌟 简述说明 (第一次未接时隐藏，第二次未接或常规跟进时显示) -->
+    <view class="form-item column" wx:if="{{selectedStatus !== 'No Answer' || todayNoAnswerCount >= 1}}">
       <text class="label">{{t.fuNote}}</text>
       <textarea class="note-input" placeholder="{{t.fuNotePlaceholder}}" bindinput="onNoteInput"></textarea>
     </view>
-    
-    <!-- 🌟 录音文件上传模块 (上传后隐藏加号版) -->
-    <view class="form-item column">
-      <text class="label" style="width: 100%;">{{t.fuUploadAudio}}</text>
-      
-      <view class="audio-list">
-        <view class="audio-box" wx:for="{{tempAudioFiles}}" wx:key="path">
-          <text class="audio-icon">🎵</text>
-          <text class="audio-name">{{item.name}}</text>
-          <view class="del-btn audio-del" bindtap="removeAudio" data-index="{{index}}">×</view>
-        </view>
-        
-        <!-- 核心修改：长度为0时才显示长条形按钮，只要选了1个就立刻隐藏 -->
-        <view class="audio-upload-btn" bindtap="chooseAudio" wx:if="{{tempAudioFiles.length === 0}}">
-          <text>+ {{currentLang === 'zh' ? '点击添加录音' : 'คลิกเพื่อเพิ่มเสียง'}}</text>
-        </view>
-        
-        <!-- 提示语同样在上传后隐藏，保持界面清爽 -->
-        <view class="tips" wx:if="{{tempAudioFiles.length === 0}}" style="font-size:22rpx;color:#999;margin-top:10rpx;">
-          {{t.fuAudioTips}}
-        </view>
-      </view>
-    </view>
 
-    <!-- 原有图片上传模块 -->
-    <view class="form-item column">
-      <text class="label">{{t.fuUpload}}</text>
+    <!-- 🌟 图片上传 (第一次未接时隐藏，第二次未接或常规跟进时显示) -->
+    <view class="form-item column" wx:if="{{selectedStatus !== 'No Answer' || todayNoAnswerCount >= 1}}">
+    
+      <view style="width: 100%;">
+      <text wx:if="{{selectedStatus === 'No Answer' && todayNoAnswerCount >= 1}}" style="color: #e74c3c; font-size: 24rpx; font-weight: bold;">* </text>
+        <text class="label">{{t.fuUpload}}</text>
+      </view>
       <view class="image-grid">
         <view class="img-box" wx:for="{{tempImgPaths}}" wx:key="*this">
           <image src="{{item}}" mode="aspectFill" class="preview-img" bindtap="previewImage" data-url="{{item}}"></image>
@@ -70,6 +54,37 @@
       </view>
     </view>
   </view>
+  <view class="card profile-card">
+      <view class="profile-header" bindtap="toggleProfile">
+        <view class="profile-title">
+          <text class="icon">🎯</text>
+          <text>{{currentLang === 'zh' ? '完善客户画像 (选填)' : 'ข้อมูลลูกค้า (เลือกกรอก)'}}</text>
+        </view>
+        <text class="collapse-arrow {{isProfileExpanded ? 'expanded' : ''}}">></text>
+      </view>
 
+      <view class="profile-body" wx:if="{{isProfileExpanded}}">
+        <view class="p-input-group">
+          <text class="p-label">{{t.profileDemand || (currentLang === 'zh' ? '核心需求' : 'ความต้องการ')}}</text>
+          <input class="p-input" value="{{profile.demand}}" data-field="demand" bindinput="onProfileInput" placeholder="{{currentLang === 'zh' ? '例: 需要10吨载重' : 'เช่น: ต้องการน้ำหนักบรรทุก 10 ตัน'}}" placeholder-class="p-placeholder" />
+        </view>
+        <view class="p-input-group">
+          <text class="p-label">{{t.profileMotivation || (currentLang === 'zh' ? '购买动机' : 'แรงจูงใจ')}}</text>
+          <input class="p-input" value="{{profile.motivation}}" data-field="motivation" bindinput="onProfileInput" placeholder="{{currentLang === 'zh' ? '例: 扩大业务规模' : 'เช่น: ขยายธุรกิจ'}}" placeholder-class="p-placeholder" />
+        </view>
+        <view class="p-input-group">
+          <text class="p-label">{{t.profileUserType || (currentLang === 'zh' ? '最终使用者' : 'ผู้ใช้งาน')}}</text>
+          <input class="p-input" value="{{profile.userType}}" data-field="userType" bindinput="onProfileInput" placeholder="{{currentLang === 'zh' ? '例: 农场工人' : 'เช่น: คนงานในฟาร์ม'}}" placeholder-class="p-placeholder" />
+        </view>
+        <view class="p-input-group">
+          <text class="p-label">{{t.profileScenario || (currentLang === 'zh' ? '使用场景' : 'สถานที่ใช้งาน')}}</text>
+          <input class="p-input" value="{{profile.scenario}}" data-field="scenario" bindinput="onProfileInput" placeholder="{{currentLang === 'zh' ? '例: 泥泞道路' : 'เช่น: ถนนโคลน'}}" placeholder-class="p-placeholder" />
+        </view>
+        <view class="p-input-group">
+          <text class="p-label">{{t.profileTimeframe || (currentLang === 'zh' ? '预计购买时间' : 'เวลาที่คาดว่าจะซื้อ')}}</text>
+          <input class="p-input" value="{{profile.timeframe}}" data-field="timeframe" bindinput="onProfileInput" placeholder="{{currentLang === 'zh' ? '例: 下个月' : 'เช่น: เดือนหน้า'}}" placeholder-class="p-placeholder" />
+        </view>
+      </view>
+    </view>
   <button class="submit-btn" bindtap="submitFollowUp">{{t.fuSubmit}}</button>
 </view>

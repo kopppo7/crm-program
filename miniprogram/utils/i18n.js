@@ -3,7 +3,6 @@ const zh = {
   homeTitle: "销售工作台",
   homeTodo: "今日待办",
   homeAll: "我的客户",
-  homeStudy: "学习手册",
   
   // --- 销售列表页 ---
   searchPlaceholder: "搜索姓名、电话、城市、需求...",
@@ -24,6 +23,7 @@ const zh = {
     'FollowUp': '再次跟进',        // 系统自动判断展示用，销售不可选
     'Quoted': '已发资料',
     'Considering': '还在考虑 (需写明原因)', // 🌟 新增
+    'Busy': '不方便接电话',
     'No Answer': '未接电话 (需重拨)',
     'Demo Scheduled': '约定看机',
     'Closed Won': '✅ 已成交',
@@ -66,7 +66,7 @@ const zh = {
    fuDatePlaceholder: "点击选择日期 ▾",
    fuNote: "沟通简述",
    fuNotePlaceholder: "简单记录一下沟通内容及客户痛点...",
-   fuUpload: "上传截图 (最多3张)",
+   fuUpload: "上传截图",
    fuSubmit: "保存记录",
    fuSuccess: "保存成功",
    // --- 🎯 客户画像模块 (中文) ---
@@ -92,27 +92,6 @@ const zh = {
    editProfileTitle: '编辑客户画像',
    cancel: '取消',
    saveProfile: '保存画像',
-   // 🌟 学习手册模块
-   manualTitle: '销售学习手册',
-   manualHeader: '内部资料库',
-   manualSub: 'Internal Sales Manual',
-   manualTag: '绝密资料 · 禁止外传',
-   modProdTitle: '产品资料',
-   modProdDesc: '各型号挖掘机、履带车参数与高清大图',
-   modSalesTitle: '销售话术',
-   modSalesDesc: '客户异议解答与竞品话术应对(即将开放)',
-   modDevToast: '该模块正在整理中',
-   manualDetailTips: '💡 点击图片可放大全屏预览，支持左右滑动',
-   modIntroTitle: '产品介绍',
-    modIntroDesc: '各系列产品详细介绍与规格参数',
-    prodCrawler: '履带运输车',
-    prodExcavator: '小型挖掘机',
-    prodTiller: '微耕机',
-    prodHarvester: '收割机',
-    lawnMower: '割草机',
-   // 跟进记录 - 录音模块
-   fuUploadAudio: '上传录音 (m4a/mp3等)',
-   fuAudioTips: '提示：请先将录音发给微信“文件传输助手”，再点击“+”从聊天记录选择。',
    // --- 管理后台 (Admin Home) ---
    adminTitle: "Agritech 管理后台",
    adminDistribute: "分配客户",
@@ -153,6 +132,7 @@ const th = {
     'FollowUp': 'ติดตามอีกครั้ง', 
     'Quoted': 'ส่งข้อมูลแล้ว',
     'Considering': 'กำลังตัดสินใจ (โปรดระบุเหตุผล)', // 🌟 新增
+'Busy': 'ไม่สะดวกรับสาย',
     'No Answer': 'ไม่รับสาย (ต้องโทรซ้ำ)',
     'Demo Scheduled': 'นัดดูเครื่อง',
     'Closed Won': '✅ ปิดการขาย',
@@ -195,7 +175,7 @@ const th = {
   fuDatePlaceholder: "คลิกเลือกวันที่ ▾",
   fuNote: "สรุปการสนทนา",
   fuNotePlaceholder: "บันทึกสรุปการพูดคุยและปัญหาของลูกค้า...",
-  fuUpload: "อัปโหลดภาพ (สูงสุด 3 รูป)",
+  fuUpload: "อัปโหลดภาพ",
   fuSubmit: "บันทึกข้อมูล",
   fuSuccess: "บันทึกสำเร็จ",
   // --- 🎯 客户画像模块 (泰文) ---
@@ -221,27 +201,6 @@ const th = {
   editProfileTitle: 'แก้ไขข้อมูลลูกค้า',
   cancel: 'ยกเลิก',
   saveProfile: 'บันทึกข้อมูล',
-  // 🌟 学习手册模块 (泰文翻译)
-  manualTitle: 'คู่มือการเรียนรู้การขาย',
-  manualHeader: 'ฐานข้อมูลภายใน',
-  manualSub: 'Internal Sales Manual',
-  manualTag: 'ข้อมูลลับ · ห้ามเผยแพร่',
-  modProdTitle: 'ข้อมูลผลิตภัณฑ์',
-  modProdDesc: 'พารามิเตอร์และรูปภาพความละเอียดสูงของรถขุดและรถตีนตะขาบแต่ละรุ่น',
-  modSalesTitle: 'บทสนทนาการขาย',
-  modSalesDesc: 'การตอบข้อโต้แย้งและรับมือคู่แข่ง (เปิดให้บริการเร็วๆ นี้)',
-  modDevToast: 'โมดูลนี้กำลังอยู่ระหว่างการจัดทำ',
-  manualDetailTips: '💡 คลิกที่รูปเพื่อดูแบบเต็มจอ และปัดซ้ายขวาเพื่อเลื่อนดู',
-  modIntroTitle: 'แนะนำผลิตภัณฑ์',
-    modIntroDesc: 'รายละเอียดผลิตภัณฑ์และข้อมูลจำเพาะของแต่ละซีรีส์',
-    prodCrawler: 'รถบรรทุกตีนตะขาบ',
-    prodExcavator: 'รถขุดขนาดเล็ก',
-    prodTiller: 'รถไถเดินตาม',
-    prodHarvester: 'รถเกี่ยวนวดข้าว',
-    lawnMower: 'เครื่องตัดหญ้า',
-  // 跟进记录 - 录音模块 (泰文翻译)
-  fuUploadAudio: 'อัปโหลดไฟล์เสียง (m4a/mp3 ฯลฯ)',
-  fuAudioTips: 'คำแนะนำ: โปรดส่งไฟล์เสียงไปยัง "File Transfer" ใน WeChat ก่อน แล้วคลิก "+" เพื่อเลือกจากประวัติการแชท',
   // --- 管理后台 (Admin Home) ---
   adminTitle: "ระบบจัดการ Agritech",
   adminDistribute: "มอบหมายลูกค้า",

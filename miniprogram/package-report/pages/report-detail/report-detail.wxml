@@ -1,30 +1,37 @@
 <view class="container" wx:if="{{report}}">
-  <view class="header-card">
-    <view class="sales-info">👤 {{report.sales_name}} 的{{type === 'daily' ? '每日汇报' : '周工作计划'}}</view>
-    <view class="time-info">📅 {{type === 'daily' ? report.report_date : report.week_start}}</view>
+  
+  <view class="header-card" style="padding: 30rpx; background: #fff; border-bottom: 2rpx solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20rpx;">
+    <view class="sales-info" style="font-size: 32rpx; font-weight: bold; color: #1f2937;">👤 {{report.sales_name}} 的{{type === 'daily' ? '每日汇报' : '周工作计划'}}</view>
+    <view class="time-info" style="font-size: 26rpx; color: #64748b;">📅 {{type === 'daily' ? report.report_date : (report.week_range || report.week_start)}}</view>
   </view>
 
-  <view class="section">
-    <view class="section-title">
-      <button class="copy-btn" bindtap="copyOriginalText">一键复制原文</button>
+  <view class="section" style="padding: 0 30rpx;">
+    <view class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+      <text style="font-weight: bold; color: #374151; font-size: 30rpx;">📄 汇报内容</text>
+      <button class="copy-btn" bindtap="copyOriginalText" style="margin: 0; font-size: 24rpx; background: #eff6ff; color: #3b82f6; border: 1px solid #bfdbfe; border-radius: 8rpx; padding: 10rpx 20rpx; line-height: 1.5;">一键复制汇报单</button>
     </view>
-    <view class="original-content">
-      <text>{{combinedText}}</text>
+    
+    <view class="original-content" style="background: #f8fafc; padding: 24rpx; border-radius: 12rpx; margin-top: 20rpx; border: 1px solid #e2e8f0;">
+      <text user-select="true" style="font-size: 28rpx; color: #475569; line-height: 1.8; word-break: break-all; white-space: pre-wrap;">{{combinedText}}</text>
     </view>
   </view>
 
-  <view class="section">
+  <view class="section" style="padding: 40rpx 30rpx;">
     <view class="section-title">
-      <text>🇨🇳 翻译与中文存档</text>
+      <text style="font-weight: bold; color: #374151; font-size: 30rpx;">🇨🇳 翻译与中文存档</text>
     </view>
-    <view class="translate-box">
+    
+    <view class="translate-box" style="margin-top: 20rpx;">
       <textarea 
         class="translate-input" 
-        placeholder="请将翻译后的中文内容粘贴在这里，方便日后查看..." 
+        style="width: 100%; box-sizing: border-box; background: #fff; border: 2rpx solid #e2e8f0; padding: 24rpx; border-radius: 12rpx; font-size: 28rpx; min-height: 300rpx;"
+        placeholder="请将复制出来的汇报单翻译成中文后粘贴在这里，方便您日后查看..." 
         model:value="{{translatedText}}" 
         maxlength="-1"
       ></textarea>
     </view>
-    <button class="save-btn" bindtap="saveTranslation">保存中文存档</button>
+    
+    <button class="save-btn" bindtap="saveTranslation" style="margin-top: 40rpx; background: #10b981; color: #fff; font-weight: bold; border-radius: 12rpx; padding: 20rpx 0;">保存中文存档</button>
   </view>
+
 </view>

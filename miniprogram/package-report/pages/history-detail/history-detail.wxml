@@ -1,0 +1,12 @@
+<view class="container" wx:if="{{report}}">
+  <view class="header-card">
+    <text class="icon">{{type === 'daily' ? '📅' : '📆'}}</text>
+    <text class="date-text">
+      {{type === 'daily' ? 'วันที่รายงาน: ' + report.report_date : 'สัปดาห์: ' + (report.week_range || report.week_start)}} 
+    </text>
+  </view>
+
+  <view class="detail-content">
+    <text class="text-block" user-select="true">{{formattedText}}</text>
+  </view>
+</view>

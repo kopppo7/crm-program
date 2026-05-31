@@ -23,5 +23,9 @@ Page({
   // 跳转到日汇报填写页 (我们下一步要做)
   goToDaily() {
     wx.navigateTo({ url: '/package-report/pages/daily-report/daily-report' });
+  },
+
+  goToHistory() {
+    wx.navigateTo({ url: '/package-report/pages/report-history/report-history' });
   }
 });

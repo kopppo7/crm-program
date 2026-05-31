@@ -294,3 +294,8 @@ page {
   color: #9CA3AF; 
   letter-spacing: 2rpx;
 }
+
+.tag-busy {
+  background: #e0e7ff; 
+  color: #4f46e5; /* 优雅的靛蓝色，区分于未接的警告黄 */
+}

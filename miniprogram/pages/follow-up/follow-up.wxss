@@ -68,3 +68,101 @@ page { background-color: #f5f7fa; }
   font-size: 24rpx;
   z-index: 10;
 }
+.tag-busy {
+  background: #e0e7ff; 
+  color: #4f46e5; /* 优雅的靛蓝色，区分于未接的警告黄 */
+}
+
+/* 🌟 客户画像高级卡片样式 */
+.profile-card {
+  margin-top: 30rpx;
+  background: #ffffff;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.03); /* 柔和的高级阴影 */
+  overflow: hidden;
+  padding: 0; /* 覆写默认 padding，让 header 顶边充满 */
+  width: 100%;
+}
+
+/* 顶部标题栏 */
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 30rpx;
+  background: #f8fafc; /* 淡灰蓝色背景 */
+  border-bottom: 2rpx solid #f1f5f9;
+}
+
+.profile-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #3b82f6; /* 主题蓝 */
+  display: flex;
+  align-items: center;
+}
+
+.profile-title .icon {
+  margin-right: 12rpx;
+  font-size: 34rpx;
+}
+
+/* 折叠箭头动画 */
+.collapse-arrow {
+  color: #94a3b8;
+  font-size: 30rpx;
+  font-family: monospace;
+  transition: transform 0.3s ease;
+}
+.collapse-arrow.expanded {
+  transform: rotate(90deg);
+}
+
+/* 身体表单区 */
+.profile-body {
+  padding: 30rpx;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.p-input-group {
+  margin-bottom: 26rpx;
+}
+.p-input-group:last-child {
+  margin-bottom: 0;
+}
+
+.p-label {
+  display: block;
+  font-size: 26rpx;
+  color: #64748b;
+  margin-bottom: 12rpx;
+}
+
+.p-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: #f8fafc;
+  border: 2rpx solid #e2e8f0;
+  border-radius: 10rpx;
+  /* padding: 18rpx 24rpx; */
+  font-size: 28rpx;
+  color: #1e293b;
+  transition: all 0.2s ease;
+}
+
+/* 交互反馈：输入框聚焦时变蓝变白 */
+.p-input:focus {
+  border-color: #3b82f6;
+  background: #ffffff;
+  box-shadow: 0 0 0 4rpx rgba(59, 130, 246, 0.1);
+}
+
+.p-placeholder {
+  color: #94a3b8;
+  font-size: 26rpx;
+}

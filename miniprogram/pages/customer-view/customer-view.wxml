@@ -59,6 +59,8 @@
             <text wx:if="{{item.status !== 'pending' && item.status !== 'No Answer' && item.status !== 'Closed Won' && item.status !== 'Closed Lost' && item.status !== 'Invalid' && item.status}}" class="tag tag-following">{{currentLang === 'zh' ? '再次跟进' : 'ติดตามอีกครั้ง'}}</text>
             
             <text wx:if="{{item.status === 'Closed Won' || item.status === 'Closed Lost' || item.status === 'Invalid'}}" class="tag tag-closed">{{statusMap[item.status] || item.status}}</text>
+
+            <text wx:if="{{item.status === 'Busy'}}" class="tag tag-busy">{{currentLang === 'zh' ? '不方便接电话' : 'ไม่สะดวกรับสาย'}}</text>
           </view>
         </view>
 

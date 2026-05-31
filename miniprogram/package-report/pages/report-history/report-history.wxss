@@ -1,0 +1,103 @@
+page {
+  background: #f4f6f9;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  padding: 0 !important; /* 🌟 强制清空全局可能带有的 padding */
+  align-items: stretch !important; /* 🌟 核心：强制子元素横向拉满全屏，防止挤压 */
+}
+
+/* 顶部分类 Tabs */
+.tabs {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row !important; /* 🌟 强制横向排列 */
+  justify-content: space-around;
+  background: #fff;
+  border-bottom: 2rpx solid #e2e8f0;
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  font-size: 28rpx; /* 泰文字符较长，稍微调小一点点 */
+  color: #64748b;
+  padding: 26rpx 0;
+  position: relative;
+  white-space: nowrap; /* 🌟 强制文字在一行内显示，绝对不准换行 */
+  transition: all 0.3s;
+}
+
+/* 激活状态 */
+.tab.active {
+  color: #3b82f6;
+  font-weight: bold;
+}
+
+/* 激活状态下的蓝色指示条 */
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60rpx;
+  height: 6rpx;
+  background-color: #3b82f6;
+  border-radius: 6rpx;
+}
+
+/* 列表容器 */
+.list-container {
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20rpx 30rpx;
+}
+
+/* 暂无数据的样式 */
+.empty-state {
+  text-align: center;
+  padding-top: 150rpx;
+  color: #94a3b8;
+  font-size: 28rpx;
+}
+
+/* 列表卡片 */
+.list-card {
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.03);
+}
+
+.card-left {
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  font-size: 36rpx;
+  margin-right: 20rpx;
+}
+
+.date-text {
+  font-size: 30rpx;
+  color: #333;
+  font-weight: bold;
+  line-height: 0rpx;
+}
+
+.card-arrow {
+  color: #cbd5e1;
+  font-weight: bold;
+}

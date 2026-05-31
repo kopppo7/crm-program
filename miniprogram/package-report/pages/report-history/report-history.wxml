@@ -1,0 +1,23 @@
+<view class="container">
+  <view class="tabs">
+    <view class="tab {{currentTab === 'daily' ? 'active' : ''}}" bindtap="switchTab" data-tab="daily">
+      รายงานประจำวัน </view>
+    <view class="tab {{currentTab === 'weekly' ? 'active' : ''}}" bindtap="switchTab" data-tab="weekly">
+      แผนงานประจำสัปดาห์ </view>
+  </view>
+
+  <scroll-view class="list-container" scroll-y>
+    <view class="empty-state" wx:if="{{listData.length === 0 && !isLoading}}" >
+      <text>ไม่มีข้อมูลประวัติ</text> </view>
+
+    <view class="list-card" wx:for="{{listData}}" wx:key="_id" bindtap="goToDetail" data-id="{{item._id}}" >
+      <view class="card-left" >
+        <text class="icon">{{currentTab === 'daily' ? '📅' : '📆'}}</text>
+        <text class="date-text">
+          {{currentTab === 'daily' ? 'วันที่รายงาน: ' + item.report_date : 'สัปดาห์: ' + (item.week_range || item.week_start)}} 
+        </text>
+      </view>
+      <view class="card-arrow">></view>
+    </view>
+  </scroll-view>
+</view>

@@ -4,45 +4,53 @@ const db = wx.cloud.database();
 Page({
   data: {
     currentLang: 'zh',
-    weekStartDate: ''
+    weekRange: '', // 显示用的时间段，如 2026-06-01 至 2026-06-07
+    weekStart: ''  // 入库用的周一日期
   },
 
   onShow() {
     const lang = i18n.getLang();
     this.setData({ currentLang: lang });
-    this.initDefaultWeek();
+    this.initCurrentWeek();
   },
 
-  // 自动计算本周一
-  initDefaultWeek() {
+  // 🌟 核心逻辑：自动计算出当前的周一到周日
+  initCurrentWeek() {
     const today = new Date();
     const day = today.getDay();
-    const diff = today.getDate() - day + (day === 0 ? -6 : 1); 
-    const monday = new Date(today.setDate(diff));
-    
-    const y = monday.getFullYear();
-    const m = ('0' + (monday.getMonth() + 1)).slice(-2);
-    const d = ('0' + monday.getDate()).slice(-2);
-    
-    this.setData({ weekStartDate: `${y}-${m}-${d}` });
-  },
+    // 计算本周一
+    const diffMonday = today.getDate() - day + (day === 0 ? -6 : 1); 
+    const monday = new Date(today.setDate(diffMonday));
+    // 计算本周日
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
 
-  onDateChange(e) {
-    this.setData({ weekStartDate: e.detail.value });
+    const formatDate = (d) => {
+      const y = d.getFullYear();
+      const m = ('0' + (d.getMonth() + 1)).slice(-2);
+      const date = ('0' + d.getDate()).slice(-2);
+      return `${y}-${m}-${date}`;
+    };
+
+    const startStr = formatDate(monday);
+    const endStr = formatDate(sunday);
+
+    this.setData({ 
+      weekStart: startStr,
+      weekRange: `${startStr} 至 ${endStr}`
+    });
   },
 
   // 提交表单
   async submitForm(e) {
-    // 🌟 核心修改：只提取我们要的3个核心模块数据
-    const { dailyCustomerCount, weeklyDealCount, routinePlan } = e.detail.value;
-    const weekStart = this.data.weekStartDate;
+    const { planCalls, planLine, planVisit, planVideo, planOther } = e.detail.value;
 
-    if (!weekStart) {
-      wx.showToast({ title: this.data.currentLang === 'zh' ? '请选择当前周' : 'โปรดเลือกสัปดาห์', icon: 'none' });
-      return;
-    }
-    if (!dailyCustomerCount || !routinePlan.trim()) {
-      wx.showToast({ title: this.data.currentLang === 'zh' ? '请将量化目标与日常计划填写完整' : 'กรุณากรอกเป้าหมายและแผนงานให้ครบถ้วน', icon: 'none' });
+    // 必填项校验
+    if (!planCalls || !planLine || !planVisit || !planVideo) {
+      wx.showToast({ 
+        title: this.data.currentLang === 'zh' ? '请将4个量化目标填写完整' : 'กรุณากรอกเป้าหมายเชิงปริมาณทั้ง 4 ข้อให้ครบถ้วน', 
+        icon: 'none' 
+      });
       return;
     }
 
@@ -53,15 +61,18 @@ Page({
       const userRes = await db.collection('users').where({ _openid: myOpenId }).get();
       const salesName = userRes.data.length > 0 ? userRes.data[0].name : '未知销售';
 
-      // 🌟 写入更精简的数据库结构
+      // 写入最新的 5 项指标数据结构
       await db.collection('report_weekly').add({
         data: {
           sales_id: myOpenId,
           sales_name: salesName,
-          week_start: weekStart, // 1. 当前周
-          plan_daily_customers: Number(dailyCustomerCount), // 2. 每天处理客户数
-          plan_weekly_deals: Number(weeklyDealCount) || 0,  // 2. 预计成单数
-          routine_plan: routinePlan,                        // 3. 日常笼统计划
+          week_start: this.data.weekStart, // 周一日期，方便排序
+          week_range: this.data.weekRange, // 直观展示的日期范围
+          plan_calls: Number(planCalls) || 0,
+          plan_line: Number(planLine) || 0,
+          plan_visit: Number(planVisit) || 0,
+          plan_video: Number(planVideo) || 0,
+          plan_other: planOther || '',
           createTime: db.serverDate()
         }
       });

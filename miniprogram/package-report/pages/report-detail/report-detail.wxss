@@ -24,3 +24,34 @@ page { background: #f4f6f9; color: #333; padding-bottom: 50rpx;}
 .section {
   width: 95%;
 }
+.list-card {
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.03);
+}
+
+.card-left {
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  font-size: 36rpx;
+  margin-right: 20rpx;
+}
+
+.date-text {
+  font-size: 30rpx;
+  color: #333;
+  font-weight: bold;
+}
+
+.card-arrow {
+  color: #cbd5e1;
+  font-weight: bold;
+}
