@@ -16,7 +16,9 @@ Page({
     editProfileForm: {},
 
     showGlobalTransModal: false,
-    globalTransText: ''
+    globalTransText: '',
+
+    localizedStatusMap: {} // 🌟 新增：存放动态拉取的双语字典映射
   },
 
   onLoad(options) {
@@ -31,7 +33,7 @@ Page({
     this.initLanguage();
     wx.showNavigationBarLoading();
 
-    // 🌟 核心修改：直接拿大门(index.js)发给我们的身份牌，不要再去调用微信服务器覆盖了！
+    // 直接拿大门(index.js)发给我们的身份牌，不要再去调用微信服务器覆盖了！
     const myOpenId = wx.getStorageSync('myOpenId');
     if (myOpenId) {
       this.checkAdminRole(myOpenId);
@@ -73,6 +75,28 @@ Page({
       t: i18n.t()
     });
     wx.setNavigationBarTitle({ title: lang === 'zh' ? '客户详情' : 'รายละเอียดลูกค้า' });
+
+    // 🌟 核心升级：动态拉取云端系统状态字典
+    this.fetchStatusDict(lang);
+  },
+
+  // 🌟 核心升级：从 system_dict 拉取动态字典并生成映射表
+  async fetchStatusDict(lang) {
+    try {
+      const res = await db.collection('system_dict')
+        .where({ type: 'customer_status', status: 'active' })
+        .orderBy('sort', 'asc')
+        .get();
+
+      const dictMap = {};
+      res.data.forEach(item => {
+        dictMap[item.value] = lang === 'zh' ? item.label_zh : item.label_th;
+      });
+      
+      this.setData({ localizedStatusMap: dictMap });
+    } catch (e) {
+      console.error('获取动态状态字典失败', e);
+    }
   },
 
   fetchSalesList() {
@@ -130,7 +154,7 @@ Page({
             result_tag: 'pending',
             note: this.data.currentLang === 'zh' ? '线索成功录入并分配给销售' : 'รับข้อมูลลูกค้าและมอบหมายสำเร็จ',
             screenshot_files: []
-          }); 
+          });
         }
         this.setData({ logs: fetchedLogs });
       });
@@ -139,8 +163,7 @@ Page({
   formatDateTime(dateStrOrObj) {
     if (!dateStrOrObj) return '';
     const date = new Date(dateStrOrObj);
-    if (isNaN(date.getTime())) return dateStrOrObj; 
-
+    if (isNaN(date.getTime())) return dateStrOrObj;
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
@@ -161,7 +184,6 @@ Page({
     const index = e.detail.value;
     const newSales = this.data.salesList[index];
     const oldSalesName = this.data.customer.sales_name || this.data.customer.assigned_sales_name || '未分配';
-    
     if (newSales._openid === this.data.customer.assigned_sales_id) {
       return wx.showToast({ title: '该客户已属于此人', icon: 'none' });
     }
@@ -272,7 +294,8 @@ Page({
     let text = `【客户画像】\n需求: ${p.demand || '未填'}\n动机: ${p.motivation || '未填'}\n使用者: ${p.userType || '未填'}\n场景: ${p.scenario || '未填'}\n时间: ${p.timeframe || '未填'}\n预算: ${p.budget || '未填'}\n\n【跟进记录】\n`;
     
     this.data.logs.forEach(log => {
-      const statusStr = this.data.t.status[log.result_tag] || log.result_tag;
+      // 🌟 核心升级：一键复制导出的文案，也升级为从动态字典中读取
+      const statusStr = this.data.localizedStatusMap[log.result_tag] || log.result_tag;
       text += `[${log.createTimeStr}] 状态:${statusStr}\n内容: ${log.note}\n`;
       if (log.lost_reason) text += `原因: ${log.lost_reason}\n`;
       text += `---\n`;
@@ -301,7 +324,6 @@ Page({
 
   saveGlobalTranslation() {
     wx.showLoading({ title: '保存中...', mask: true });
-
     db.collection('customers').doc(this.data.customerId).update({
       data: {
         translated_context: this.data.globalTransText,

@@ -1,4 +1,30 @@
 <view class="container" wx:if="{{report}}">
+  
+  <!-- 🌟 1. 核心状态判断：审批状态 Banner -->
+  <view class="approval-banner status-{{report.approval_status || 'pending'}}">
+    <text class="icon">
+      {{report.approval_status === 'approved' ? '✅' : (report.approval_status === 'rejected' ? '❌' : '⏳')}}
+    </text>
+    <text class="status-text">
+      <!-- 泰语：已通过 / 被驳回 / 待阅 -->
+      {{report.approval_status === 'approved' ? 'อนุมัติแล้ว' : (report.approval_status === 'rejected' ? 'ถูกปฏิเสธ' : 'รอการตรวจสอบ')}}
+    </text>
+  </view>
+
+  <!-- 🌟 3. 具体原因与备注 (针对最新状态的按需展示) -->
+  <view class="reason-card" wx:if="{{report.approval_status === 'rejected' || report.approval_remark}}">
+    <view class="reason-item" wx:if="{{report.unfinished_reason}}">
+      <text class="label">สาเหตุที่ไม่สำเร็จ: </text><text>{{report.unfinished_reason}}</text> <!-- 泰语：未完成原因 -->
+    </view>
+    <view class="reason-item" wx:if="{{report.reject_reason}}">
+      <text class="label">เหตุผลที่ปฏิเสธ: </text><text>{{report.reject_reason}}</text> <!-- 泰语：驳回理由 -->
+    </view>
+    <view class="reason-item" wx:if="{{report.approval_remark}}">
+      <text class="label">หมายเหตุการอนุมัติ: </text><text>{{report.approval_remark}}</text> <!-- 泰语：审批备注 -->
+    </view>
+  </view>
+
+  <!-- 📅 原有的日期头部 -->
   <view class="header-card">
     <text class="icon">{{type === 'daily' ? '📅' : '📆'}}</text>
     <text class="date-text">
@@ -6,7 +32,41 @@
     </text>
   </view>
 
+  <!-- 📝 原有的汇报详情 -->
   <view class="detail-content">
     <text class="text-block" user-select="true">{{formattedText}}</text>
+  </view>
+
+  <!-- 🌟 4. 遗留待办智能变色展示 -->
+  <view class="detail-content" style="margin-top: 30rpx;" wx:if="{{report.pending_todos}}">
+    <view style="font-weight: bold; margin-bottom: 16rpx; font-size: 32rpx; color: #1f2937;">งานที่ค้างอยู่</view> <!-- 泰语：遗留待办 -->
+    <text class="text-block {{isTodosCleared ? 'text-green' : 'text-red'}}">{{report.pending_todos}}</text>
+  </view>
+
+  <!-- 🌟 2. 审批历史时间轴 (Timeline) -->
+  <view class="history-section" wx:if="{{report.approval_history && report.approval_history.length > 0}}">
+    <view style="font-weight: bold; margin-bottom: 30rpx; font-size: 32rpx; color: #1f2937;">ประวัติการอนุมัติ</view> <!-- 泰语：审批历史时间轴 -->
+    <view class="timeline">
+      <view class="timeline-item" wx:for="{{report.approval_history}}" wx:key="index">
+        <!-- 状态圆点与连接线 -->
+        <view class="timeline-dot dot-{{item.status}}"></view>
+        <view class="timeline-line" wx:if="{{index !== report.approval_history.length - 1}}"></view>
+        
+        <view class="timeline-content">
+          <view class="time-row">
+            <!-- 泰语：已通过 / 被驳回 -->
+            <text class="status-badge badge-{{item.status}}">{{item.status === 'approved' ? 'อนุมัติแล้ว' : 'ถูกปฏิเสธ'}}</text>
+            <text class="time-text">{{item.formattedTime}}</text>
+          </view>
+          <view class="history-reason" wx:if="{{item.unfinished_reason}}">สาเหตุที่ไม่สำเร็จ: {{item.unfinished_reason}}</view> <!-- 未完成原因 -->
+          <view class="history-reason" wx:if="{{item.reject_reason}}">เหตุผลที่ปฏิเสธ: {{item.reject_reason}}</view> <!-- 驳回理由 -->
+          <view class="history-reason" wx:if="{{item.remark}}">หมายเหตุ: {{item.remark}}</view> <!-- 备注 -->
+        </view>
+      </view>
+    </view>
+  </view>
+<!-- 🌟 重新修改按钮 (仅在被驳回且是日报时显示) -->
+<view class="edit-btn-container" wx:if="{{report.approval_status === 'rejected' && type === 'daily'}}">
+    <button class="edit-btn" bindtap="goToEdit">แก้ไขและส่งใหม่</button> <!-- 泰语：重新修改并提交 -->
   </view>
 </view>

@@ -11,7 +11,7 @@
   <view class="filter-bar">
     <picker mode="selector" range="{{salesOptions}}" range-key="name" bindchange="onSalesChange" value="{{salesIndex}}">
       <view class="filter-cell">
-        <text class="icon">👤</text>
+        <text class="icon"></text>
         <text>{{salesOptions[salesIndex].name}}</text>
       </view>
     </picker>
@@ -29,6 +29,7 @@
       <text>{{currentLang === 'zh' ? '暂无相关汇报记录' : 'ไม่มีบันทึกรายงาน'}}</text>
     </view>
 
+    <!-- 🌟 日报列表卡片：清理旧逻辑，仅在外层显示轻量化数据 -->
     <block wx:if="{{currentTab === 'daily'}}">
       <view class="report-card daily-card" wx:for="{{dataList}}" wx:key="_id" bindtap="goToDetail" data-id="{{item._id}}">
         <view class="card-title-row">
@@ -36,24 +37,26 @@
           <text class="report-date">{{item.report_date}} {{item.submitTime}}</text>
         </view>
         <view class="badge-row">
-          <view class="badge-item bg-blue">新客: <text class="num">{{item.count_new}}</text></view>
-          <view class="badge-item bg-orange">跟进: <text class="num">{{item.count_follow}}</text></view>
-          <view class="badge-item bg-green">自拓: <text class="num">{{item.count_self}}</text></view>
+          <!-- 因为通话、看车等都是具体名单，外面只展示数字型的 Line新增，其他进详情看 -->
+          <view class="badge-item bg-green">Line新增: <text class="num">{{item.count_line || 0}}</text></view>
         </view>
+        <view class="click-hint">{{currentLang === 'zh' ? '点击查看工作详情与翻译 >>' : 'คลิกเพื่อดูรายละเอียด >>'}}</view>
       </view>
     </block>
 
+    <!-- 🌟 周报列表卡片：替换为全新的量化目标字段 -->
     <block wx:if="{{currentTab === 'weekly'}}">
       <view class="report-card weekly-card" wx:for="{{dataList}}" wx:key="_id" bindtap="goToDetail" data-id="{{item._id}}">
         <view class="card-title-row">
           <text class="sales-name">👤 {{item.sales_name}}</text>
-          <text class="week-tag">📅 {{item.week_start}} 周计划 | {{item.submitTime}}</text>
+          <text class="week-tag">📅 {{item.week_range || item.week_start}} | {{item.submitTime}}</text>
         </view>
         <view class="badge-row">
-          <view class="badge-item bg-blue">日均计划处理: <text class="num">{{item.plan_daily_customers}} 人</text></view>
-          <view class="badge-item bg-purple">计划自拓客: <text class="num">{{item.plan_self_expanded}} 人</text></view>
+          <!-- 替换为新的三大核心量化指标 -->
+          <view class="badge-item bg-blue">计划通话: <text class="num">{{item.plan_calls || 0}}</text></view>
+          <view class="badge-item bg-green">Line目标: <text class="num">{{item.plan_line || 0}}</text></view>
+          <view class="badge-item bg-orange">邀约看车: <text class="num">{{item.plan_visit || 0}}</text></view>
         </view>
-        <view class="click-hint">{{currentLang === 'zh' ? '点击查看工作详情与翻译 >>' : 'คลิกเพื่อดูรายละเอียด >>'}}</view>
       </view>
     </block>
   </scroll-view>

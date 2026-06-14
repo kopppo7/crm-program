@@ -5,24 +5,22 @@
   </view>
 
   <form bindsubmit="submitForm" style="width: 100%;">
-    <!-- 汇报日期 -->
     <view class="form-section" style="padding: 24rpx 30rpx; display: flex; align-items: center;">
       <text class="icon" style="margin-bottom: 0; margin-right: 12rpx;">📅</text>
       <text style="font-size: 28rpx; color: #374151; font-weight: bold;">{{currentLang === 'zh' ? '汇报日期：' : 'วันที่รายงาน: '}} <text style="color: #3b82f6;">{{reportDate}}</text></text>
     </view>
 
-    <!-- 1. 2分钟通话名单 (结构化) -->
     <view class="form-section">
       <view class="section-title">
         <text class="icon">📞</text>
         <text>{{currentLang === 'zh' ? '1. 聊过2分钟以上的客户名单' : '1. รายชื่อลูกค้าที่คุยเกิน 2 นาที'}}</text>
       </view>
-      <!-- 列表展示区 -->
       <view class="client-list">
         <view class="client-item" wx:for="{{listCallsArr}}" wx:key="index">
           <view class="item-info">
-            <view class="item-title"><text class="c-name">{{item.name}}</text> <text class="c-phone">{{item.phone}}</text></view>
-            <view class="item-desc">意向: {{item.intent}}</view>
+            <view class="item-title"><text class="c-phone">电话: {{item.phone}}</text></view>
+            <!-- 将标签从“意向”修改为了“说明”[cite: 21] -->
+            <view class="item-desc">说明: {{item.intent}}</view>
           </view>
           <view class="item-actions">
             <text class="btn-edit" bindtap="editItem" data-type="call" data-index="{{index}}">{{currentLang === 'zh' ? '修改' : 'แก้ไข'}}</text>
@@ -33,18 +31,16 @@
       <view class="add-btn" bindtap="openModal" data-type="call">+ {{currentLang === 'zh' ? '添加客户' : 'เพิ่มลูกค้า'}}</view>
     </view>
 
-    <!-- 2. LineOA新增好友 -->
     <view class="form-section">
       <view class="section-title">
         <text class="icon">💬</text>
         <text>{{currentLang === 'zh' ? '2. LineOA新增好友数量 (人)' : '2. จำนวนเพื่อนใหม่ใน Line OA (คน)'}}</text>
       </view>
       <view class="input-group" style="margin-bottom: 0; border-bottom: none;">
-        <input name="countLine" type="number" placeholder="{{currentLang === 'zh' ? '请输入今日新增人数，如：5' : 'โปรดระบุจำนวน เช่น: 5'}}" placeholder-class="placeholder-style" />
+        <input name="countLine" type="number" placeholder="{{currentLang === 'zh' ? '请输入今日新增人数，如：5' : 'โปรดระบุจำนวน เช่น: 5'}}" placeholder-class="placeholder-style" value="{{countLine}}" />
       </view>
     </view>
 
-    <!-- 3. 邀约到店看车 (结构化) -->
     <view class="form-section">
       <view class="section-title">
         <text class="icon">🏪</text>
@@ -53,7 +49,7 @@
       <view class="client-list">
         <view class="client-item" wx:for="{{listVisitArr}}" wx:key="index">
           <view class="item-info">
-            <view class="item-title"><text class="c-name">{{item.name}}</text> <text class="c-phone">{{item.phone}}</text></view>
+            <view class="item-title"><text class="c-phone">电话: {{item.phone}}</text></view>
             <view class="item-desc">时间: {{item.date}}</view>
           </view>
           <view class="item-actions">
@@ -65,7 +61,6 @@
       <view class="add-btn" bindtap="openModal" data-type="visit">+ {{currentLang === 'zh' ? '添加客户' : 'เพิ่มลูกค้า'}}</view>
     </view>
 
-    <!-- 4. 视频看车 (结构化) -->
     <view class="form-section">
       <view class="section-title">
         <text class="icon">🎥</text>
@@ -74,7 +69,7 @@
       <view class="client-list">
         <view class="client-item" wx:for="{{listVideoArr}}" wx:key="index">
           <view class="item-info">
-            <view class="item-title"><text class="c-name">{{item.name}}</text> <text class="c-phone">{{item.phone}}</text></view>
+            <view class="item-title"><text class="c-phone">电话: {{item.phone}}</text></view>
             <view class="item-desc">说明: {{item.note}}</view>
           </view>
           <view class="item-actions">
@@ -86,52 +81,49 @@
       <view class="add-btn" bindtap="openModal" data-type="video">+ {{currentLang === 'zh' ? '添加客户' : 'เพิ่มลูกค้า'}}</view>
     </view>
 
-    <!-- 5. 其他工作内容 -->
     <view class="form-section">
       <view class="section-title">
         <text class="icon">📝</text>
         <text>{{currentLang === 'zh' ? '5. 其他工作内容' : '5. เนื้อหางานอื่นๆ'}}</text>
       </view>
-      <textarea name="detailOther" class="form-textarea" placeholder="{{currentLang === 'zh' ? '例如：整理报表、处理售后等...' : 'เช่น: จัดทำรายงาน, จัดการปัญหาหลังการขาย...'}}" maxlength="-1"></textarea>
+      <textarea name="detailOther" class="form-textarea" placeholder="{{currentLang === 'zh' ? '例如：整理报表、处理售后等...' : 'เช่น: จัดทำรายงาน, จัดการปัญหาหลังการขาย...'}}" maxlength="-1" value="{{detailOther}}"></textarea>
     </view>
 
     <button class="submit-btn" form-type="submit">{{currentLang === 'zh' ? '确认并提交日报' : 'ยืนยันการส่งรายงานประจำวัน'}}</button>
   </form>
 </view>
 
-<!-- 🌟 通用输入弹窗 -->
-<view class="modal-mask" wx:if="{{activeModal}}" bindtap="closeModal"></view>
-<view class="modal-content" wx:if="{{activeModal}}">
-  <view class="modal-header">{{currentLang === 'zh' ? '填写客户信息' : 'กรอกข้อมูลลูกค้า'}}</view>
-  <view class="modal-body">
-    <view class="m-input-group">
-      <text class="m-label">{{currentLang === 'zh' ? '电话号码' : 'เบอร์โทร'}}</text>
-      <input class="m-input" type="number" placeholder="输入电话" value="{{tempPhone}}" data-field="tempPhone" bindinput="onModalInput" />
-    </view>
+<view class="modal-mask" wx:if="{{activeModal}}" bindtap="closeModal">
+  <view class="modal-content" catchtap="preventClose">
+    <view class="modal-header">{{currentLang === 'zh' ? '填写客户信息' : 'กรอกข้อมูลลูกค้า'}}</view>
+    <view class="modal-body">
+      <view class="m-input-group">
+        <text class="m-label">{{currentLang === 'zh' ? '电话号码' : 'เบอร์โทร'}}</text>
+        <input class="m-input" type="number" placeholder="输入电话" value="{{tempPhone}}" data-field="tempPhone" bindinput="onModalInput" />
+      </view>
 
-    <!-- 动态字段：通话意向 -->
-    <view class="m-input-group" wx:if="{{activeModal === 'call'}}">
-      <text class="m-label">{{currentLang === 'zh' ? '简单意向' : 'ความสนใจ'}}</text>
-      <input class="m-input" placeholder="เช่น: อยากดูรถขุดเล็ก เป็นต้น" value="{{tempIntent}}" data-field="tempIntent" bindinput="onModalInput" />
-    </view>
+      <view class="m-input-group" wx:if="{{activeModal === 'call'}}">
+        <!-- 弹窗标题和提示词修改为了“情况说明”[cite: 21] -->
+        <text class="m-label">{{currentLang === 'zh' ? '情况说明' : 'คำอธิบาย'}}</text>
+        <input class="m-input" placeholder="{{currentLang === 'zh' ? '如：想看小挖机、意向较高等' : 'เช่น: อยากดูรถขุดเล็ก มีความสนใจค่อนข้างสูง'}}" value="{{tempIntent}}" data-field="tempIntent" bindinput="onModalInput" />
+      </view>
 
-    <!-- 动态字段：到店日期 -->
-    <view class="m-input-group" wx:if="{{activeModal === 'visit'}}">
-      <text class="m-label">{{currentLang === 'zh' ? '选择到店日期' : 'วันที่มาถึง'}}</text>
-      <picker mode="date" bindchange="onTempDateChange">
-        <view class="m-picker">{{tempDate || (currentLang === 'zh' ? '点击选择日期' : 'คลิกเลือกวันที่')}}</view>
-      </picker>
-    </view>
+      <view class="m-input-group" wx:if="{{activeModal === 'visit'}}">
+        <text class="m-label">{{currentLang === 'zh' ? '选择到店日期' : 'วันที่มาถึง'}}</text>
+        <picker mode="date" bindchange="onTempDateChange">
+          <view class="m-picker">{{tempDate || (currentLang === 'zh' ? '点击选择日期' : 'คลิกเลือกวันที่')}}</view>
+        </picker>
+      </view>
 
-    <!-- 动态字段：视频情况说明 -->
-    <view class="m-input-group" wx:if="{{activeModal === 'video'}}">
-      <text class="m-label">{{currentLang === 'zh' ? '情况说明' : 'คำอธิบาย'}}</text>
-      <input class="m-input" placeholder="เช่น: พึงพอใจ นัดดูเครื่องหน้าร้าน/กำลังพิจารณา สื่อสารต่อในภายหลัง" value="{{tempNote}}" data-field="tempNote" bindinput="onModalInput" />
+      <view class="m-input-group" wx:if="{{activeModal === 'video'}}">
+        <text class="m-label">{{currentLang === 'zh' ? '情况说明' : 'คำอธิบาย'}}</text>
+        <input class="m-input" placeholder="เช่น: พึงพอใจ นัดดูเครื่องหน้าร้าน/กำลังพิจารณา สื่อสารต่อในภายหลัง" value="{{tempNote}}" data-field="tempNote" bindinput="onModalInput" />
+      </view>
     </view>
-  </view>
-  
-  <view class="modal-footer">
-    <button class="m-btn-cancel" bindtap="closeModal">{{currentLang === 'zh' ? '取消' : 'ยกเลิก'}}</button>
-    <button class="m-btn-confirm" bindtap="saveModal">{{currentLang === 'zh' ? '确认保存' : 'บันทึก'}}</button>
+    
+    <view class="modal-footer">
+      <button class="m-btn-cancel" bindtap="closeModal">{{currentLang === 'zh' ? '取消' : 'ยกเลิก'}}</button>
+      <button class="m-btn-confirm" bindtap="saveModal">{{currentLang === 'zh' ? '确认保存' : 'บันทึก'}}</button>
+    </view>
   </view>
 </view>

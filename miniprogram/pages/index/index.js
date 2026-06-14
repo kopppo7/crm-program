@@ -39,7 +39,7 @@ Page({
       success: res => {
         const id = res.result.openid;
         // const id = 'o6WpV3bKAVJMXEn4PQISU1sXSnuQ'; // chey manager
-        // const id = 'o6WpV3bCQ3YezfL7drNZ19N4XAwg'  // 泰1
+        // const id = 'o6WpV3bCQ3YezfL7drNZ19N4XAwgs'  // 泰1
         // const id = 'o6WpV3ZD942ytdWL-5wcwrsDR0wI';  // k
         this.setData({ tempOpenId: id });
         wx.setStorageSync('myOpenId', id);
@@ -92,8 +92,7 @@ Page({
             wx.showToast({ title: this.data.currentLang === 'zh' ? '还在审核中哦' : 'รอการอนุมัติ', icon: 'none' });
           }
         } 
-        // 🌟 2. 核心修改：admin 和 manager 都可以进入管理后台！
-        else if (user.role === 'admin' || user.role === 'manager') {
+        else if (user.role === 'admin') {
           wx.reLaunch({ url: '/pages/admin-home/admin-home' });
         } 
         // 3. 正常销售进入销售页

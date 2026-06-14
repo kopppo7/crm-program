@@ -32,7 +32,7 @@
       <view class="card-left">
         <view class="icon-box all-bg">👥</view>
         <view class="card-text">
-          <text class="menu-name">{{t.homeAll}}</text>
+          <text class="menu-name">{{t.homeAll}} </text>
           <text class="menu-desc">{{currentLang === 'zh' ? '管理名下分配的所有线索' : 'จัดการลูกค้าทั้งหมดของคุณ'}}</text>
         </view>
       </view>

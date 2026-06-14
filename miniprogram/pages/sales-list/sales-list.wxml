@@ -1,77 +1,78 @@
 <view class="container">
-  
-  <!-- 🌟 新增：专属待办分类 Tab (仅在进入“今日待办”时显示) -->
-  <view class="todo-tabs" wx:if="{{currentType === 'todo'}}">
-    <view class="todo-tab {{activeTab === 'all_todo' ? 'active' : ''}}" bindtap="switchTab" data-tab="all_todo">
-      {{currentLang === 'zh' ? '常规待办' : 'งานทั่วไป'}}
-    </view>
-    <view class="todo-tab {{activeTab === 'no_answer' ? 'active' : ''}}" bindtap="switchTab" data-tab="no_answer">
-      {{currentLang === 'zh' ? '未接电话' : 'ไม่รับสาย'}}
-      <!-- 醒目的未接电话红点 -->
-      <view class="tab-badge" wx:if="{{noAnswerCount > 0}}">{{noAnswerCount}}</view>
-    </view>
+
+<view class="todo-tabs" wx:if="{{currentType === 'todo'}}">
+  <view class="todo-tab {{activeTab === 'all_todo' ? 'active' : ''}}" bindtap="switchTab" data-tab="all_todo">
+    {{currentLang === 'zh' ? '常规待办' : 'งานทั่วไป'}}
+  </view>
+  <view class="todo-tab {{activeTab === 'no_answer' ? 'active' : ''}}" bindtap="switchTab" data-tab="no_answer">
+    {{currentLang === 'zh' ? '未接电话' : 'ไม่รับสาย'}}
+    <view class="tab-badge" wx:if="{{noAnswerCount > 0}}">{{noAnswerCount}}</view>
+  </view>
+</view>
+
+<view class="search-bar">
+  <view class="search-box">
+    <icon type="search" size="14" color="#999" />
+    <input class="search-input" placeholder="{{t.searchPlaceholder}}" bindinput="onSearchInput" bindconfirm="onSearch" confirm-type="search" value="{{searchKeyword}}" />
+    <icon wx:if="{{searchKeyword}}" type="clear" size="14" color="#ccc" bindtap="clearSearch" style="padding: 10px;" />
+  </view>
+</view>
+
+<scroll-view class="list-container" scroll-y bindscrolltolower="loadMore">
+  <view wx:if="{{customerList.length === 0 && !isLoading}}" class="empty-state">
+    <text>{{searchKeyword ? (currentLang === 'zh' ? '没有找到' : 'ไม่พบข้อมูล') : (currentType === 'todo' ? t.emptyTodo : t.emptyData)}}</text>
   </view>
 
-  <view class="search-bar">
-    <view class="search-box">
-      <icon type="search" size="14" color="#999" />
-      <input 
-        class="search-input" 
-        placeholder="{{t.searchPlaceholder}}" 
-        bindinput="onSearchInput" 
-        bindconfirm="onSearch" 
-        confirm-type="search" 
-        value="{{searchKeyword}}"
-      />
-      <icon wx:if="{{searchKeyword}}" type="clear" size="14" color="#ccc" bindtap="clearSearch" style="padding: 10px;" />
-    </view>
-  </view>
+  <view class="customer-card" wx:for="{{customerList}}" wx:key="_id">
+    <view class="card-content" bindtap="goToDetail" data-id="{{item._id}}">
 
-  <scroll-view class="list-container" scroll-y bindscrolltolower="loadMore">
-    <view wx:if="{{customerList.length === 0 && !isLoading}}" class="empty-state">
-      <text>{{searchKeyword ? (currentLang === 'zh' ? '没有找到' : 'ไม่พบข้อมูล') : (currentType === 'todo' ? t.emptyTodo : t.emptyData)}}</text>
-    </view>
+      <view class="header">
+        <text class="name">{{item.name}}</text>
 
-    <view class="customer-card" wx:for="{{customerList}}" wx:key="_id">
-      <view class="card-content" bindtap="goToDetail" data-id="{{item._id}}">
-        
-        <view class="header">
-          <text class="name">{{item.name}}</text>
+        <view class="tags-container">
+          <!-- 🚨 逾期标签：业务逻辑警告标签，保留原有渲染规则 -->
+          <text wx:if="{{item.isOverdue && item.status !== 'Closed Won' && item.status !== 'Closed Lost' && item.status !== 'Invalid'}}" class="tag tag-overdue">{{currentLang === 'zh' ? '已逾期' : 'เลยกำหนด'}}</text>
+
+          <!-- 🌟 核心升级：状态标签全部换绑 localizedStatusMap，直接读取动态字典中文案，同时保留原有的 CSS 色块控制 -->
           
-          <view class="tags-container">
-            <text wx:if="{{item.isOverdue && item.status !== 'Closed Won' && item.status !== 'Closed Lost' && item.status !== 'Invalid'}}" class="tag tag-overdue">{{currentLang === 'zh' ? '已逾期' : 'เลยกำหนด'}}</text>
-            
-            <text wx:if="{{item.status === 'pending' || !item.status}}" class="tag tag-pending">{{currentLang === 'zh' ? '待处理' : 'รอดำเนินการ'}}</text>
-            
-            <text wx:if="{{item.status === 'No Answer'}}" class="tag tag-warning">{{currentLang === 'zh' ? '未接通(需重拨)' : 'ไม่รับสาย(โทรซ้ำ)'}}</text>
-            
-            <text wx:if="{{item.status !== 'pending' && item.status !== 'No Answer' && item.status !== 'Closed Won' && item.status !== 'Closed Lost' && item.status !== 'Invalid' && item.status}}" class="tag tag-following">{{currentLang === 'zh' ? '再次跟进' : 'ติดตามอีกครั้ง'}}</text>
-            
-            <text wx:if="{{item.status === 'Closed Won' || item.status === 'Closed Lost' || item.status === 'Invalid'}}" class="tag tag-closed">{{statusMap[item.status] || item.status}}</text>
+          <text wx:if="{{item.status === 'pending' || !item.status}}" class="tag tag-pending">{{localizedStatusMap['pending'] || (currentLang === 'zh' ? '待处理' : 'รอดำเนินการ')}}</text>
 
-            <text wx:if="{{item.status === 'Busy'}}" class="tag tag-busy">{{currentLang === 'zh' ? '不方便接电话' : 'ไม่สะดวกรับสาย'}}</text>
-          </view>
-        </view>
-        
-        <view class="info phone-row">
-          <text>📞 </text>
-          <text class="phone-link" catchtap="makePhoneCall" data-phone="{{item.phone}}">{{item.phone}}</text>
-        </view>
-        
-        <view class="info text-gray">{{t.lblPayload}}: {{item.payload || '--'}} | {{t.lblCity}}: {{item.city || '--'}}</view>
-        
-        <view class="info text-alert" wx:if="{{item.next_follow_up}}">
-          ⏰ {{t.lblNextTime || (currentLang === 'zh' ? '约定跟进' : 'นัดหมาย')}}: {{item.next_follow_up}}
-        </view>
-        <view class="info text-gray" wx:else>
-          ⏰ {{currentLang === 'zh' ? '首次分配' : 'เวลาที่ได้รับ'}}: {{item.formattedCreateTime || '--'}}
-        </view>
+          <text wx:if="{{item.status === 'No Answer'}}" class="tag tag-warning">{{localizedStatusMap['No Answer'] || (currentLang === 'zh' ? '未接通' : 'ไม่รับสาย')}}</text>
 
+          <text wx:if="{{item.status === 'Busy'}}" class="tag tag-busy">{{localizedStatusMap['Busy'] || (currentLang === 'zh' ? '忙碌' : 'ไม่สะดวก')}}</text>
+
+          <!-- 顺手修复 Bug：此前 Busy 状态会和这个标签同时触发，现已严格隔离 -->
+          <text wx:if="{{item.status !== 'pending' && item.status !== 'No Answer' && item.status !== 'Busy' && item.status !== 'Closed Won' && item.status !== 'Closed Lost' && item.status !== 'Invalid' && item.status}}" class="tag tag-following">{{localizedStatusMap[item.status] || item.status}}</text>
+
+          <text wx:if="{{item.status === 'Closed Won' || item.status === 'Closed Lost' || item.status === 'Invalid'}}" class="tag tag-closed">{{localizedStatusMap[item.status] || item.status}}</text>
+        </view>
       </view>
-    </view>
 
-    <view class="loading-bottom" wx:if="{{customerList.length > 0}}">
-      <text>{{isLoading ? t.loading : (hasMore ? t.loadMore : t.noMore)}}</text>
+      <view class="info phone-row">
+        <text>📞 </text>
+        <text class="phone-link" catchtap="makePhoneCall" data-phone="{{item.phone}}">{{item.phone}}</text>
+      </view>
+
+      <view class="info text-gray">
+        {{t.lblPayload}}: {{item.payload || '--'}} |
+        {{t.lblCity}}: {{item.city || '--'}}
+        <block wx:if="{{item.remark}}">
+          | {{t.lblRemark || '备注'}}: {{item.remark}}
+        </block>
+      </view>
+
+      <view class="info text-alert" wx:if="{{item.next_follow_up}}">
+        ⏰ {{t.lblNextTime || (currentLang === 'zh' ? '约定跟进' : 'นัดหมาย')}}: {{item.next_follow_up}}
+      </view>
+      <view class="info text-gray" wx:else>
+        ⏰ {{currentLang === 'zh' ? '首次分配' : 'เวลาที่ได้รับ'}}: {{item.formattedCreateTime || '--'}}
+      </view>
+
     </view>
-  </scroll-view>
+  </view>
+
+  <view class="loading-bottom" wx:if="{{customerList.length > 0}}">
+    <text>{{isLoading ? t.loading : (hasMore ? t.loadMore : t.noMore)}}</text>
+  </view>
+</scroll-view>
 </view>

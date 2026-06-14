@@ -44,7 +44,7 @@ Page({
         const user = res.data[0];
         this.setData({ 
           isDisabled: user.status === 'disabled', // 🌟 获取禁用状态
-          isVisitor: !(user.role === 'admin' || user.role === 'sales')
+          isVisitor: !(user.role === 'admin' || user.role === 'sales' || user.role === 'manager')
         });
       } else {
         this.setData({ isVisitor: true });

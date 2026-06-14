@@ -14,10 +14,18 @@
       <view class="card-left" >
         <text class="icon">{{currentTab === 'daily' ? '📅' : '📆'}}</text>
         <text class="date-text">
-          {{currentTab === 'daily' ? 'วันที่รายงาน: ' + item.report_date : 'สัปดาห์: ' + (item.week_range || item.week_start)}} 
+          <!-- 'วันที่รายงาน: ' +  -->
+          {{currentTab === 'daily' ? item.report_date : 'สัปดาห์: ' + (item.week_range || item.week_start)}} 
         </text>
       </view>
-      <view class="card-arrow">></view>
+      
+      <!-- 🌟 新增：右侧状态标签与箭头 -->
+      <view class="card-right">
+        <!-- 泰语：已通过(อนุมัติแล้ว) / 被驳回(ถูกปฏิเสธ) / 待阅(รอการตรวจสอบ) -->
+        <text class="status-tag tag-{{item.approval_status || 'pending'}}">{{item.approval_status === 'approved' ? 'อนุมัติแล้ว' : (item.approval_status === 'rejected' ? 'ถูกปฏิเสธ' : 'รอการตรวจสอบ')}}
+        </text>
+        <view class="card-arrow">></view>
+      </view>
     </view>
   </scroll-view>
 </view>

@@ -17,7 +17,7 @@ Page({
 
     t: {}, 
     currentLang: 'zh',
-    statusMap: {} 
+    localizedStatusMap: {} // 🌟 新增：存放从数据库拉取的动态双语字典映射
   },
 
   onLoad(options) {
@@ -57,14 +57,37 @@ Page({
     const trans = i18n.t();
     this.setData({
       currentLang: lang,
-      t: trans,
-      statusMap: trans.status 
+      t: trans
     });
     const titleObj = {
       'zh': { todo: '今日待办', all: '我的客户' },
       'th': { todo: 'งานวันนี้', all: 'ลูกค้าของฉัน' }
     };
     wx.setNavigationBarTitle({ title: titleObj[lang][this.data.currentType] });
+
+    // 🌟 核心升级：每次初始化/切换语言时，从云端动态拉取状态字典
+    this.fetchStatusDict(lang);
+  },
+
+  // 🌟 核心升级：从 system_dict 拉取动态字典并生成映射表
+  async fetchStatusDict(lang) {
+    try {
+      const db = wx.cloud.database();
+      const res = await db.collection('system_dict')
+        .where({ type: 'customer_status', status: 'active' })
+        .orderBy('sort', 'asc')
+        .get();
+
+      const dictMap = {};
+      res.data.forEach(item => {
+        // 根据当前语言，将 value 映射为对应的 label
+        dictMap[item.value] = lang === 'zh' ? item.label_zh : item.label_th;
+      });
+      
+      this.setData({ localizedStatusMap: dictMap });
+    } catch (e) {
+      console.error('获取动态状态字典失败', e);
+    }
   },
 
   switchLang() {
@@ -81,7 +104,6 @@ Page({
     });
   },
 
-  // 🌟 修复 2：改用最稳妥的对象级 _.and + _.or，杜绝底层查询报错
   fetchNoAnswerCount() {
     const db = wx.cloud.database();
     const _ = db.command;
@@ -89,7 +111,7 @@ Page({
 
     db.collection('customers').where(_.and([
       { assigned_sales_id: this.data.myOpenId },
-      { status: 'No Answer' },
+      { status: 'No Answer' }, // 💡 这里的英文 value 用于底层逻辑判断，依然有效
       _.or([
         { next_follow_up: _.lte(todayStr) },
         { next_follow_up: '' },
@@ -153,7 +175,6 @@ Page({
           ])
         );
       } else if (this.data.activeTab === 'no_answer') {
-        // 🌟 修复 2同步：统一改为最稳健的对象级 or
         conditions.push({ status: 'No Answer' });
         conditions.push(
           _.or([
@@ -183,10 +204,8 @@ Page({
       .get()
       .then(res => {
         
-        // 🌟 修复 1：仅对 'todo' 待办列表施加严格拦截，绝不误伤 '全部客户' 列表
         const validData = res.data.filter(item => {
           if (this.data.currentType === 'todo') {
-            // 在待办列表中，隐藏掉已经被关闭的客户
             if (['Closed Won', 'Closed Lost', 'Invalid'].includes(item.status)) return false;
             
             let compareDate = item.next_follow_up;
@@ -205,11 +224,9 @@ Page({
               return item.status !== 'No Answer' && (compareDate <= todayStr || item.status === 'pending');
             }
           }
-          // 如果是 "我的客户" 页面，必须一律放行，显示所有历史数据！
           return true; 
         });
 
-        // 格式化过检的数据
         const newData = validData.map(item => {
           let createDateStr = '';
           if (item.createTime) {
@@ -256,7 +273,6 @@ Page({
 
   makePhoneCall(e) { 
     const phoneNum = String(e.currentTarget.dataset.phone);
-    // 🌟 修复 3：拦截前端转义造成的 "undefined" 和 "null" 字符串陷阱
     if (!phoneNum || phoneNum === 'undefined' || phoneNum === 'null' || phoneNum.trim() === '') {
       return wx.showToast({ title: '没有电话号码', icon: 'none' });
     }

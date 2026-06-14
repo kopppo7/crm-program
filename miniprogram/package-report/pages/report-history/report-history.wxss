@@ -101,3 +101,35 @@ page {
   color: #cbd5e1;
   font-weight: bold;
 }
+
+/* 🌟 新增：列表卡片右侧布局 */
+.card-right {
+  display: flex;
+  align-items: center;
+}
+
+/* 🌟 新增：状态小标签样式 */
+.status-tag {
+  font-size: 24rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+  margin-right: 16rpx; /* 和最右侧箭头拉开一点距离 */
+  font-weight: bold;
+}
+
+/* 三种状态对应的颜色（和详情页保持一致） */
+.tag-pending { 
+  background: #fef3c7; 
+  color: #d97706; 
+} /* 待阅 - 黄色 */
+
+.tag-approved { 
+  background: #d1fae5; 
+  color: #059669; 
+} /* 已通过 - 绿色 */
+
+.tag-rejected { 
+  background: #fee2e2; 
+  color: #dc2626; 
+} /* 被驳回 - 红色 */
+

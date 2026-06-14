@@ -3,10 +3,51 @@ page {
 }
 .container {
   padding: 30rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 居中对齐 */
 }
 
+/* 🌟 新增：审批状态 Banner */
+.approval-banner {
+  width: 95%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  padding: 24rpx 30rpx;
+  border-radius: 12rpx;
+  margin-bottom: 30rpx;
+}
+.status-pending { background: #fef3c7; color: #d97706; } /* 待阅 - 黄色 */
+.status-approved { background: #d1fae5; color: #059669; } /* 通过 - 绿色 */
+.status-rejected { background: #fee2e2; color: #dc2626; } /* 驳回 - 红色 */
+
+.approval-banner .icon { margin-right: 16rpx; font-size: 36rpx; }
+.approval-banner .status-text { font-weight: bold; font-size: 32rpx; }
+
+/* 🌟 新增：驳回原因卡片 */
+.reason-card {
+  width: 95%;
+  box-sizing: border-box;
+  background: #fffafa;
+  border: 1px dashed #fca5a5;
+  padding: 24rpx;
+  border-radius: 12rpx;
+  margin-bottom: 30rpx;
+}
+.reason-item {
+  font-size: 28rpx;
+  color: #dc2626;
+  margin-bottom: 12rpx;
+  line-height: 1.5;
+}
+.reason-item:last-child { margin-bottom: 0; }
+.reason-item .label { font-weight: bold; }
+
+/* 原有的头部卡片 */
 .header-card {
   width: 95%;
+  box-sizing: border-box;
   background: #fff;
   padding: 30rpx;
   border-radius: 12rpx;
@@ -27,13 +68,15 @@ page {
   color: #1f2937;
 }
 
+/* 原有的内容区块 */
 .detail-content {
+  width: 95%;
+  box-sizing: border-box;
   background: #fff;
   padding: 30rpx;
   border-radius: 12rpx;
   box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.03);
-  min-height: 400rpx;
-  width: 95%;
+  min-height: auto; /* 移除最低高度，自动撑开 */
 }
 
 .text-block {
@@ -42,4 +85,96 @@ page {
   line-height: 1.8;
   word-break: break-all;
   white-space: pre-wrap;
+}
+
+/* 🌟 新增：遗留待办颜色控制 */
+.text-green { color: #10b981 !important; font-weight: bold; }
+.text-red { color: #ef4444 !important; font-weight: bold; }
+
+/* 🌟 新增：审批历史时间轴 */
+.history-section {
+  width: 95%;
+  box-sizing: border-box;
+  background: #fff;
+  padding: 30rpx;
+  border-radius: 12rpx;
+  margin-top: 30rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.03);
+}
+
+.timeline {
+  margin-top: 20rpx;
+  padding-left: 20rpx;
+}
+.timeline-item {
+  position: relative;
+  padding-bottom: 40rpx;
+  padding-left: 40rpx;
+}
+.timeline-item:last-child { padding-bottom: 0; }
+
+.timeline-dot {
+  position: absolute;
+  left: -8rpx;
+  top: 10rpx;
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  z-index: 2;
+}
+.dot-approved { background: #10b981; }
+.dot-rejected { background: #ef4444; }
+
+.timeline-line {
+  position: absolute;
+  left: -1rpx;
+  top: 20rpx;
+  bottom: -10rpx;
+  width: 4rpx;
+  background: #e2e8f0;
+  z-index: 1;
+}
+
+.time-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+.status-badge {
+  font-size: 22rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 6rpx;
+  color: #fff;
+  margin-right: 16rpx;
+  font-weight: bold;
+}
+.badge-approved { background: #10b981; }
+.badge-rejected { background: #ef4444; }
+
+.time-text { font-size: 24rpx; color: #94a3b8; }
+.history-reason {
+  font-size: 26rpx;
+  color: #475569;
+  background: #f8fafc;
+  padding: 16rpx;
+  border-radius: 8rpx;
+  margin-top: 12rpx;
+  line-height: 1.5;
+}
+
+/* 🌟 重新修改按钮样式 */
+.edit-btn-container {
+  width: 95%;
+  box-sizing: border-box;
+  margin: 40rpx auto;
+}
+.edit-btn {
+  background: #3b82f6;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 12rpx;
+  padding: 24rpx 0;
+  font-size: 32rpx;
+  text-align: center;
+  box-shadow: 0 4rpx 12rpx rgba(59, 130, 246, 0.3);
 }
