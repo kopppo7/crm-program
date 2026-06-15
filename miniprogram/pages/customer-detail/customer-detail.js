@@ -18,7 +18,7 @@ Page({
     showGlobalTransModal: false,
     globalTransText: '',
 
-    localizedStatusMap: {} // 🌟 新增：存放动态拉取的双语字典映射
+    localizedStatusMap: {} 
   },
 
   onLoad(options) {
@@ -33,7 +33,6 @@ Page({
     this.initLanguage();
     wx.showNavigationBarLoading();
 
-    // 直接拿大门(index.js)发给我们的身份牌，不要再去调用微信服务器覆盖了！
     const myOpenId = wx.getStorageSync('myOpenId');
     if (myOpenId) {
       this.checkAdminRole(myOpenId);
@@ -75,12 +74,9 @@ Page({
       t: i18n.t()
     });
     wx.setNavigationBarTitle({ title: lang === 'zh' ? '客户详情' : 'รายละเอียดลูกค้า' });
-
-    // 🌟 核心升级：动态拉取云端系统状态字典
     this.fetchStatusDict(lang);
   },
 
-  // 🌟 核心升级：从 system_dict 拉取动态字典并生成映射表
   async fetchStatusDict(lang) {
     try {
       const res = await db.collection('system_dict')
@@ -291,13 +287,23 @@ Page({
 
   copyAllContext() {
     const p = this.data.customer.profile || {};
-    let text = `【客户画像】\n需求: ${p.demand || '未填'}\n动机: ${p.motivation || '未填'}\n使用者: ${p.userType || '未填'}\n场景: ${p.scenario || '未填'}\n时间: ${p.timeframe || '未填'}\n预算: ${p.budget || '未填'}\n\n【跟进记录】\n`;
+    let text = '';
+    
+    // 🌟 一键复制中加入重点客户字段
+    if (this.data.customer.is_key_customer) {
+      text += `【⭐ 重点客户】\n原因: ${this.data.customer.key_customer_reason || '未填'}\n\n`;
+    }
+
+    text += `【客户画像】\n需求: ${p.demand || '未填'}\n动机: ${p.motivation || '未填'}\n使用者: ${p.userType || '未填'}\n场景: ${p.scenario || '未填'}\n时间: ${p.timeframe || '未填'}\n预算: ${p.budget || '未填'}\n\n【跟进记录】\n`;
     
     this.data.logs.forEach(log => {
-      // 🌟 核心升级：一键复制导出的文案，也升级为从动态字典中读取
       const statusStr = this.data.localizedStatusMap[log.result_tag] || log.result_tag;
       text += `[${log.createTimeStr}] 状态:${statusStr}\n内容: ${log.note}\n`;
       if (log.lost_reason) text += `原因: ${log.lost_reason}\n`;
+      
+      // 🌟 一键复制中加入成交金额
+      if (log.transaction_amount) text += `成交金额: ${log.transaction_amount}\n`;
+      
       text += `---\n`;
     });
 

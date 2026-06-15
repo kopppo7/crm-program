@@ -49,7 +49,11 @@ Page({
 
     try {
       // 获取所有销售（包括正常的和被禁用的）
-      const usersRes = await db.collection('users').where({ role: 'sales' }).get();
+      // 🌟 核心修改：扩大拉取范围，同时精准屏蔽“纯管理”账号
+      const usersRes = await db.collection('users').where({
+        role: _.in(['sales', 'manager']), // 允许拉取销售和主管
+        name: _.nin(['kristin', 'chey'])  // 🚨 排除掉纯管理的高管（请替换成您数据库里实际的纯主管拼音/名字）
+      }).get();
       const salesList = usersRes.data;
 
       const today = this.data.todayStr;

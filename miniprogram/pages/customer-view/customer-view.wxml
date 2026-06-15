@@ -43,12 +43,14 @@
       <text>{{currentLang === 'zh' ? '暂无符合条件的客户数据' : 'ไม่พบข้อมูลลูกค้าที่ตรงกัน'}}</text>
     </view>
 
-    <view class="customer-card" wx:for="{{customerList}}" wx:key="_id" bindtap="goToDetail" data-id="{{item._id}}">
-      <view class="card-content">
+    <view class="customer-card" wx:for="{{customerList}}" wx:key="_id">
+      
+      <view class="card-content" bindtap="goToDetail" data-id="{{item._id}}" style="{{item.is_key_customer ? 'border-right: 12rpx solid #f59e0b; background: linear-gradient(to right, #ffffff 60%, #fffbeb 100%);' : ''}}">
         
         <view class="header">
+          <text wx:if="{{item.is_key_customer}}">⭐</text>
           <text class="name">{{item.name}}</text>
-          
+
           <view class="tags-container">
             <text wx:if="{{item.isOverdue && item.status !== 'Closed Won' && item.status !== 'Closed Lost' && item.status !== 'Invalid'}}" class="tag tag-overdue">{{currentLang === 'zh' ? '已逾期' : 'เลยกำหนด'}}</text>
             

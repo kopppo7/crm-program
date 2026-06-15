@@ -33,10 +33,15 @@
       <text class="label">{{currentLang === 'zh' ? '备注' : 'หมายเหตุ'}}:</text>
       <text class="value">{{customer.remark}}</text>
     </view>
-      <view class="info-item" wx:if="{{customer.next_follow_up}}">
-        <text class="label">{{currentLang === 'zh' ? '下次跟进' : 'ติดตามครั้งต่อไป'}}:</text>
-        <text class="value" style="color: #ff9800; font-weight: bold;">{{customer.next_follow_up}}</text>
-      </view>
+    <view class="info-item" wx:if="{{customer.next_follow_up}}">
+      <text class="label">{{currentLang === 'zh' ? '下次跟进' : 'ติดตามครั้งต่อไป'}}:</text>
+      <text class="value" style="color: #ff9800; font-weight: bold;">{{customer.next_follow_up}}</text>
+    </view>
+    <!-- 🌟 新增：重点客户高亮反显 -->
+    <view class="info-item" wx:if="{{customer.is_key_customer}}">
+      <text class="label" style="color: red;">{{currentLang === 'zh' ? '⭐ 重点客户' : '⭐ ลูกค้าสำคัญ'}}:</text>
+      <text class="value" style="color: #f59e0b; font-weight: bold;">{{customer.key_customer_reason || (currentLang === 'zh' ? '是' : 'ใช่')}}</text>
+    </view>
   </view>
 </view>
 
@@ -95,8 +100,15 @@
       <view class="log-tag">{{localizedStatusMap[item.result_tag] || item.result_tag}}</view>
       
       <text class="log-note" user-select="true">{{item.note}}</text>
-      <view class="log-reason" wx:if="{{item.lost_reason}}">战败原因：<text user-select="true">{{item.lost_reason}}</text></view>
       
+      <!-- 保留旧数据的战败原因显示 -->
+      <view class="log-reason" wx:if="{{item.lost_reason}}">{{currentLang === 'zh' ? '战败原因' : 'เหตุผลที่ปฏิเสธ'}}：<text user-select="true">{{item.lost_reason}}</text></view>
+      
+      <!-- 🌟 新增：成交金额展示 -->
+      <view class="log-reason" wx:if="{{item.transaction_amount}}">
+        <text style="color: #10b981; font-weight: bold;">{{currentLang === 'zh' ? '💰 成交金额' : '💰 ยอดซื้อขาย'}}：{{item.transaction_amount}}</text>
+      </view>
+
       <view class="log-images" wx:if="{{item.screenshot_files.length > 0}}">
         <image wx:for="{{item.screenshot_files}}" wx:for-item="img" wx:key="*this" src="{{img}}" mode="aspectFill" class="log-img" bindtap="previewImage" data-current="{{img}}" data-all="{{item.screenshot_files}}"></image>
       </view>
