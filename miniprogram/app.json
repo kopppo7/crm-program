@@ -17,6 +17,7 @@
       "root": "package-report",
       "pages": [
         "pages/report-menu/report-menu",
+        "pages/sale-add-customer/sale-add-customer",
         "pages/weekly-plan/weekly-plan",
         "pages/daily-report/daily-report",
         "pages/admin-report-list/admin-report-list",

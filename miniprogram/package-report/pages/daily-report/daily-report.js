@@ -6,11 +6,10 @@ Page({
   data: {
     currentLang: 'zh',
     reportDate: '',
-    editId: '', // 🌟 记录是否为修改模式
+    editId: '', 
     
     // 数据回填用
-    countLine: '',
-    detailOther: '',
+    detailOther: '', // 🌟 已删除 countLine 字段
 
     listCallsArr: [],
     listVisitArr: [],
@@ -25,7 +24,6 @@ Page({
   },
 
   onLoad(options) {
-    // 🌟 1. 接收编辑 ID 并触发回显[cite: 20]
     if (options.editId) {
       this.setData({ editId: options.editId });
       this.loadEditData(options.editId);
@@ -35,7 +33,6 @@ Page({
   onShow() {
     const lang = i18n.getLang();
     this.setData({ currentLang: lang });
-    // 只有非修改模式才自动生成今天日期[cite: 20]
     if (!this.data.editId) {
       this.initTodayDate();
     }
@@ -49,19 +46,16 @@ Page({
     this.setData({ reportDate: `${y}-${m}-${day}` });
   },
 
-  // 🌟 2. 逆向解析：把文本拆解回卡片数组 (修改了匹配规则)[cite: 20]
   async loadEditData(id) {
     wx.showLoading({ title: 'กำลังโหลดข้อมูล...' }); 
     try {
       const res = await db.collection('report_daily').doc(id).get();
       const data = res.data;
 
-      // 拆解引擎：精准匹配 "电话:xxx 说明/情况/日期:xxx"[cite: 20]
       const parseStringToArray = (str, type) => {
         if (!str || str === '无' || str.trim() === '') return [];
         return str.split('\n').map(line => {
           let phone = (line.match(/电话:([^\s]+)/) || [])[1] || '';
-          // 这里将匹配规则从“意向”改为“说明”[cite: 20]
           if (type === 'call') return { phone, intent: (line.match(/说明:(.+)/) || [])[1] || '' };
           if (type === 'visit') return { phone, date: (line.match(/日期:([^\s]+)/) || [])[1] || '' };
           if (type === 'video') return { phone, note: (line.match(/情况:(.+)/) || [])[1] || '' };
@@ -71,8 +65,7 @@ Page({
 
       this.setData({
         reportDate: data.report_date,
-        countLine: data.count_line || '',
-        detailOther: data.detail_other || '',
+        detailOther: data.detail_other || '', // 🌟 已删除 count_line 的回填
         listCallsArr: parseStringToArray(data.list_calls, 'call'),
         listVisitArr: parseStringToArray(data.list_visit, 'visit'),
         listVideoArr: parseStringToArray(data.list_video, 'video')
@@ -120,7 +113,6 @@ Page({
     let key = '';
 
     if (activeModal === 'call') {
-      // 提示语修改为“请填写说明”[cite: 20]
       if (!tempIntent.trim()) return wx.showToast({ title: currentLang === 'zh' ? '请填写说明' : 'กรุณากรอกคำอธิบาย', icon: 'none' });
       newItem.intent = tempIntent.trim();
       targetArr = this.data.listCallsArr;
@@ -191,21 +183,19 @@ Page({
     const lang = this.data.currentLang;
     const dateStr = this.data.reportDate;
 
-    // 🌟 3. 防重复提交拦截校验 (仅在新增模式下执行)
     if (!this.data.editId) {
       wx.showLoading({ title: '正在校验...', mask: true });
       try {
         const myOpenId = wx.getStorageSync('myOpenId') || '';
         const checkRes = await db.collection('report_daily').where({
           sales_id: myOpenId,
-          report_date: dateStr // 检查今天是否已提交
+          report_date: dateStr 
         }).get();
         
         wx.hideLoading();
 
         if (checkRes.data.length > 0) {
           const existingRecord = checkRes.data[0];
-          // 如果已被驳回，引导去历史记录重填
           if (existingRecord.approval_status === 'rejected') {
             return wx.showModal({
               title: lang === 'zh' ? '拦截提示' : 'ไม่สามารถส่งได้',
@@ -213,7 +203,6 @@ Page({
               showCancel: false
             });
           } else {
-            // 如果是待阅或已通过，防止重复添加
             return wx.showModal({
               title: lang === 'zh' ? '请勿重复提交' : 'ไม่สามารถส่งได้',
               content: lang === 'zh' ? '您今日已提交过汇报，请勿重复提交。' : 'คุณส่งรายงานของวันนี้แล้ว โปรดอย่าส่งซ้ำ',
@@ -228,7 +217,6 @@ Page({
       }
     }
 
-    // 校验通过，或者本来就是修改模式，弹窗确认
     wx.showModal({
       title: lang === 'zh' ? '提交确认' : 'ยืนยันการส่ง',
       content: lang === 'zh' ? `确认提交 ${this.data.reportDate} 的工作日报吗？` : `ยืนยันการส่งรายงานหรือไม่?`,
@@ -242,10 +230,10 @@ Page({
   },
 
   async executeSubmit(formData) {
-    const { countLine, detailOther } = formData;
+    // 🌟 已删除 formData 中的 countLine 解构
+    const { detailOther } = formData;
     const dateStr = this.data.reportDate;
 
-    // 将组装时的“意向”统一改为“说明”[cite: 20]
     const formattedCalls = this.data.listCallsArr.map(i => `电话:${i.phone} 说明:${i.intent}`).join('\n');
     const formattedVisit = this.data.listVisitArr.map(i => `电话:${i.phone} 日期:${i.date}`).join('\n');
     const formattedVideo = this.data.listVideoArr.map(i => `电话:${i.phone} 情况:${i.note}`).join('\n');
@@ -257,7 +245,6 @@ Page({
       const userRes = await db.collection('users').where({ _openid: myOpenId }).get();
       const salesName = userRes.data.length > 0 ? userRes.data[0].name : '未知销售';
 
-      // 抓取遗留待办
       let pendingTodosText = '';
       try {
         const todoRes = await db.collection('customers').where({
@@ -281,21 +268,19 @@ Page({
         sales_name: salesName,
         report_date: dateStr,            
         list_calls: formattedCalls,       
-        count_line: Number(countLine) || 0, 
+        // 🌟 已删除入库的 count_line 属性
         list_visit: formattedVisit,     
         list_video: formattedVideo,                  
         detail_other: detailOther || '',  
         pending_todos: pendingTodosText,
-        approval_status: 'pending' // 🌟 4. 这里写死了 pending，如果是被驳回重交，状态会被成功洗白[cite: 20]
+        approval_status: 'pending' 
       };
 
       if (this.data.editId) {
-        // 🌟 5. 路由分发：修改模式更新数据[cite: 20]
         await db.collection('report_daily').doc(this.data.editId).update({
           data: submitData
         });
       } else {
-        // 🌟 路由分发：新增模式插入数据[cite: 20]
         submitData.createTime = db.serverDate();
         await db.collection('report_daily').add({
           data: submitData

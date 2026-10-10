@@ -1,0 +1,77 @@
+<view class="container">
+  <view class="card">
+    
+    <!-- 1. 客户来源 (单选框) -->
+    <view class="form-item no-border">
+      <view class="label-row">
+        <text class="required">*</text>
+        <text class="label">{{currentLang === 'zh' ? '客户来源' : 'แหล่งที่มาของลูกค้า'}}</text>
+      </view>
+      <radio-group class="radio-group" bindchange="onSourceChange">
+        <label class="radio-label" wx:for="{{sourceOptions}}" wx:key="value">
+          <radio value="{{item.value}}" checked="{{form.source === item.value}}" color="#10b981" />
+          <text class="radio-text">{{item.label}}</text>
+        </label>
+      </radio-group>
+    </view>
+
+    <!-- 2. 姓名 (选填) -->
+    <view class="form-item">
+      <view class="label-row">
+        <text class="label" style="padding-left: 14rpx;">{{currentLang === 'zh' ? '客户姓名' : 'ชื่อลูกค้า'}}</text>
+      </view>
+      <input class="input-box" value="{{form.name}}" bindinput="handleInput" data-field="name" placeholder="{{currentLang === 'zh' ? '选填 (Name)' : 'เลือกกรอก (Name)'}}" placeholder-class="placeholder-style" />
+    </view>
+
+    <!-- 3. 手机号 (必填) -->
+    <view class="form-item">
+      <view class="label-row">
+        <text class="required">*</text>
+        <text class="label">{{currentLang === 'zh' ? '手机号码' : 'เบอร์โทรศัพท์'}}</text>
+      </view>
+      <input class="input-box" value="{{form.phone}}" bindinput="handleInput" data-field="phone" type="number" placeholder="{{currentLang === 'zh' ? '必填 (Phone)' : 'บังคับกรอก (Phone)'}}" placeholder-class="placeholder-style" />
+    </view>
+
+    <!-- 4. 🌟 新增：产品品类 (必填下拉菜单) -->
+    <view class="form-item">
+      <view class="label-row">
+        <text class="required">*</text>
+        <text class="label">{{currentLang === 'zh' ? '产品品类' : 'หมวดหมู่สินค้า'}}</text>
+      </view>
+      <picker mode="selector" range="{{productCategoryOptions}}" range-key="label" bindchange="onProductCategoryChange">
+        <!-- 直接复用 input-box 样式，配合 flex 布局模拟下拉框的精美质感 -->
+        <view class="input-box" style="display: flex; align-items: center; justify-content: space-between;">
+          <text style="color: {{selectedProductIndex === -1 ? '#9ca3af' : '#1f2937'}};">
+            {{selectedProductIndex === -1 ? (currentLang === 'zh' ? '请选择产品品类' : 'กรุณาเลือกหมวดหมู่สินค้า') : productCategoryOptions[selectedProductIndex].label}}
+          </text>
+          <text style="color: #9ca3af; font-size: 24rpx;">▼</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 5. 需求机型 (细分型号 - 必填) -->
+    <view class="form-item">
+      <view class="label-row">
+        <text class="required">*</text>
+        <text class="label">{{currentLang === 'zh' ? '需求机型' : 'รุ่นที่ต้องการ'}}</text>
+      </view>
+      <input class="input-box" value="{{form.payload}}" bindinput="handleInput" data-field="payload" placeholder="{{currentLang === 'zh' ? '例: 填写具体型号或配置' : 'เช่น ระบุรุ่นเฉพาะหรือการกำหนดค่า'}}" placeholder-class="placeholder-style" />
+    </view>
+
+    <!-- 6. 备注信息 (选填) -->
+    <view class="form-item no-border">
+      <view class="label-row">
+        <text class="label" style="padding-left: 14rpx;">{{currentLang === 'zh' ? '备注信息' : 'หมายเหตุ'}}</text>
+      </view>
+      <textarea class="textarea-box" value="{{form.remark}}" bindinput="handleInput" data-field="remark" placeholder="{{currentLang === 'zh' ? '选填，在此输入客户的其他说明...' : 'เลือกกรอก คำอธิบายเพิ่มเติม...'}}" placeholder-class="placeholder-style"></textarea>
+    </view>
+    
+  </view>
+
+  <view class="footer-btn">
+    <button class="submit-btn" bindtap="submitCustomer">
+      <text class="btn-icon">⚡</text>
+      <text>{{currentLang === 'zh' ? '建档并立刻跟进' : 'บันทึกและติดตามทันที'}}</text>
+    </button>
+  </view>
+</view>

@@ -1,301 +1,235 @@
-/* =======================================
-   🌟 全局与基础框架
-======================================= */
-page { 
-  background-color: #F5F7FA; /* 更显高级的冷灰蓝背景 */
-  height: 100%; 
-  overflow: hidden; 
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-}
-
-.container { 
-  display: flex; 
-  flex-direction: column; 
-  height: 100vh; 
-}
-
-/* =======================================
-   🌟 顶部搜索栏与筛选栏
-======================================= */
-.search-bar { 
-  background: #FFFFFF; 
-  padding: 20rpx 30rpx; 
-  z-index: 10; 
-}
-
-.search-box { 
-  display: flex; 
-  align-items: center; 
-  background: #F3F4F6; /* 更柔和的输入框背景 */
-  border-radius: 36rpx; 
-  padding: 0 30rpx; 
-  height: 72rpx; 
-  width: 100%; 
-  box-sizing: border-box; 
-  border: 1px solid transparent;
-  transition: all 0.3s ease;
-}
-.search-box:focus-within {
-  background: #FFFFFF;
-  border: 1px solid #409EFF;
-  box-shadow: 0 0 0 6rpx rgba(64, 158, 255, 0.1);
-}
-
-.search-input { 
-  flex: 1; 
-  margin-left: 16rpx; 
-  font-size: 28rpx; 
-  color: #111827; 
-}
-
-.filter-bar { 
-  display: flex; 
-  background: #FFFFFF; 
-  padding: 10rpx 20rpx 24rpx; 
-  z-index: 10; 
-  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.02); /* 增加头部立体感 */
-}
-
-.filter-picker { 
-  flex: 1; 
-  text-align: center; 
-}
-
-.filter-item { 
-  display: inline-flex; 
-  align-items: center; 
-  justify-content: center; 
-  font-size: 26rpx; 
-  color: #4B5563; 
-  font-weight: 600; 
-  background: #F3F4F6; 
-  padding: 12rpx 24rpx; 
-  border-radius: 40rpx; /* 胶囊型下拉按钮 */
-  width: 85%;
-  transition: all 0.2s;
-}
-.filter-item:active {
-  background: #E5E7EB;
-  transform: scale(0.98);
-}
-.arrow { font-size: 20rpx; color: #9CA3AF; margin-left: 10rpx; }
-
-/* =======================================
-   🌟 列表容器与空状态
-======================================= */
-.list-container { 
-  flex: 1; 
-  height: 0; 
-  padding: 24rpx; 
-  box-sizing: border-box; 
-}
-
-.empty-state { 
-  text-align: center; 
-  color: #9CA3AF; 
-  margin-top: 160rpx; 
-  font-size: 28rpx; 
-  letter-spacing: 2rpx;
-}
-
-/* =======================================
-   🌟 客户卡片主体 (极致视觉打磨)
-======================================= */
-.customer-card { 
-  background: #FFFFFF; 
-  border-radius: 24rpx; /* 苹果级大圆角 */
-  margin-bottom: 24rpx; 
-  box-shadow: 0 8rpx 32rpx -12rpx rgba(0, 0, 0, 0.08); /* 柔和的高级弥散阴影 */
-  border: 1px solid rgba(243, 244, 246, 0.8);
-  transition: transform 0.2s ease;
-}
-.customer-card:active {
-  transform: scale(0.99); /* 点击时的微交互缩放 */
-}
-
-.card-content { 
-  padding: 30rpx; 
-}
-
-/* =======================================
-   🌟 卡片头部 (姓名与状态)
-======================================= */
-.header { 
-  position: relative;
-  display: flex; 
-  width: 100%;
-  align-items: flex-start;
-  margin-bottom: 20rpx;
-  min-height: 60rpx;
-}
-
-.name { 
-  flex: 1; 
-  padding-right: 180rpx; /* 给右侧绝对定位的标签留足空间 */
-  word-break: break-all;
-  font-size: 34rpx; 
-  font-weight: 700; 
-  color: #111827; /* 极黑字，增加对比度 */
-  line-height: 1.3;
-}
-
-/* 标签容器 */
-.tags-container {
-  position: absolute;
-  top: -4rpx;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 12rpx;
-  z-index: 2;
-}
-
-/* =======================================
-   🌟 智能状态标签体系 (马卡龙质感)
-======================================= */
-.tag { 
-  font-size: 22rpx; 
-  padding: 6rpx 16rpx; 
-  border-radius: 12rpx; 
-  font-weight: 600; 
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-/* 红色：已逾期 (强警告) */
-.tag-overdue {
-  background-color: #FEF2F2 !important;
-  color: #DC2626 !important;
-  border: 1px solid #FECACA !important;
-}
-
-/* 蓝色：待处理 */
-.tag-pending {
-  background-color: #EFF6FF;
-  color: #2563EB;
-  border: 1px solid #BFDBFE;
-}
-
-/* 橙黄色：未接通 */
-.tag-warning {
-  background-color: #FFFBEB;
-  color: #D97706;
-  border: 1px solid #FDE68A;
-}
-
-/* 紫色：再次跟进 */
-.tag-following {
-  background-color: #F5F3FF;
-  color: #7C3AED;
-  border: 1px solid #E9D5FF;
-}
-
-/* 灰色：已完结 / 无效 */
-.tag-closed {
-  background-color: #F3F4F6;
-  color: #6B7280;
-  border: 1px solid #E5E7EB;
-}
-
-/* =======================================
-   🌟 卡片内容区 (排版与间距)
-======================================= */
-.info { 
-  font-size: 26rpx; 
-  margin-bottom: 12rpx; 
-  color: #4B5563; 
-}
-.text-gray { 
-  color: #6B7280; 
-  font-size: 24rpx; 
-}
-
-/* --- ✨ 电话行特殊强化 ✨ --- */
-.phone-row { 
-  display: inline-flex; 
-  align-items: center; 
-  background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%); /* 淡淡的翡翠绿渐变背景 */
-  padding: 12rpx 24rpx;
-  border-radius: 16rpx;
-  margin: 12rpx 0 20rpx 0;
-}
-.phone-link {
-  color: #059669; /* 深翡翠绿 */
-  font-size: 32rpx;
-  font-weight: 700;
-  margin-left: 12rpx;
-  letter-spacing: 1rpx;
-}
-.phone-link:active { opacity: 0.7; }
-
-/* 虚线分割线更加精致 */
-.divider { 
-  border-top: 2rpx dashed #E5E7EB; 
-  margin: 24rpx 0; 
-  height: 0; 
-}
-
-/* =======================================
-   🌟 卡片底部 (销售与时间对齐)
-======================================= */
-.footer-info { 
-  display: flex; 
-  flex-wrap: wrap; /* 🌟 核心：允许换行，完美兼容新增的时间字段 */
-  justify-content: space-between; 
-  align-items: center; 
-  font-size: 24rpx; 
-}
-
-.sales-name { 
-  font-weight: 600; 
-  color: #374151;
-  background: #F3F4F6; 
-  padding: 8rpx 20rpx; 
-  border-radius: 12rpx; 
-  display: flex;
-  align-items: center;
-}
-
-.next-time { 
-  color: #EF4444; /* 约定时间用醒目的红色 */
-  font-weight: 700; 
-  background: #FEF2F2;
-  padding: 6rpx 16rpx;
-  border-radius: 10rpx;
-}
-
-.text-gray-time { 
-  color: #9CA3AF; 
-  font-weight: 500; 
-  background: transparent;
-  padding: 0;
-} 
-
-/* 🌟 专门处理您新增的 "最新记录时间" 样式，让它独占一行靠右对齐 */
-.footer-info > view.next-time { 
-  width: 100%; 
-  text-align: right; 
-  background: transparent; 
-  color: #9CA3AF !important; 
-  font-size: 22rpx; 
-  font-weight: 500; 
-  margin-top: 16rpx !important; 
-  padding: 0;
-}
-
-/* =======================================
-   🌟 底部加载提示
-======================================= */
-.loading-bottom { 
-  text-align: center; 
-  padding: 20rpx 0 40rpx; 
-  font-size: 24rpx; 
-  color: #9CA3AF; 
-  letter-spacing: 2rpx;
-}
-
-.tag-busy {
-  background: #e0e7ff; 
-  color: #4f46e5; /* 优雅的靛蓝色，区分于未接的警告黄 */
-}
+/* =========================================
+   全局与容器结构
+   ========================================= */
+   page { 
+    background-color: #f4f6f9; 
+    height: 100%; 
+    overflow: hidden; 
+  }
+  
+  .container { 
+    display: flex; 
+    flex-direction: column; 
+    height: 100vh; 
+  }
+  
+  /* =========================================
+     搜索与筛选区
+     ========================================= */
+  .search-bar { 
+    background: #fff; 
+    padding: 16rpx 30rpx; /* 减小上下高度 */
+    border-bottom: 1rpx solid #eee; 
+    position: sticky; 
+    top: 0; 
+    z-index: 10; 
+  }
+  
+  .search-box { 
+    display: flex; 
+    align-items: center; 
+    background: #f0f2f5; 
+    border-radius: 40rpx; 
+    padding: 0 30rpx; 
+    height: 64rpx; /* 搜索框变扁 */
+    width: 100%; 
+    box-sizing: border-box; 
+  }
+  
+  .search-input { 
+    flex: 1; 
+    margin-left: 16rpx; 
+    font-size: 26rpx; 
+    color: #333; 
+  }
+  
+  /* =========================================
+     列表区域
+     ========================================= */
+  .list-container { 
+    flex: 1; 
+    height: 0; 
+    padding: 24rpx 30rpx; 
+    box-sizing: border-box; 
+  }
+  
+  .empty-state { 
+    text-align: center; 
+    color: #999; 
+    margin-top: 160rpx; 
+    font-size: 28rpx; 
+  }
+  
+  /* =========================================
+     卡片主体 (极致高度压缩、清爽设计)
+     ========================================= */
+  .customer-card { 
+    background: #fff; 
+    border-radius: 16rpx; 
+    margin-bottom: 24rpx; 
+    box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.02); 
+    display: flex; 
+    flex-direction: column; 
+    overflow: hidden; 
+  }
+  
+  .card-content { 
+    padding: 24rpx; /* 内边距缩小，让卡片更紧凑 */
+    position: relative;
+  }
+  
+  /* 1. 头部容器 */
+  .header {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 8rpx;
+  }
+  
+  .name-box {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    padding-right: 140rpx; /* 给右上角标签留出安全区 */
+  }
+  
+  .key-star {
+    margin-right: 8rpx;
+    font-size: 26rpx;
+  }
+  
+  /* 名字限制单行缩略 */
+  .name {
+    font-size: 32rpx;
+    font-weight: 800;
+    color: #1f2937;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* 2. 电话行突出显示 */
+  .phone-row {
+    margin-bottom: 12rpx;
+  }
+  
+  .phone-link {
+    color: #10b981; 
+    font-size: 30rpx;
+    font-weight: bold;
+    text-decoration: underline;
+    padding: 4rpx 0; 
+    display: inline-block;
+  }
+  
+  /* 3. 辅助信息强制单行，自动截断防撑破卡片 */
+  .info.text-gray { 
+    color: #6b7280; 
+    font-size: 24rpx; 
+    margin-bottom: 16rpx;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* 🌟 4. 全新底部极简元数据栏 (替代以前的 footer-info) */
+  .card-bottom-bar {
+    display: flex;
+    flex-wrap: wrap; /* 横向排列，自动折行 */
+    background: #f8fafc; /* 超级淡的背景块，代替线条分割 */
+    padding: 10rpx 16rpx;
+    border-radius: 8rpx;
+    column-gap: 24rpx;
+    row-gap: 8rpx;
+  }
+  
+  .bottom-item {
+    font-size: 22rpx;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+  }
+  
+  .bottom-icon {
+    margin-right: 6rpx;
+    font-size: 22rpx;
+  }
+  
+  .text-highlight {
+    color: #f59e0b; /* 橙色高亮约定时间 */
+    font-weight: bold;
+  }
+  
+  /* =========================================
+     状态标签体系 (右上角绝对定位)
+     ========================================= */
+  .tags-container {
+    position: absolute; 
+    top: 24rpx; 
+    right: 24rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8rpx;
+    z-index: 2; 
+  }
+  
+  .tag {
+    padding: 4rpx 14rpx;
+    border-radius: 8rpx;
+    font-size: 20rpx;
+    font-weight: bold;
+  }
+  
+  .tag-overdue { background-color: #fee2e2; color: #ef4444; }
+  .tag-pending { background-color: #e0f2fe; color: #0284c7; }
+  .tag-warning { background-color: #fef3c7; color: #d97706; }
+  .tag-following { background-color: #f3e8ff; color: #7e22ce; }
+  .tag-closed { background-color: #f1f5f9; color: #64748b; font-weight: normal; }
+  
+  /* =========================================
+     Tabs 样式
+     ========================================= */
+  .todo-tabs {
+    width: 100%;
+    display: flex;
+    background-color: #fff;
+    border-bottom: 2rpx solid #f1f2f6;
+    padding: 0 40rpx;
+    position: relative;
+    z-index: 10;
+  }
+  
+  .todo-tab {
+    flex: 1;
+    text-align: center;
+    font-size: 28rpx;
+    color: #666;
+    padding: 24rpx 0;
+    position: relative;
+    transition: all 0.3s;
+  }
+  
+  .todo-tab.active {
+    color: #10b981; 
+    font-weight: bold;
+  }
+  
+  .todo-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50rpx;
+    height: 6rpx;
+    background-color: #10b981;
+    border-radius: 6rpx;
+  }
+  
+  .loading-bottom { 
+    text-align: center; 
+    padding: 20rpx 0 40rpx; 
+    font-size: 24rpx; 
+    color: #aaa; 
+  }

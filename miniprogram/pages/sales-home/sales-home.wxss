@@ -128,25 +128,32 @@ page {
   font-family: monospace;
 }
 
-/* 🌟 新增的红点角标样式 */
-.badge {
+/* 今日待办醒目提示角标：只提示“有待办”，不显示数量 */
+.todo-alert-badge {
   position: absolute;
-  top: -12rpx;
-  right: -12rpx;
-  background-color: #ff4d4f; /* 醒目的红色 */
-  color: #ffffff;
-  font-size: 22rpx;
-  padding: 0 10rpx;
-  height: 32rpx;
-  line-height: 32rpx;
-  border-radius: 16rpx;
-  font-weight: bold;
-  border: 4rpx solid #ffffff; /* 白色描边，避免红点和图标粘连 */
-  box-shadow: 0 4rpx 8rpx rgba(255, 77, 79, 0.3);
+  top: -10rpx;
+  right: -10rpx;
+  width: 34rpx;
+  height: 34rpx;
+  border-radius: 50%;
+  background: #ff3b30;
+  border: 4rpx solid #ffffff;
+  box-shadow:
+    0 4rpx 10rpx rgba(255, 59, 48, 0.35),
+    0 0 0 4rpx rgba(255, 59, 48, 0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 10;
-  min-width: 16rpx;
-  text-align: center;
 }
+
+.todo-alert-dot {
+  color: #ffffff;
+  font-size: 24rpx;
+  font-weight: 800;
+  line-height: 1;
+}
+
 
 .study-bg {
   background: #e3d9c6;

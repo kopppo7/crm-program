@@ -18,7 +18,14 @@ Page({
     showGlobalTransModal: false,
     globalTransText: '',
 
-    localizedStatusMap: {} 
+    localizedStatusMap: {},
+    localizedProductMap: {}, 
+    localizedSourceMap: {},
+
+    // 管理员“打回 / 重新处理”提醒
+    showReprocessAlert: false,
+    latestReprocessReason: '',
+    latestReprocessTime: ''
   },
 
   onLoad(options) {
@@ -75,6 +82,29 @@ Page({
     });
     wx.setNavigationBarTitle({ title: lang === 'zh' ? '客户详情' : 'รายละเอียดลูกค้า' });
     this.fetchStatusDict(lang);
+    this.buildLocalDicts(lang); 
+  },
+
+  buildLocalDicts(lang) {
+    const pDict = {
+      'excavator': lang === 'zh' ? '挖掘机' : 'รถขุด',
+      'dumper': lang === 'zh' ? '履带运输车' : 'รถตีนตะขาบขนส่ง',
+      'lawn_mower': lang === 'zh' ? '割草机' : 'เครื่องตัดหญ้า',
+      'harvester': lang === 'zh' ? '收割机' : 'รถเกี่ยวข้าว',
+      'mini_tiller': lang === 'zh' ? '微耕机' : 'เครื่องไถนาขนาดเล็ก',
+      'wood_chipper': lang === 'zh' ? '碎枝机' : 'เครื่องบดกิ่งไม้'
+    };
+    
+    const sDict = {
+      'operate_allocate': lang === 'zh' ? '运营分配' : 'การจัดสรรการดำเนินงาน',
+      'customer_call': lang === 'zh' ? '客户致电' : 'การโทรจากลูกค้า',
+      'independent_develop': lang === 'zh' ? '自主开发' : 'พัฒนาขึ้นเอง'
+    };
+
+    this.setData({
+      localizedProductMap: pDict,
+      localizedSourceMap: sDict
+    });
   },
 
   async fetchStatusDict(lang) {
@@ -116,17 +146,43 @@ Page({
   },
   
   fetchFollowUpLogs() {
-    db.collection('follow_up_logs')
+    return db.collection('follow_up_logs')
       .where({ customer_id: this.data.customerId })
       .orderBy('createTime', 'desc')
       .get()
       .then(res => { 
-        let fetchedLogs = res.data.map(log => {
+        let fetchedLogs = (res.data || []).map(log => {
           if (log.createTime) {
             log.displayTime = this.formatDateTime(log.createTime);
           } else {
             log.displayTime = log.createTimeStr || '';
           }
+
+          // 新版管理员重新处理日志识别：
+          // 管理端会写 action_type = reprocess / follow_type = 管理员重新处理。
+          // 同时兼容 reprocess_opinion 字段，避免仅靠文本关键词误判普通重新分配。
+          log.isReprocess = (
+            log.action_type === 'reprocess' ||
+            log.follow_type === '管理员重新处理' ||
+            log.follow_type === 'ส่งกลับให้ติดตามใหม่' ||
+            !!log.reprocess_opinion
+          );
+
+          if (log.isReprocess) {
+            log.reprocessReason =
+              log.reprocess_opinion ||
+              log.note ||
+              log.content ||
+              (this.data.currentLang === 'zh'
+                ? '管理员要求重新处理该客户'
+                : 'ผู้ดูแลให้ติดตามลูกค้าใหม่');
+          }
+
+          // 防止旧日志没有 screenshot_files 时 WXML 读取 length 报错
+          if (!Array.isArray(log.screenshot_files)) {
+            log.screenshot_files = [];
+          }
+
           return log;
         });
 
@@ -149,11 +205,35 @@ Page({
             follow_type: this.data.currentLang === 'zh' ? '系统自动记录' : 'บันทึกระบบ',
             result_tag: 'pending',
             note: this.data.currentLang === 'zh' ? '线索成功录入并分配给销售' : 'รับข้อมูลลูกค้าและมอบหมายสำเร็จ',
-            screenshot_files: []
+            screenshot_files: [],
+            isReprocess: false
           });
         }
-        this.setData({ logs: fetchedLogs });
+
+        // 因为数据库已经按 createTime desc 排序，所以 find 到的是最近一次管理员打回记录
+        const latestReprocessLog = fetchedLogs.find(log => log.isReprocess);
+
+        this.setData({
+          logs: fetchedLogs,
+          showReprocessAlert: !!latestReprocessLog,
+          latestReprocessReason: latestReprocessLog
+            ? latestReprocessLog.reprocessReason
+            : '',
+          latestReprocessTime: latestReprocessLog
+            ? (latestReprocessLog.displayTime || latestReprocessLog.createTimeStr || '')
+            : ''
+        });
+      })
+      .catch(err => {
+        console.error('获取跟进记录失败', err);
       });
+  },
+
+
+  confirmReprocessAlert() {
+    // 只能通过“我已知晓 / 确认处理”按钮关闭。
+    // 遮罩层本身不绑定关闭事件，避免误触跳过管理员意见。
+    this.setData({ showReprocessAlert: false });
   },
 
   formatDateTime(dateStrOrObj) {
@@ -289,10 +369,16 @@ Page({
     const p = this.data.customer.profile || {};
     let text = '';
     
-    // 🌟 一键复制中加入重点客户字段
     if (this.data.customer.is_key_customer) {
       text += `【⭐ 重点客户】\n原因: ${this.data.customer.key_customer_reason || '未填'}\n\n`;
     }
+
+    // 🌟 修正：将产品品类（大类）和需求机型（具体填写的型号）分离
+    const salesName = this.data.customer.sales_name || this.data.customer.assigned_sales_name || '未分配';
+    const sourceStr = this.data.localizedSourceMap[this.data.customer.customer_source] || this.data.customer.customer_source || '未填';
+    const productCategoryStr = this.data.localizedProductMap[this.data.customer.product_category] || this.data.customer.product_category || '未填';
+
+    text += `【基础档案】\n销售归属: ${salesName}\n客户来源: ${sourceStr}\n产品品类: ${productCategoryStr}\n需求机型: ${this.data.customer.payload || '未填'}\n\n`;
 
     text += `【客户画像】\n需求: ${p.demand || '未填'}\n动机: ${p.motivation || '未填'}\n使用者: ${p.userType || '未填'}\n场景: ${p.scenario || '未填'}\n时间: ${p.timeframe || '未填'}\n预算: ${p.budget || '未填'}\n\n【跟进记录】\n`;
     
@@ -301,7 +387,6 @@ Page({
       text += `[${log.createTimeStr}] 状态:${statusStr}\n内容: ${log.note}\n`;
       if (log.lost_reason) text += `原因: ${log.lost_reason}\n`;
       
-      // 🌟 一键复制中加入成交金额
       if (log.transaction_amount) text += `成交金额: ${log.transaction_amount}\n`;
       
       text += `---\n`;

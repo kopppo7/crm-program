@@ -11,8 +11,8 @@ Page({
     },
     t: {},
     customerId: '',
-    followTypes: [],
-    selectedType: '',
+    
+    // 🌟 移除了 followTypes 和 selectedType
     statusOptions: [],
     selectedStatus: '',
     selectedStatusLabel: '',
@@ -40,18 +40,15 @@ Page({
     this.fetchExistingProfile(); 
   },
 
-  // 🌟 重点客户和画像的“反显”核心逻辑，打开页面自动执行
   async fetchExistingProfile() {
     try {
       const res = await db.collection('customers').doc(this.data.customerId).get();
       const customerData = res.data;
       
-      // 画像反显
       if (customerData.profile) {
         this.setData({ profile: customerData.profile });
       }
       
-      // 重点客户与原因反显
       this.setData({
         isKeyCustomer: customerData.is_key_customer || false,
         keyCustomerReason: customerData.key_customer_reason || ''
@@ -91,10 +88,9 @@ Page({
   initLanguage() {
     const t = i18n.t();
     const lang = i18n.getLang();
-    const types = lang === 'zh' ? ['电话沟通', 'Line', '线下拜访'] : ['โทรศัพท์ (Phone)', 'Line', 'พบปะลูกค้า (Visit)'];
+    
     this.setData({
       t: t,
-      followTypes: types,
       currentLang: lang
     });
     wx.setNavigationBarTitle({
@@ -110,10 +106,14 @@ Page({
         .orderBy('sort', 'asc')
         .get();
 
-      const options = res.data.map(item => ({
-        value: item.value,
-        label: lang === 'zh' ? item.label_zh : item.label_th 
-      }));
+      // 🌟 核心修改 1：过滤掉 'pending'（待处理）状态
+      const options = res.data
+        .filter(item => item.value !== 'pending') 
+        .map(item => ({
+          value: item.value,
+          label: lang === 'zh' ? item.label_zh : item.label_th 
+        }));
+        
       this.setData({ statusOptions: options });
     } catch (e) {
       console.error('获取动态状态字典失败', e);
@@ -167,15 +167,10 @@ Page({
   onAmountInput(e) { this.setData({ transactionAmount: e.detail.value }); },
   onNoteInput(e) { this.setData({ note: e.detail.value }); },
 
-  // 🌟 表单提交前校验逻辑精简
   submitFollowUp() {
     if (!this.data.selectedStatus) return wx.showToast({ title: '请选择跟进结果', icon: 'none' });
     
-    // 🌟 动态免除特定状态的“沟通方式”必填校验
-    const skipTypeCheck = ['Closed Won', 'No Answer', 'Busy'].includes(this.data.selectedStatus);
-    if (!skipTypeCheck && !this.data.selectedType) {
-      return wx.showToast({ title: '请选择沟通方式', icon: 'none' });
-    }
+    // 🌟 核心修改 2：删除了沟通方式的判断逻辑
     
     if (this.data.isKeyCustomer && !this.data.keyCustomerReason.trim()) {
       return wx.showToast({ title: '请填写重点原因', icon: 'none' });
@@ -187,9 +182,8 @@ Page({
     let finalNote = this.data.note;
     let requireImage = false;
 
-    // 🌟 动态处理特定状态下的备注必填逻辑
     if (this.data.selectedStatus === 'Invalid') {
-      finalNote = '标记为无效线索'; // 无效线索隐藏了输入框，由系统自动生成备注
+      finalNote = '标记为无效线索'; 
     } else if (this.data.selectedStatus === 'No Answer') {
       if (this.data.todayNoAnswerCount === 0) {
         finalNote = '今日首次联系，客户未接听 (系统快捷记录)';
@@ -202,34 +196,14 @@ Page({
     }
 
     if (this.data.selectedStatus === 'Closed Won') {
-       requireImage = true; // 成交必须上传支付截图
+       requireImage = true; 
     }
 
     if (requireImage && this.data.tempImgPaths.length === 0) {
       return wx.showToast({ title: '请上传相关凭证或截图', icon: 'none' });
     }
 
-    // 客户画像强制拦截校验逻辑
-    const skipProfileCheck = ['Busy', 'No Answer', 'Invalid', 'Closed Lost'].includes(this.data.selectedStatus);
-    const hasProfileData = Object.values(this.data.profile).some(val => val && val.trim() !== '');
-
-    if (!skipProfileCheck && !hasProfileData) {
-      wx.showModal({
-        title: this.data.currentLang === 'zh' ? '温馨提示' : 'แจ้งเตือน',
-        content: this.data.currentLang === 'zh' ? '您还没有填入客户画像内容，请至少填入一项。' : 'คุณยังไม่ได้กรอกข้อมูลลูกค้า โปรดกรอกอย่างน้อยหนึ่งรายการ',
-        cancelText: this.data.currentLang === 'zh' ? '去填入' : 'ไปกรอก',
-        confirmText: this.data.currentLang === 'zh' ? '依然提交' : 'ยืนยันส่ง',
-        success: (res) => {
-          if (res.confirm) {
-            this.executeSubmit(finalNote);
-          } else {
-            this.setData({ isProfileExpanded: true });
-            wx.pageScrollTo({ scrollTop: 1000, duration: 300 }); 
-          }
-        }
-      });
-      return; 
-    }
+    // 🌟 核心修改 3：移除了所有的客户画像强制填写阻断拦截弹窗逻辑
 
     this.executeSubmit(finalNote);
   },
@@ -270,17 +244,53 @@ Page({
       const custRes = await db.collection('customers').doc(this.data.customerId).get();
       const oldCustomer = custRes.data;
       let currentNoAnswerCount = oldCustomer.no_answer_count || 0;
-      
+
       let finalStatus = this.data.selectedStatus; 
       let finalNextDate = this.data.nextFollowUp;
 
       if (finalStatus === 'No Answer') {
-        currentNoAnswerCount += 1;
-        if (currentNoAnswerCount >= 5) {
+        // ==========================================
+        // 新规则：
+        // 1. 同一天仍然最多拨打 2 次：
+        //    第1次未接 -> 当天继续拨打
+        //    第2次未接 -> 自动安排到第二天
+        // 2. 不再按“累计未接次数”判无效，
+        //    改为累计 7 个不同自然日出现未接后转为无效线索。
+        // ==========================================
+
+        // 查询该客户历史上的未接电话记录
+        const missedRes = await db.collection('follow_up_logs').where({
+          customer_id: this.data.customerId,
+          result_tag: 'No Answer'
+        }).get();
+
+        const missedDaySet = new Set(
+          (missedRes.data || [])
+            .map(item => item.createTimeStr)
+            .filter(Boolean)
+        );
+
+        // 当前这次提交还没有写入日志，因此把今天主动加入统计
+        missedDaySet.add(this.data.today);
+
+        const missedDayCount = missedDaySet.size;
+
+        // no_answer_count 现在保存“累计未接天数”
+        currentNoAnswerCount = missedDayCount;
+
+        if (missedDayCount >= 7) {
           finalStatus = 'Invalid';
           finalNextDate = '';
-          wx.showModal({ title: '系统提示', content: '连续5次未接听，已转为无效线索', showCancel: false });
+
+          wx.showModal({
+            title: '系统提示',
+            content: '累计7天未接听，已转为无效线索',
+            showCancel: false
+          });
         } else {
+          // 保持原来的“当天两次未接”规则：
+          // 0 = 当前是当天第1次未接，仍安排今天；
+          // >=1 = 当前是当天第2次未接，安排第二天。
           if (this.data.todayNoAnswerCount === 0) {
             finalNextDate = this.data.today;
           } else {
@@ -290,11 +300,14 @@ Page({
           }
         }
       } else {
+        // 一旦选择其他跟进结果，连续未接天数清零
         currentNoAnswerCount = 0;
-        if (['Closed Won', 'Closed Lost', 'Invalid'].includes(finalStatus)) finalNextDate = '';
+
+        if (['Closed Won', 'Closed Lost', 'Invalid'].includes(finalStatus)) {
+          finalNextDate = '';
+        }
       }
 
-      // 更新客户主表
       await db.collection('customers').doc(this.data.customerId).update({
         data: {
           status: finalStatus,
@@ -308,7 +321,6 @@ Page({
         }
       });
 
-      // 追加跟进记录细节
       let extendInfo = {};
       if (finalStatus === 'Closed Won') extendInfo.transaction_amount = this.data.transactionAmount;
 
@@ -321,8 +333,8 @@ Page({
           }
         });
       } else {
-        // 特定状态（如已成交、未接、不方便）允许 follow_type 为空
-        const finalFollowType = this.data.selectedType || (this.data.currentLang === 'zh' ? '系统快捷记录' : 'บันทึกระบบ');
+        // 由于没有沟通方式了，这里使用保底的默认值填充
+        const finalFollowType = this.data.currentLang === 'zh' ? '常规跟进' : 'ติดตามทั่วไป';
         await db.collection('follow_up_logs').add({
           data: {
             customer_id: this.data.customerId,
@@ -368,7 +380,6 @@ Page({
     return `${year}-${month}-${day}`;
   },
 
-  onTypeChange(e) { this.setData({ selectedType: this.data.followTypes[e.detail.value] }); },
   onStatusChange(e) {
     const selected = this.data.statusOptions[e.detail.value];
     this.setData({

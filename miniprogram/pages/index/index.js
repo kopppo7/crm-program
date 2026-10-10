@@ -38,9 +38,9 @@ Page({
       },
       success: res => {
         const id = res.result.openid;
+        // const id = 'o6WpV3TGwF_-oQdSnsgo40VhD6iFU'  // aon
         // const id = 'o6WpV3bKAVJMXEn4PQISU1sXSnuQ'; // chey manager
-        // const id = 'o6WpV3bCQ3YezfL7drNZ19N4XAwgs'  // 泰1
-        // const id = 'o6WpV3ZD942ytdWL-5wcwrsDR0wI';  // k
+        // const id = '238cef266a73eeaa012d0ec60975b194';
         this.setData({ tempOpenId: id });
         wx.setStorageSync('myOpenId', id);
         this.checkAuth();

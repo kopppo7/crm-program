@@ -18,7 +18,9 @@
       <view class="card-left">
         <view class="icon-box todo-bg" style="position: relative;">
           <text>📅</text>
-          <view class="badge" wx:if="{{todoCount > 0}}">{{todoCount}}</view>
+          <view class="todo-alert-badge" wx:if="{{hasTodo}}">
+            <text class="todo-alert-dot">!</text>
+          </view>
         </view>
         <view class="card-text">
           <text class="menu-name">{{t.homeTodo}}</text>
@@ -34,6 +36,19 @@
         <view class="card-text">
           <text class="menu-name">{{t.homeAll}} </text>
           <text class="menu-desc">{{currentLang === 'zh' ? '管理名下分配的所有线索' : 'จัดการลูกค้าทั้งหมดของคุณ'}}</text>
+        </view>
+      </view>
+      <view class="card-arrow">></view>
+    </view>
+
+    <!-- 🌟 新增：手动添加客户模块 -->
+    <view class="menu-card {{isDisabled ? 'disabled-card' : ''}}" bindtap="goToAddCustomer" wx:if="{{!isVisitor}}">
+      <view class="card-left">
+        <!-- 这里的背景色采用了内联样式以确保立刻生效，您也可以后续在 WXSS 中提取为统一的 add-bg 类 -->
+        <view class="icon-box" style="background-color: #d1fae5; color: #10b981;">➕</view>
+        <view class="card-text">
+          <text class="menu-name">{{currentLang === 'zh' ? '手动添加客户' : 'เพิ่มลูกค้าด้วยตนเอง'}}</text>
+          <text class="menu-desc">{{currentLang === 'zh' ? '手动录入新的客户线索' : 'ป้อนข้อมูลลูกค้าใหม่ด้วยตนเอง'}}</text>
         </view>
       </view>
       <view class="card-arrow">></view>

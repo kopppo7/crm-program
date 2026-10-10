@@ -43,12 +43,13 @@ Page({
 
   // 提交表单
   async submitForm(e) {
-    const { planCalls, planLine, planVisit, planVideo, planOther } = e.detail.value;
+    // 移除了 planLine
+    const { planCalls, planVisit, planVideo, planOther } = e.detail.value;
 
-    // 必填项校验
-    if (!planCalls || !planLine || !planVisit || !planVideo) {
+    // 必填项校验（减少为3项）
+    if (!planCalls || !planVisit || !planVideo) {
       wx.showToast({ 
-        title: this.data.currentLang === 'zh' ? '请将4个量化目标填写完整' : 'กรุณากรอกเป้าหมายเชิงปริมาณทั้ง 4 ข้อให้ครบถ้วน', 
+        title: this.data.currentLang === 'zh' ? '请将3个量化目标填写完整' : 'กรุณากรอกเป้าหมายเชิงปริมาณทั้ง 3 ข้อให้ครบถ้วน', 
         icon: 'none' 
       });
       return;
@@ -61,7 +62,7 @@ Page({
       const userRes = await db.collection('users').where({ _openid: myOpenId }).get();
       const salesName = userRes.data.length > 0 ? userRes.data[0].name : '未知销售';
 
-      // 写入最新的 5 项指标数据结构
+      // 写入最新的 4 项指标数据结构
       await db.collection('report_weekly').add({
         data: {
           sales_id: myOpenId,
@@ -69,7 +70,6 @@ Page({
           week_start: this.data.weekStart, // 周一日期，方便排序
           week_range: this.data.weekRange, // 直观展示的日期范围
           plan_calls: Number(planCalls) || 0,
-          plan_line: Number(planLine) || 0,
           plan_visit: Number(planVisit) || 0,
           plan_video: Number(planVideo) || 0,
           plan_other: planOther || '',

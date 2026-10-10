@@ -1,6 +1,5 @@
 <view class="container">
   <view class="card">
-    <!-- 🌟 头部与重点客户标记 (自带反显能力) -->
     <view class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
       <text>{{t.fuTitle}}</text>
       <view class="key-customer-toggle" style="display: flex; align-items: center;">
@@ -9,7 +8,6 @@
       </view>
     </view>
 
-    <!-- 🌟 重点原因 (开启重点客户时显示，自带反显) -->
     <view class="form-item column" wx:if="{{isKeyCustomer}}">
       <text class="label" style="color: #f59e0b;">{{currentLang === 'zh' ? '重点原因' : 'เหตุผลสำคัญ'}}</text>
       <input class="input-box" placeholder="{{currentLang === 'zh' ? '请输入将此客户标记为重点的原因...' : 'โปรดระบุเหตุผลที่ให้ความสำคัญ...'}}" value="{{keyCustomerReason}}" bindinput="onKeyReasonInput" />
@@ -23,13 +21,7 @@
       </picker>
     </view>
 
-    <!-- 🌟 沟通方式 (已成交、未接电话、不方便接电话 时隐藏) -->
-    <view class="form-item" wx:if="{{selectedStatus !== 'Closed Won' && selectedStatus !== 'No Answer' && selectedStatus !== 'Busy' && selectedStatus !== 'Invalid'}}">
-      <text class="label">{{t.fuType}}</text>
-      <picker mode="selector" range="{{followTypes}}" bindchange="onTypeChange">
-        <view class="picker-val">{{selectedType || t.fuTypePlaceholder}}</view>
-      </picker>
-    </view>
+    <!-- 🌟 删除了沟通方式的相关视图代码 -->
 
     <!-- 动态字段 (已成交 -> 成交金额) -->
     <view class="form-item column" wx:if="{{selectedStatus === 'Closed Won'}}">
@@ -37,14 +29,12 @@
       <input class="input-box" type="digit" placeholder="{{currentLang === 'zh' ? '请输入最终成交金额' : 'โปรดระบุยอดเงินสุทธิ'}}" value="{{transactionAmount}}" bindinput="onAmountInput" />
     </view>
 
-    <!-- 无效线索防误触提示 -->
     <view class="form-item column" wx:if="{{selectedStatus === 'Invalid'}}" style="padding: 10rpx 0;">
       <view style="background: #fee2e2; padding: 20rpx; border-radius: 8rpx;">
         <text style="color: #ef4444; font-size: 24rpx; line-height: 1.5;">{{currentLang === 'zh' ? '⚠️ 提示：此选项仅适用于【错号、空号】。若为多次未接，系统会自动判定并归类，无需手动选择。' : '⚠️ คำแนะนำ: เลือกเฉพาะเบอร์ผิด/ไม่มีหมายเลขนี้ หากไม่รับสายหลายครั้งระบบจะจัดประเภทให้อัตโนมัติ'}}</text>
       </view>
     </view>
 
-    <!-- 下次跟进时间 (未接电话、流失、成交、无效时均隐藏) -->
     <view class="form-item" wx:if="{{selectedStatus !== 'Closed Won' && selectedStatus !== 'Closed Lost' && selectedStatus !== 'Invalid' && selectedStatus !== 'No Answer'}}">
       <text class="label">{{t.fuNextTime}}</text>
       <picker mode="date" start="{{today}}" value="{{nextFollowUp || today}}" bindchange="onDateChange">
@@ -52,13 +42,11 @@
       </picker>
     </view>
 
-    <!-- 🌟 简述说明 (无效线索时彻底隐藏；“还在考虑”时动态改变 placeholder) -->
     <view class="form-item column" wx:if="{{selectedStatus !== 'Invalid' && (selectedStatus !== 'No Answer' || todayNoAnswerCount >= 1)}}">
       <text class="label">{{t.fuNote}}</text>
       <textarea class="note-input" placeholder="{{selectedStatus === 'Considering' ? (currentLang === 'zh' ? '请记录：客户还在考虑什么？' : 'โปรดระบุ: ลูกค้ายังพิจารณาเรื่องอะไร?') : t.fuNotePlaceholder}}" bindinput="onNoteInput" value="{{note}}"></textarea>
     </view>
 
-    <!-- 🌟 图片上传 (无效线索时彻底隐藏) -->
     <view class="form-item column" wx:if="{{selectedStatus !== 'Invalid' && (selectedStatus !== 'No Answer' || todayNoAnswerCount >= 1)}}">
       <view style="width: 100%;">
         <text wx:if="{{selectedStatus === 'No Answer' && todayNoAnswerCount >= 1}}" style="color: #e74c3c; font-size: 24rpx; font-weight: bold;">* </text>
@@ -85,7 +73,6 @@
       <text class="collapse-arrow {{isProfileExpanded ? 'expanded' : ''}}">></text>
     </view>
 
-    <!-- 🌟 客户画像 (自带反显能力) -->
     <view class="profile-body" wx:if="{{isProfileExpanded}}">
       <view class="p-input-group">
         <text class="p-label">{{t.profileDemand || (currentLang === 'zh' ? '核心需求' : 'ความต้องการ')}}</text>

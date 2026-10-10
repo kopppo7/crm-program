@@ -1,101 +1,105 @@
 <view class="container">
-  <view class="search-bar">
-    <view class="search-box">
-      <icon type="search" size="14" color="#999" />
-      <input 
-        class="search-input" 
-        placeholder="{{t.searchPlaceholder || (currentLang === 'zh' ? '搜索姓名、电话、城市、需求...' : 'ค้นหาชื่อ, เบอร์โทร, เมือง, ความต้องการ...')}}" 
-        bindinput="onSearchInput" 
-        bindconfirm="onSearch" 
-        confirm-type="search" 
-        value="{{searchKeyword}}"
-      />
-      <icon wx:if="{{searchKeyword}}" type="clear" size="14" color="#ccc" bindtap="clearSearch" style="padding: 10px;" />
-    </view>
-  </view>
-  
-  <view class="filter-bar">
-    <picker class="filter-picker" mode="date" bindchange="onDateChange">
-      <view class="filter-item">
-        <text>{{selectedDate ? selectedDate : (currentLang === 'zh' ? '全部时间' : 'ทุกเวลา')}}</text>
-        <text class="arrow" wx:if="{{!selectedDate}}">▾</text>
-        <text class="clear-icon" catchtap="clearDate" wx:if="{{selectedDate}}" style="margin-left:10rpx; color:#ff4d4f; font-size:28rpx; padding: 0 10rpx;">✖</text>
-      </view>
-    </picker>
 
-    <picker class="filter-picker" mode="selector" range="{{salesOptions}}" range-key="name" bindchange="onSalesChange">
-      <view class="filter-item">
-        <text>{{salesOptions[selectedSalesIndex].name}}</text>
-        <text class="arrow">▾</text>
-      </view>
-    </picker>
-    
-    <picker class="filter-picker" mode="selector" range="{{statusFilterOptions}}" range-key="label" bindchange="onStatusFilterChange">
-      <view class="filter-item">
-        <text>{{statusFilterOptions[selectedStatusIndex].label}}</text>
-        <text class="arrow">▾</text>
-      </view>
-    </picker>
+<!-- 专门的全部客户Tabs -->
+<view class="todo-tabs">
+  <view class="todo-tab {{activeTab === 'all_customers' ? 'active' : ''}}" bindtap="switchTab" data-tab="all_customers">
+    {{currentLang === 'zh' ? '全部客户' : 'ลูกค้าทั้งหมด'}}
   </view>
-  
-  <scroll-view class="list-container" scroll-y bindscrolltolower="loadMore">
-    <view wx:if="{{customerList.length === 0 && !isLoading}}" class="empty-state">
-      <text>{{currentLang === 'zh' ? '暂无符合条件的客户数据' : 'ไม่พบข้อมูลลูกค้าที่ตรงกัน'}}</text>
-    </view>
+  <view class="todo-tab {{activeTab === 'key_customers' ? 'active' : ''}}" bindtap="switchTab" data-tab="key_customers">
+    {{currentLang === 'zh' ? '重点客户' : 'ลูกค้าสำคัญ'}}
+  </view>
+</view>
 
-    <view class="customer-card" wx:for="{{customerList}}" wx:key="_id">
+<view class="search-bar">
+  <view class="search-box">
+    <icon type="search" size="14" color="#999" />
+    <input class="search-input" placeholder="{{t.searchPlaceholder || (currentLang === 'zh' ? '搜索姓名、电话、城市...' : 'ค้นหา...')}}" bindinput="onSearchInput" bindconfirm="onSearch" confirm-type="search" value="{{searchKeyword}}"/>
+    <icon wx:if="{{searchKeyword}}" type="clear" size="14" color="#ccc" bindtap="clearSearch" style="padding: 10px;" />
+  </view>
+</view>
+
+<view class="filter-bar" style="display: flex; background: #fff; padding: 20rpx; border-bottom: 1rpx solid #eee;">
+  <picker class="filter-picker" mode="date" bindchange="onDateChange" style="flex: 1; text-align: center; border-right: 1rpx solid #eee;">
+    <view class="filter-item" style="font-size: 26rpx; color: #333;">
+      <text>{{selectedDate ? selectedDate : (currentLang === 'zh' ? '全部时间' : 'ทุกเวลา')}}</text>
+      <text class="arrow" wx:if="{{!selectedDate}}" style="margin-left: 8rpx; color: #999;">▾</text>
+      <text class="clear-icon" catchtap="clearDate" wx:if="{{selectedDate}}" style="margin-left:10rpx; color:#ff4d4f; padding: 0 10rpx;">✖</text>
+    </view>
+  </picker>
+
+  <picker wx:if="{{isAdmin}}" class="filter-picker" mode="selector" range="{{salesOptions}}" range-key="name" bindchange="onSalesChange" style="flex: 1; text-align: center; border-right: 1rpx solid #eee;">
+    <view class="filter-item" style="font-size: 26rpx; color: #333;">
+      <text>{{salesOptions[selectedSalesIndex].name}}</text>
+      <text class="arrow" style="margin-left: 8rpx; color: #999;">▾</text>
+    </view>
+  </picker>
+  
+  <picker class="filter-picker" mode="selector" range="{{statusFilterOptions}}" range-key="label" bindchange="onStatusFilterChange" style="flex: 1; text-align: center;">
+    <view class="filter-item" style="font-size: 26rpx; color: #333;">
+      <text>{{statusFilterOptions[selectedStatusIndex].label}}</text>
+      <text class="arrow" style="margin-left: 8rpx; color: #999;">▾</text>
+    </view>
+  </picker>
+</view>
+
+<scroll-view class="list-container" scroll-y bindscrolltolower="loadMore" style="height: calc(100vh - 280rpx);">
+  <view wx:if="{{customerList.length === 0 && !isLoading}}" class="empty-state">
+    <text>{{currentLang === 'zh' ? '暂无符合条件的客户数据' : 'ไม่พบข้อมูลลูกค้าที่ตรงกัน'}}</text>
+  </view>
+
+  <view class="customer-card" wx:for="{{customerList}}" wx:key="_id">
+    <view class="card-content" bindtap="goToDetail" data-id="{{item._id}}" style="{{item.is_key_customer ? 'border-right: 10rpx solid #f59e0b; background: linear-gradient(to right, #ffffff 60%, #fffbeb 100%);' : ''}}">
       
-      <view class="card-content" bindtap="goToDetail" data-id="{{item._id}}" style="{{item.is_key_customer ? 'border-right: 12rpx solid #f59e0b; background: linear-gradient(to right, #ffffff 60%, #fffbeb 100%);' : ''}}">
-        
-        <view class="header">
-          <text wx:if="{{item.is_key_customer}}">⭐</text>
+      <view class="header">
+        <view class="name-box">
+          <text wx:if="{{item.is_key_customer}}" class="key-star">⭐</text>
           <text class="name">{{item.name}}</text>
-
-          <view class="tags-container">
-            <text wx:if="{{item.isOverdue && item.status !== 'Closed Won' && item.status !== 'Closed Lost' && item.status !== 'Invalid'}}" class="tag tag-overdue">{{currentLang === 'zh' ? '已逾期' : 'เลยกำหนด'}}</text>
-            
-            <text wx:if="{{item.status === 'pending' || !item.status}}" class="tag tag-pending">{{localizedStatusMap['pending'] || (currentLang === 'zh' ? '待处理' : 'รอดำเนินการ')}}</text>
-            
-            <text wx:if="{{item.status === 'No Answer'}}" class="tag tag-warning">{{localizedStatusMap['No Answer'] || (currentLang === 'zh' ? '未接通' : 'ไม่รับสาย')}}</text>
-            
-            <text wx:if="{{item.status === 'Busy'}}" class="tag tag-busy">{{localizedStatusMap['Busy'] || (currentLang === 'zh' ? '忙碌' : 'ไม่สะดวก')}}</text>
-
-            <text wx:if="{{item.status !== 'pending' && item.status !== 'No Answer' && item.status !== 'Busy' && item.status !== 'Closed Won' && item.status !== 'Closed Lost' && item.status !== 'Invalid' && item.status}}" class="tag tag-following">{{localizedStatusMap[item.status] || item.status}}</text>
-            
-            <text wx:if="{{item.status === 'Closed Won' || item.status === 'Closed Lost' || item.status === 'Invalid'}}" class="tag tag-closed">{{localizedStatusMap[item.status] || item.status}}</text>
-          </view>
         </view>
-
-        <view class="info phone-row">
-          <text>📞 </text>
-          <text class="phone-link" catchtap="makePhoneCall" data-phone="{{item.phone}}">{{item.phone}}</text>
-        </view>
-        <view class="info text-gray">
-          {{t.lblPayload}}: {{item.payload || '--'}} |
-          {{t.lblCity}}: {{item.city || '--'}}
-          <block wx:if="{{item.remark}}">
-            | {{t.lblRemark || '备注'}}: {{item.remark}}
-          </block>
-        </view>
-        <view class="info text-gray" wx:if="{{item.timeline}}">{{currentLang === 'zh' ? '预计购买' : 'คาดว่าจะซื้อ'}}: {{item.timeline}}</view>
-        
-        <view class="divider"></view>
-        
-        <view class="footer-info">
-          <text class="sales-name">👤 {{currentLang === 'zh' ? '负责人' : 'ผู้รับผิดชอบ'}}: {{item.sales_name || item.assigned_sales_name || (currentLang === 'zh' ? '未分配' : 'ยังไม่ระบุ')}}</text>
-          
-          <text class="next-time" wx:if="{{item.next_follow_up}}">⏰ {{t.lblNextTime || '约定跟进'}}: {{item.next_follow_up}}</text>
-          <text class="next-time text-gray-time" wx:else>⏰ {{t.lblFirstAssign || '首次分配'}}: {{item.formattedCreateTime || '--'}}</text>
-          
-          <view class="next-time" style="display: block; margin-top: 10rpx; color: #888;" wx:if="{{item.formattedUpdateTime}}">
-            📝 {{currentLang === 'zh' ? '最新记录' : 'บันทึกล่าสุด'}}: {{item.formattedUpdateTime}}
-          </view>
+        <view class="tags-container">
+          <text wx:if="{{item.isOverdue && item.status !== 'Closed Won' && item.status !== 'Closed Lost' && item.status !== 'Invalid'}}" class="tag tag-overdue">{{currentLang === 'zh' ? '已逾期' : 'เลยกำหนด'}}</text>
+          <text wx:if="{{item.status === 'pending' || !item.status}}" class="tag tag-pending">{{localizedStatusMap['pending'] || (currentLang === 'zh' ? '待处理' : 'รอดำเนินการ')}}</text>
+          <text wx:if="{{item.status === 'No Answer'}}" class="tag tag-warning">{{localizedStatusMap['No Answer'] || (currentLang === 'zh' ? '未接通' : 'ไม่รับสาย')}}</text>
+          <text wx:if="{{item.status === 'Busy'}}" class="tag tag-busy">{{localizedStatusMap['Busy'] || (currentLang === 'zh' ? '忙碌' : 'ไม่สะดวก')}}</text>
+          <text wx:if="{{item.status !== 'pending' && item.status !== 'No Answer' && item.status !== 'Busy' && item.status !== 'Closed Won' && item.status !== 'Closed Lost' && item.status !== 'Invalid' && item.status}}" class="tag tag-following">{{localizedStatusMap[item.status] || item.status}}</text>
+          <text wx:if="{{item.status === 'Closed Won' || item.status === 'Closed Lost' || item.status === 'Invalid'}}" class="tag tag-closed">{{localizedStatusMap[item.status] || item.status}}</text>
         </view>
       </view>
-    </view>
 
-    <view class="loading-bottom" wx:if="{{customerList.length > 0}}">
-      <text>{{isLoading ? (t.loading || '加载中...') : (hasMore ? (t.loadMore || '上拉加载更多') : (t.noMore || '— 到底啦 —'))}}</text>
+      <view class="phone-row">
+        <text class="phone-link" catchtap="makePhoneCall" data-phone="{{item.phone}}">📞 {{item.phone}}</text>
+      </view>
+
+      <view class="info text-gray">
+        {{t.lblPayload || '需求机型'}}: {{item.payload && item.payload !== 'none' ? item.payload : '--'}} |
+        {{t.lblCity || '城市'}}: {{item.city && item.city !== 'none' ? item.city : '--'}}
+        <block wx:if="{{item.remark && item.remark !== 'none' && item.remark !== 'undefined'}}">
+          | {{t.lblRemark || '备注'}}: {{item.remark}}
+        </block>
+      </view>
+      
+      <!-- 🌟 极度紧凑的横向折叠底部信息栏 -->
+      <view class="card-bottom-bar">
+        <view class="bottom-item" wx:if="{{isAdmin}}">
+          <text class="bottom-icon">👤</text> 
+          <text>{{item.sales_name || item.assigned_sales_name || (currentLang === 'zh' ? '未分配' : 'ยังไม่ระบุ')}}</text>
+        </view>
+
+        <view class="bottom-item">
+          <text class="bottom-icon">⏰</text> 
+          <text class="{{item.next_follow_up ? 'text-highlight' : ''}}">{{item.next_follow_up || item.formattedCreateTime}}</text>
+        </view>
+
+        <view class="bottom-item" wx:if="{{item.formattedUpdateTime}}">
+          <text class="bottom-icon">📝</text> 
+          <text>{{item.formattedUpdateTime}}</text>
+        </view>
+      </view>
+
     </view>
-  </scroll-view>
+  </view>
+
+  <view class="loading-bottom" wx:if="{{customerList.length > 0}}">
+    <text>{{isLoading ? (t.loading || '加载中...') : (hasMore ? (t.loadMore || '上拉加载更多') : (t.noMore || '— 到底啦 —'))}}</text>
+  </view>
+</scroll-view>
 </view>

@@ -26,18 +26,14 @@
         <input name="planCalls" type="number" placeholder="{{currentLang === 'zh' ? '请输入目标数量...' : 'โปรดระบุจำนวนเป้าหมาย...'}}" placeholder-class="placeholder-style" />
       </view>
 
+      <!-- 已删除新增 Line OA 好友逻辑，后续项自动递进为第 2 项 -->
       <view class="input-group">
-        <text class="label">{{currentLang === 'zh' ? '2. 计划新增 Line OA 好友人数 (人)' : '2. จำนวนเพื่อนใหม่ใน Line OA (คน)'}}</text>
-        <input name="planLine" type="number" placeholder="{{currentLang === 'zh' ? '请输入目标数量...' : 'โปรดระบุจำนวนเป้าหมาย...'}}" placeholder-class="placeholder-style" />
-      </view>
-
-      <view class="input-group">
-        <text class="label">{{currentLang === 'zh' ? '3. 计划邀约到店看车客户数量 (个)' : '3. จำนวนลูกค้าที่เชิญมาดูรถที่ร้าน (คน)'}}</text>
+        <text class="label">{{currentLang === 'zh' ? '2. 计划邀约到店看车客户数量 (个)' : '2. จำนวนลูกค้าที่เชิญมาดูรถที่ร้าน (คน)'}}</text>
         <input name="planVisit" type="number" placeholder="{{currentLang === 'zh' ? '请输入目标数量...' : 'โปรดระบุจำนวนเป้าหมาย...'}}" placeholder-class="placeholder-style" />
       </view>
 
       <view class="input-group">
-        <text class="label">{{currentLang === 'zh' ? '4. 计划邀约视频看车客户数量 (个)' : '4. จำนวนลูกค้าที่เชิญดูรถผ่านวิดีโอ (คน)'}}</text>
+        <text class="label">{{currentLang === 'zh' ? '3. 计划邀约视频看车客户数量 (个)' : '3. จำนวนลูกค้าที่เชิญดูรถผ่านวิดีโอ (คน)'}}</text>
         <input name="planVideo" type="number" placeholder="{{currentLang === 'zh' ? '请输入目标数量...' : 'โปรดระบุจำนวนเป้าหมาย...'}}" placeholder-class="placeholder-style" />
       </view>
     </view>
@@ -45,7 +41,7 @@
     <view class="form-section">
       <view class="section-title">
         <text class="icon">📝</text>
-        <text>{{currentLang === 'zh' ? '5. 其他工作安排' : '5. การจัดการงานอื่นๆ'}}</text>
+        <text>{{currentLang === 'zh' ? '4. 其他工作安排' : '4. การจัดการงานอื่นๆ'}}</text>
       </view>
       <textarea name="planOther" class="form-textarea" placeholder="{{currentLang === 'zh' ? '请填写本周其他的日常或统筹工作安排...' : 'โปรดระบุแผนงานทั่วไปหรือการจัดการงานอื่นๆ ในสัปดาห์นี้...'}}" maxlength="-1"></textarea>
     </view>

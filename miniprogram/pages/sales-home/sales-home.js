@@ -7,13 +7,13 @@ Page({
     isVisitor: true,
     isDisabled: false, // 🌟 极简状态：标记是否被禁用
     t: {},
-    currentLang: 'th', 
-    todoCount: 0       
+    currentLang: 'th',
+    hasTodo: false
   },
 
   onShow() {
     this.initLanguage();
-    this.fetchTodoCount(); 
+    this.fetchTodoAlert(); 
     this.checkUserRole();
   },
 
@@ -55,27 +55,76 @@ Page({
     });
   },
   
-  fetchTodoCount() {
+  async fetchTodoAlert() {
     const myOpenId = wx.getStorageSync('myOpenId');
-    if (!myOpenId) return;
+
+    if (!myOpenId) {
+      this.setData({ hasTodo: false });
+      return;
+    }
 
     const d = new Date();
-    const todayStr = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
+    const todayStr =
+      `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
 
-    db.collection('customers').where(_.and([
-      { assigned_sales_id: myOpenId },
-      { status: _.nin(['Closed Won', 'Closed Lost', 'Invalid']) },
-      _.or([
-        { next_follow_up: _.lte(todayStr) },
-        { next_follow_up: '' },
-        { next_follow_up: null },
-        { next_follow_up: _.exists(false) },
-        { status: 'pending' }
-        // 🌟 核心修复：把下面这行 { status: 'No Answer' } 彻底删掉，让角标严格受制于日期！
-      ])
-    ])).count().then(res => {
-      this.setData({ todoCount: res.total });
-    }).catch(err => console.error('获取待办失败:', err));
+    // 首页只需要知道“有没有待办”，不再统计具体数量。
+    // 使用已建立的组合索引：
+    // assigned_sales_id ↑ + createTime ↓
+    // 一旦找到任意一条符合今日待办条件的数据，就立即停止查询。
+    const PAGE_SIZE = 20;
+    const MAX_SCAN_ROUNDS = 20;
+
+    try {
+      let page = 0;
+      let found = false;
+
+      while (page < MAX_SCAN_ROUNDS && !found) {
+        const res = await db.collection('customers')
+          .where({
+            assigned_sales_id: myOpenId
+          })
+          .orderBy('createTime', 'desc')
+          .skip(page * PAGE_SIZE)
+          .limit(PAGE_SIZE)
+          .get();
+
+        const rows = Array.isArray(res.data) ? res.data : [];
+
+        found = rows.some(item => {
+          // 已终结客户不属于今日待办
+          if (['Closed Won', 'Closed Lost', 'Invalid'].includes(item.status)) {
+            return false;
+          }
+
+          const hasNextFollowUp =
+            item.next_follow_up &&
+            item.next_follow_up !== 'none';
+
+          // 没有日期 -> 立即属于今日待办
+          // 有日期且 <= 今天 -> 属于今日待办
+          return !hasNextFollowUp || item.next_follow_up <= todayStr;
+        });
+
+        if (found || rows.length < PAGE_SIZE) {
+          break;
+        }
+
+        page += 1;
+      }
+
+      this.setData({ hasTodo: found });
+    } catch (err) {
+      console.error('检查今日待办失败:', err);
+
+      // 首页提示失败不应影响其他功能
+      this.setData({ hasTodo: false });
+    }
+  },
+
+  goToAddCustomer() {
+    if (this.data.isDisabled) return;
+    
+    wx.navigateTo({ url: '/package-report/pages/sale-add-customer/sale-add-customer' });
   },
 
   // 🌟 新增：跳转到工作汇报分包的菜单页
@@ -110,6 +159,6 @@ Page({
 
   goToAll() {
     if (this.checkDisabled()) return; // 🌟 拦截
-    wx.navigateTo({ url: '/pages/sales-list/sales-list?type=all' });
+    wx.navigateTo({ url: '/pages/customer-view/customer-view?type=all' });
   }
 });

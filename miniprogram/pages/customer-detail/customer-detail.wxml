@@ -17,27 +17,49 @@
       <text class="label">{{t.cdPhone || '电话'}}:</text>
       <text class="value highlight">{{customer.phone}} 📞</text>
     </view>
+
+    <view class="info-item">
+      <text class="label">{{currentLang === 'zh' ? '销售归属' : 'ผู้รับผิดชอบ'}}:</text>
+      <text class="value">{{customer.sales_name || customer.assigned_sales_name || (currentLang === 'zh' ? '未分配' : 'ยังไม่ระบุ')}}</text>
+    </view>
+
+    <view class="info-item" wx:if="{{customer.customer_source}}">
+      <text class="label">{{currentLang === 'zh' ? '客户来源' : 'แหล่งที่มาของลูกค้า'}}:</text>
+      <text class="value">{{localizedSourceMap[customer.customer_source] || customer.customer_source}}</text>
+    </view>
+
     <view class="info-item">
       <text class="label">{{t.cdCity || '城市'}}:</text>
       <text class="value">{{customer.city}}</text>
     </view>
+
+    <!-- 🌟 新增：产品品类 (大类字典映射) -->
+    <view class="info-item" wx:if="{{customer.product_category}}">
+      <text class="label">{{currentLang === 'zh' ? '产品品类' : 'หมวดหมู่สินค้า'}}:</text>
+      <text class="value">{{localizedProductMap[customer.product_category] || customer.product_category}}</text>
+    </view>
+
+    <!-- 🌟 恢复：需求机型 (原 payload 字段，直接展示客户填写的细分机型) -->
     <view class="info-item" wx:if="{{customer.payload}}">
-      <text class="label">{{t.cdPayload || '需求'}}:</text>
+      <text class="label">{{currentLang === 'zh' ? '需求机型' : 'รุ่นที่ต้องการ'}}:</text>
       <text class="value">{{customer.payload}}</text>
     </view>
+
     <view class="info-item" wx:if="{{customer.timeline}}">
       <text class="label">{{currentLang === 'zh' ? '预计购买' : 'คาดว่าจะซื้อ'}}:</text>
       <text class="value">{{customer.timeline}}</text>
     </view>
+
     <view class="info-item" wx:if="{{customer.remark}}">
       <text class="label">{{currentLang === 'zh' ? '备注' : 'หมายเหตุ'}}:</text>
       <text class="value">{{customer.remark}}</text>
     </view>
+
     <view class="info-item" wx:if="{{customer.next_follow_up}}">
       <text class="label">{{currentLang === 'zh' ? '下次跟进' : 'ติดตามครั้งต่อไป'}}:</text>
       <text class="value" style="color: #ff9800; font-weight: bold;">{{customer.next_follow_up}}</text>
     </view>
-    <!-- 🌟 新增：重点客户高亮反显 -->
+
     <view class="info-item" wx:if="{{customer.is_key_customer}}">
       <text class="label" style="color: red;">{{currentLang === 'zh' ? '⭐ 重点客户' : '⭐ ลูกค้าสำคัญ'}}:</text>
       <text class="value" style="color: #f59e0b; font-weight: bold;">{{customer.key_customer_reason || (currentLang === 'zh' ? '是' : 'ใช่')}}</text>
@@ -86,25 +108,33 @@
   <view class="section-title">{{t.cdTimeline || '跟进时间轴'}}</view>
   <view wx:if="{{logs.length === 0}}" class="empty-logs">{{t.cdEmptyTimeline || '暂无跟进记录'}}</view>
 
-  <view class="timeline-item" wx:for="{{logs}}" wx:key="_id">
+  <view class="timeline-item {{item.isReprocess ? 'timeline-item-reprocess' : ''}}" wx:for="{{logs}}" wx:key="_id">
     <view class="line-box">
-      <view class="dot"></view>
+      <view class="dot {{item.isReprocess ? 'dot-reprocess' : ''}}"></view>
       <view class="line"></view>
     </view>
     
-    <view class="log-content">
+    <view class="log-content {{item.isReprocess ? 'log-content-reprocess' : ''}}">
       <view class="log-header">
         <text class="log-date">{{item.displayTime || item.createTimeStr}}</text>
           <text class="log-type">{{item.follow_type}}</text>
       </view>
       <view class="log-tag">{{localizedStatusMap[item.result_tag] || item.result_tag}}</view>
       
-      <text class="log-note" user-select="true">{{item.note}}</text>
+      <view wx:if="{{item.isReprocess}}" class="reprocess-note-box">
+        <view class="reprocess-note-title">
+          {{currentLang === 'zh' ? '⚠ 管理员打回重新处理' : '⚠ ผู้ดูแลส่งกลับให้ติดตามใหม่'}}
+        </view>
+        <view class="reprocess-note-label">
+          {{currentLang === 'zh' ? '重新处理意见' : 'ความคิดเห็นในการติดตามใหม่'}}
+        </view>
+        <text class="reprocess-note-text" user-select="true">{{item.reprocessReason}}</text>
+      </view>
+
+      <text wx:else class="log-note" user-select="true">{{item.note}}</text>
       
-      <!-- 保留旧数据的战败原因显示 -->
       <view class="log-reason" wx:if="{{item.lost_reason}}">{{currentLang === 'zh' ? '战败原因' : 'เหตุผลที่ปฏิเสธ'}}：<text user-select="true">{{item.lost_reason}}</text></view>
       
-      <!-- 🌟 新增：成交金额展示 -->
       <view class="log-reason" wx:if="{{item.transaction_amount}}">
         <text style="color: #10b981; font-weight: bold;">{{currentLang === 'zh' ? '💰 成交金额' : '💰 ยอดซื้อขาย'}}：{{item.transaction_amount}}</text>
       </view>
@@ -157,6 +187,36 @@
     <button class="btn-cancel" bindtap="closeGlobalTransModal">取消</button>
     <button class="btn-save" bindtap="saveGlobalTranslation">保存档案</button>
   </view>
+</view>
+
+<!-- 管理员打回 / 重新处理强提醒：遮罩不可点击关闭，只能点确认 -->
+<view class="reprocess-alert-mask" wx:if="{{showReprocessAlert}}"></view>
+<view class="reprocess-alert-dialog" wx:if="{{showReprocessAlert}}">
+  <view class="reprocess-alert-icon">!</view>
+  <view class="reprocess-alert-title">
+    {{currentLang === 'zh' ? '客户已被管理员打回' : 'ลูกค้าถูกผู้ดูแลส่งกลับ'}}
+  </view>
+
+  <view class="reprocess-alert-desc">
+    {{currentLang === 'zh'
+      ? '请先查看管理员的重新处理意见，确认后再继续跟进客户。'
+      : 'โปรดอ่านความคิดเห็นของผู้ดูแลก่อนติดตามลูกค้าต่อ'}}
+  </view>
+
+  <view class="reprocess-alert-reason">
+    <view class="reprocess-alert-reason-label">
+      {{currentLang === 'zh' ? '重新处理意见' : 'ความคิดเห็นในการติดตามใหม่'}}
+    </view>
+    <text class="reprocess-alert-reason-text" user-select="true">{{latestReprocessReason}}</text>
+  </view>
+
+  <view class="reprocess-alert-time" wx:if="{{latestReprocessTime}}">
+    {{currentLang === 'zh' ? '打回时间：' : 'เวลาที่ส่งกลับ: '}}{{latestReprocessTime}}
+  </view>
+
+  <button class="reprocess-alert-confirm" bindtap="confirmReprocessAlert">
+    {{currentLang === 'zh' ? '我已知晓，继续处理' : 'รับทราบ และดำเนินการต่อ'}}
+  </button>
 </view>
 
 <view class="footer-action">
